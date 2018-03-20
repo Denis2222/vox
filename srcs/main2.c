@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <scop.h>
+#include <vox.h>
 #include <cmath>
 #include <Shader.hpp>
 

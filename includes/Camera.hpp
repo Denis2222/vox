@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <scop.h> // include glad to get all the required OpenGL headers
+#include <vox.h>
 
 #include <string>
 #include <fstream>

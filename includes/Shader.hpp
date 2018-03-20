@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <scop.h> // include glad to get all the required OpenGL headers
+#include <vox.h>
 
 #include <string>
 #include <fstream>

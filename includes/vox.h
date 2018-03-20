@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SCOP_H
-# define SCOP_H
+#ifndef VOX_H
+# define VOX_H
 
 # ifdef __linux__
 #  define GL3_PROTOTYPES 1
@@ -37,7 +37,7 @@
 # include <pthread.h>
 # define WIDTH 1000
 # define HEIGHT 800
-# define TITLE "Scop = [] => * "
+# define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
 #include <iostream>

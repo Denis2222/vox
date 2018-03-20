@@ -17,7 +17,8 @@ dir_guard=@mkdir -p $(@D)
 
 SRC =  	main.cpp \
 		Shader.cpp \
-		Camera.cpp
+		Camera.cpp \
+		Chunk.cpp
 
 SRCDIR = ./srcs/
 OBJDIR = ./objs

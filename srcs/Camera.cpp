@@ -25,17 +25,30 @@ void 		Camera::ProcessInput()
 
 glm::mat4	Camera::getView(void)
 {
+/*	std::cout << "Front:" << glm::to_string(front) << std::endl;
+	std::cout << "Yaw:" << yaw << std::endl;
+	std::cout << "Pitch:" << pitch << std::endl;*/
 	return (glm::lookAt(position, position + front, up));
 }
-/*
-void 		Camera::mouse_callback(GLFWwindow* window, double xpos, double ypos)
+
+void 		Camera::mouse_callback(double xpos, double ypos)
 {
+	if(firstMouse) // this bool variable is initially set to true
+	{
+	    lastX = xpos;
+	    lastY = ypos;
+	    firstMouse = false;
+	}
+
 	float xoffset = xpos - lastX;
 	float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
 	lastX = xpos;
 	lastY = ypos;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
+
+	yaw   += xoffset;
+    pitch += yoffset;
 
 	if(pitch > 89.0f)
 	  pitch =  89.0f;
@@ -47,4 +60,3 @@ void 		Camera::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	 front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
 	 front = glm::normalize(front);
 }
-*/

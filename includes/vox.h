@@ -35,12 +35,21 @@
 # include <string.h>
 # include <libgen.h>
 # include <pthread.h>
-# define WIDTH 1000
-# define HEIGHT 800
+
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+# define WIDTH 1024
+# define HEIGHT 768
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
 #include <iostream>
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -49,6 +58,7 @@
 
 #include <Shader.hpp>
 #include <Camera.hpp>
+#include <Chunk.hpp>
 
 typedef struct		s_app
 {

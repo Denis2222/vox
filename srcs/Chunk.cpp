@@ -205,114 +205,128 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 	{
 		for (int z = sz; z < size; z++)
 		{
-
 			for (int y = 0; y < size; y++)
 			{
-				if (world[x][y][z] <= 0)
-					break;
-				// UP ///////////////////////////////////////////
-				if (!collide3d(world, x, y, z, 1))
+				std::cout << x<< y << z << std::endl;
+				if (world[x][y][z] > 0)
 				{
-					std::cout << "Show UP" << std::endl;
-					for (int i = 0; i < oneFace; i+=3)
+					// UP ///////////////////////////////////////////
+					if (!collide3d(world, x, y, z, 1))
 					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
+						for (int i = 0; i < oneFace; i+=3)
+						{
+							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							vec.x += (float)x*1;
+							vec.y += (float)y*1;
+							vec.z += (float)z*1;
+							points.push_back(vec);
+						}
+
+						for (int i = 0; i < oneFaceUV; i+=2)
+						{
+							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							//std::cout << "vec: " << glm::to_string(vec) << std::endl;
+							uvs.push_back(vec);
+						}
 					}
 
-					for (int i = 0; i < oneFaceUV; i+=2)
+					// DOWN ////////////////////////////////////////////
+					if (!collide3d(world, x, y, z, 2))
 					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
+						for (int i = oneFace; i < oneFace * 2; i+=3)
+						{
+							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							vec.x += (float)x*1;
+							vec.y += (float)y*1;
+							vec.z += (float)z*1;
+							points.push_back(vec);
+						}
+
+						for (int i = oneFaceUV; i < oneFaceUV * 2; i+=2)
+						{
+							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							uvs.push_back(vec);
+						}
+					}
+
+					//EST //////////////////////////////////////////////
+
+					if (!collide3d(world, x, y, z, 3))
+					{
+						for (int i = oneFace * 2; i < oneFace * 3; i+=3)
+						{
+							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							vec.x += (float)x*1;
+							vec.y += (float)y*1;
+							vec.z += (float)z*1;
+							points.push_back(vec);
+						}
+
+						for (int i = oneFaceUV * 2; i < oneFaceUV * 3; i+=2)
+						{
+							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							//std::cout << "vec: " << glm::to_string(vec) << std::endl;
+							uvs.push_back(vec);
+						}
+					}
+
+					//OUEST ///////////////////////////////////////////////
+					if (!collide3d(world, x, y, z, 4))
+					{
+						for (int i = oneFace * 3; i < oneFace * 4; i+=3)
+						{
+							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							vec.x += (float)x*1;
+							vec.y += (float)y*1;
+							vec.z += (float)z*1;
+							points.push_back(vec);
+						}
+
+						for (int i = oneFaceUV * 3; i < oneFaceUV * 4; i+=2)
+						{
+							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							//std::cout << "vec: " << glm::to_string(vec) << std::endl;
+							uvs.push_back(vec);
+						}
+					}
+
+					//NORD
+					if (!collide3d(world, x, y, z, 5))
+					{
+						for (int i = oneFace * 4; i < oneFace * 5; i+=3)
+						{
+							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							vec.x += (float)x*1;
+							vec.y += (float)y*1;
+							vec.z += (float)z*1;
+							points.push_back(vec);
+						}
+
+						for (int i = oneFaceUV * 4; i < oneFaceUV * 5; i+=2)
+						{
+							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							uvs.push_back(vec);
+						}
+					}
+					//SUD
+					if (!collide3d(world, x, y, z, 6))
+					{
+						for (int i = oneFace * 5; i < oneFace * 6; i+=3)
+						{
+							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							vec.x += (float)x*1;
+							vec.y += (float)y*1;
+							vec.z += (float)z*1;
+							points.push_back(vec);
+						}
+
+						for (int i = oneFaceUV * 5; i < oneFaceUV * 6; i+=2)
+						{
+							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							uvs.push_back(vec);
+						}
 					}
 				}
-
-				// DOWN ////////////////////////////////////////////
-				if (!collide3d(world, x, y, z, 2))
-				{
-					std::cout << "Show DOWN" << std::endl;
-					for (int i = oneFace; i < oneFace * 2; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = oneFaceUV; i < oneFaceUV * 2; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						uvs.push_back(vec);
-					}
-				}
-
-				//EST //////////////////////////////////////////////
-
-				if (!collide3d(world, x, y, z, 3))
-				{
-					for (int i = oneFace * 2; i < oneFace * 3; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = oneFaceUV * 2; i < oneFaceUV * 3; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
-					}
-				}
-
-				//OUEST ///////////////////////////////////////////////
-				if (!collide3d(world, x, y, z, 4))
-				{
-					for (int i = oneFace * 3; i < oneFace * 4; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = oneFaceUV * 3; i < oneFaceUV * 4; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
-					}
-				}
-
-				//NORD
-				//if (!collide(world, x, y, z, 4))
-				//{
-				/*
-					for (int i = oneFace * 3; i < oneFace * 4; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = oneFaceUV * 3; i < oneFaceUV * 4; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
-					}
-				//}*/
-
 			}
 		}
 	}

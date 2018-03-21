@@ -72,7 +72,7 @@ int		init_glfw(t_app *app) {
 	glfwSetInputMode(app->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	//glfwSwapInterval(0);//delete fps limit
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
 	//glDepthFunc(GL_LESS);
 	//glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -146,8 +146,9 @@ int		main(int argc, char **argv)
 	Map map;
 	Chunk chunk;
 
-
-	chunk.customChunk3D(map.world3d, 0,0,3);
+	std::cout << "generate Chunk" << std::endl;
+	chunk.customChunk3D(map.world3d, 0,0,40);
+	std::cout << "generate Chunk over" << std::endl;
 
 	glm::vec3 cubePositions[] = {
 	  glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -279,7 +280,7 @@ int		main(int argc, char **argv)
 		nbFrames++;
 		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1sec ago
 			// printf and reset
-			printf("%f ms/frame  fps:%d triangles:%d \n", 1000.0/double(nbFrames), nbFrames, chunk.getTriangle());
+			printf("%f ms/frame  fps:%d triangles:%d \n", 1000.0/double(nbFrames), nbFrames, chunk.getTriangle() / 3);
 			nbFrames = 0;
 			lastTime += 1.0;
 

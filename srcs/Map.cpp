@@ -30,7 +30,7 @@ for (int x = 0; x < s; x++)
 	for (int z = 0; z < s; z++)
 	{
 
-		int height = (int)(myModule.GetValue ((double)((double)x/20.0f), (double)((double)z/20.0f), 0.50) * 10) + 20;
+		int height = (int)(myModule.GetValue ((double)((double)(x+20)/20.0f), (double)((double)(z+20)/20.0f), 0.50) * 10) + 20;
 		for (int y = 0; y < s; y++)
 		{
 			//std::cout << x << y << z << std::endl;

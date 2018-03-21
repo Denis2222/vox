@@ -2,7 +2,7 @@
 
 Chunk::Chunk(void)
 {
-	int size = 100;
+	int size = 1;
 
 	for (int x = 0; x < size; x++)
 	{
@@ -12,9 +12,9 @@ Chunk::Chunk(void)
 			{
 
 
-				int randy = rand() % 3;
+				int randy = 0;
 
-				for (int i = 0; i < (sizeof(vertex) / 4); i+=3)
+				for (int i = 0; i < ((sizeof(vertex) / 4) / 2); i+=3)
 				{
 					glm::vec3 vec = glm::make_vec3(&vertex[i]);
 					vec.x += (float)x*2;
@@ -23,7 +23,7 @@ Chunk::Chunk(void)
 					points.push_back(vec);
 				}
 
-				for (int i = 0; i < (sizeof(uv) / 4); i+=2)
+				for (int i = 0; i < ((sizeof(uv) / 4) / 2); i+=2)
 				{
 					glm::vec2 vec = glm::make_vec2(&uv[i]);
 					//std::cout << "vec: " << glm::to_string(vec) << std::endl;

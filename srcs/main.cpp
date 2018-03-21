@@ -149,11 +149,11 @@ int		main(int argc, char **argv)
 
 
 	glm::vec3 cubePositions[] = {
-	  glm::vec3( 0.0f,  0.0f,  0.0f)/*,
-	  glm::vec3( 1.0f,  0.0f, 0.0f),
-	  glm::vec3(2.0f, 0.0f, 0.0f),
-	  glm::vec3(3.0f, 0.0f, 0.0f),
-	  glm::vec3( 4.0f, 0.0f, 0.0f)*/
+	  glm::vec3( 0.0f,  0.0f,  0.0f),
+	  glm::vec3( 200.0f,  0.0f, 0.0f),
+	  glm::vec3(0.0f, 0.0f, 200.0f),
+	  glm::vec3(200.0f, 0.0f, 200.0f)
+	  /*,glm::vec3( 4.0f, 0.0f, 0.0f)*/
 	};
 
 
@@ -205,7 +205,7 @@ int		main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
-	unsigned char *data = stbi_load("./assets/grass2.jpg", &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load("./assets/grass.jpg", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -254,7 +254,7 @@ int		main(int argc, char **argv)
 
 
 	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	projection = glm::perspective(glm::radians(45.0f), (float)(4 / 3), 0.1f, 500.0f);
+	projection = glm::perspective(glm::radians(45.0f), (float)(4 / 3), 0.1f, 700.0f);
 	program.setMat4("projection", projection);
 	glm::mat4 view(1.0f);
 

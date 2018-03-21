@@ -35,12 +35,15 @@
 # include <string.h>
 # include <libgen.h>
 # include <pthread.h>
+# include  <libnoise/noise.h>
+
 
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <cmath>
 
 # define WIDTH 1024
@@ -59,6 +62,7 @@
 #include <Shader.hpp>
 #include <Camera.hpp>
 #include <Chunk.hpp>
+#include <Map.hpp>
 
 typedef struct		s_app
 {

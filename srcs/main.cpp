@@ -16,8 +16,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-t_app	*root(void)
-{
+t_app	*root(void) {
 	static t_app	*app = 0;
 
 	if (app == 0)
@@ -31,21 +30,15 @@ t_app	*root(void)
 	}
 	return (app);
 }
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
+void 	framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	std::cout << "Resize to :" << width << " * " << height << std::endl;
     glViewport(0, 0, width, height);
 }
-
-void processInput(t_app *app)
-{
+void 	processInput(t_app *app) {
     if(glfwGetKey(app->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(app->window, true);
 }
-
-int		init_glfw(t_app *app)
-{
+int		init_glfw(t_app *app) {
 	if (!glfwInit())
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
@@ -78,22 +71,27 @@ int		init_glfw(t_app *app)
 	glfwSetInputMode(app->window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(app->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
-	glfwSwapInterval(0);//delete fps limit
-	glEnable(GL_CULL_FACE);
+	//glfwSwapInterval(0);//delete fps limit
+	//glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
 	//glDepthFunc(GL_LESS);
 	//glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 	return (1);
 }
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void 	mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 Camera camera(0);
 
+
+
 int		main(int argc, char **argv)
 {
+
 	t_app	*app;
 
 	app = root();
+
+
 
 	if (!init_glfw(app))
 	{
@@ -101,7 +99,7 @@ int		main(int argc, char **argv)
 		return (-1);
 	}
 	glfwSetCursorPosCallback(app->window, mouse_callback);
-	float vertices[] = {
+	/*float vertices[] = {
 	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 	     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
 	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -143,13 +141,22 @@ int		main(int argc, char **argv)
 	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 	    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
+	};*/
 
+	Map map;
 	Chunk chunk;
 
 
+	chunk.customChunk3D(map.world3d, 0,0,3);
+
 	glm::vec3 cubePositions[] = {
 	  glm::vec3( 0.0f,  0.0f,  0.0f),
+	  glm::vec3( 100.0f,  0.0f, 0.0f),
+	  glm::vec3(0.0f, 0.0f, 100.0f),
+	  glm::vec3(100.0f, 0.0f, 100.0f),
+
+
+	  glm::vec3( 100.0f,  0.0f,  0.0f),
 	  glm::vec3( 200.0f,  0.0f, 0.0f),
 	  glm::vec3(0.0f, 0.0f, 200.0f),
 	  glm::vec3(200.0f, 0.0f, 200.0f)
@@ -205,7 +212,7 @@ int		main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
-	unsigned char *data = stbi_load("./assets/grass.jpg", &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load("./assets/grass2.jpg", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -253,8 +260,8 @@ int		main(int argc, char **argv)
 
 
 
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	projection = glm::perspective(glm::radians(45.0f), (float)(4 / 3), 0.1f, 700.0f);
+	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	projection = glm::perspective(glm::radians(75.0f), (float)(4 / 3), 0.1f, 700.0f);
 	program.setMat4("projection", projection);
 	glm::mat4 view(1.0f);
 
@@ -272,12 +279,12 @@ int		main(int argc, char **argv)
 		nbFrames++;
 		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1sec ago
 			// printf and reset
-			printf("%f ms/frame  %d \n", 1000.0/double(nbFrames), nbFrames);
+			printf("%f ms/frame  fps:%d triangles:%d \n", 1000.0/double(nbFrames), nbFrames, chunk.getTriangle());
 			nbFrames = 0;
 			lastTime += 1.0;
 
-			std::cout << glm::to_string(camera.position) << std::endl;
-			std::cout << glm::to_string(camera.front) << std::endl;
+			//std::cout << glm::to_string(camera.position) << std::endl;
+			//std::cout << glm::to_string(camera.front) << std::endl;
 		}
 
 		processInput(app);

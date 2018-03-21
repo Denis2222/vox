@@ -1,7 +1,7 @@
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
-	DL_INC = -Iexternal/glfw-3.1.2/include -I./includes
-	DL_FLAG = -lGLU -lGL -Lexternal/glfw-3.1.2/src -lglfw3 -lGLEW -lGLU -lGL -lXrandr -ldl -lm -lpthread -lXinerama -lXi -lXxf86vm -lXcursor -lX11
+	DL_INC = -Iexternal/glfw-3.1.2/include -I./includes  -I/usr/include/
+	DL_FLAG = -lnoise -lGLU -lGL -Lexternal/glfw-3.1.2/src -lglfw3 -lGLEW -lGLU -lGL -lXrandr -ldl -lm -lpthread -lXinerama -lXi -lXxf86vm -lXcursor -lX11
 endif
 ifeq ($(UNAME), Darwin)
 	DL_INC = -I./includes -I $(HOME)/.brew/include
@@ -18,7 +18,8 @@ dir_guard=@mkdir -p $(@D)
 SRC =  	main.cpp \
 		Shader.cpp \
 		Camera.cpp \
-		Chunk.cpp
+		Chunk.cpp \
+		Map.cpp
 
 SRCDIR = ./srcs/
 OBJDIR = ./objs

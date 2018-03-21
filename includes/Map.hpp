@@ -17,6 +17,7 @@ class Map
 
 				Map(void);
 		void 	generate();
+		bool	collide3d(int x, int y, int z, int way);
 		//Chunk	getChunk(int x, int y);
 
 };

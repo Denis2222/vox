@@ -23,17 +23,17 @@ void Map::generate(void) {
 	}
 */
 
-int s = 20;
+int s = 100;
 for (int x = 0; x < s; x++)
 {
 
 	for (int z = 0; z < s; z++)
 	{
 
-		int height = (int)(myModule.GetValue ((double)((double)x/20.0f), (double)((double)z/20.0f), 0.50) * 10) + 4;
+		int height = (int)(myModule.GetValue ((double)((double)x/20.0f), (double)((double)z/20.0f), 0.50) * 10) + 20;
 		for (int y = 0; y < s; y++)
 		{
-			std::cout << x << y << z << std::endl;
+			//std::cout << x << y << z << std::endl;
 			if (y <= height)
 				world3d[x][y][z] = 1;
 			else
@@ -47,6 +47,49 @@ for (int x = 0; x < s; x++)
 	//Chunk chunk;
 	//chunk.customChunk3D(world3d, 0,0,10);
 }
+
+bool	Map::collide3d(int x, int y, int z, int way)
+{
+	if (way == 1) // UP
+	{
+		if (this->world3d[x][y + 1][z] > 0)
+			return (true);
+		return (false);
+	}
+
+	if (way == 2) // DOWN
+	{
+		if (this->world3d[x][y - 1][z] > 0)
+			return (true);
+		return (false);
+	}
+
+	if (way == 3) // EST
+	{
+		if (this->world3d[x+1][y][z] > 0)
+			return (true);
+		return (false);
+	}
+	if (way == 4) // OUEST
+	{
+		if (this->world3d[x-1][y][z] > 0)
+			return (true);
+		return (false);
+	}
+	if (way == 5) // NORD
+	{
+		if (this->world3d[x][y][z+1] > 0)
+			return (true);
+		return (false);
+	}
+	if (way == 6) // SUD
+	{
+		if (this->world3d[x][y][z-1] > 0)
+			return (true);
+		return (false);
+	}
+}
+
 /*
 Chunk	Map::getChunk(int x, int y)
 {

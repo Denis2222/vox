@@ -12,7 +12,6 @@
 
 #include <vox.h>
 
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -147,7 +146,7 @@ int		main(int argc, char **argv)
 	Chunk chunk;
 
 	std::cout << "generate Chunk" << std::endl;
-	chunk.customChunk3D(map.world3d, 0,0,40);
+	chunk.customChunk(&map, 0,0,100);
 	std::cout << "generate Chunk over" << std::endl;
 
 	glm::vec3 cubePositions[] = {
@@ -157,10 +156,12 @@ int		main(int argc, char **argv)
 	  glm::vec3(100.0f, 0.0f, 100.0f),
 
 
-	  glm::vec3( 100.0f,  0.0f,  0.0f),
-	  glm::vec3( 200.0f,  0.0f, 0.0f),
-	  glm::vec3(0.0f, 0.0f, 200.0f),
-	  glm::vec3(200.0f, 0.0f, 200.0f)
+	  glm::vec3( 200.0f,  0.0f,  0.0f),
+	  glm::vec3( 200.0f,  0.0f, 100.0f),
+	  glm::vec3(200.0f, 0.0f, 200.0f),
+	  glm::vec3(100.0f, 0.0f, 200.0f),
+	  glm::vec3(0.0f, 0.0f, 200.0f)
+	  //glm::vec3(200.0f, 0.0f, 200.0f)
 	  /*,glm::vec3( 4.0f, 0.0f, 0.0f)*/
 	};
 
@@ -312,7 +313,7 @@ int		main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D, texture2);
 */
 		glBindVertexArray(VAO);
-		for(unsigned int i = 0; i < 1; i++)
+		for(unsigned int i = 0; i < 9; i++)
 		{
 		  glm::mat4 model;
 		  model = glm::translate(model, cubePositions[i]);

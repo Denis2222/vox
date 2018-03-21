@@ -2,6 +2,7 @@
 #define CHUNK_H
 
 #include <vox.h>
+#include <Map.hpp>
 
 class Chunk
 {
@@ -123,14 +124,14 @@ class Chunk
 		float	*getVertices(void);
 		size_t	getSizeVertices(void);
 
+		void 	customChunk(Map *map, int sx, int sz, int size);
 		float	*getUVs(void);
 		size_t	getSizeUVs(void);
 
 		size_t	getTriangle(void);
 
-		void 	customChunk(std::map<int,std::map<int,int>> world , int x, int y, int size);
+		//void 	customChunk(std::map<int,std::map<int,int>> world , int x, int y, int size);
 
-		void 	customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, int sx, int sz, int size);
 };
 
 #endif

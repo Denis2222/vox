@@ -61,8 +61,12 @@
 
 #include <Shader.hpp>
 #include <Camera.hpp>
-#include <Chunk.hpp>
-#include <Map.hpp>
+#include "Map.hpp"
+#include "Chunk.hpp"
+
+//#include <Map.hpp>
+
+
 
 typedef struct		s_app
 {

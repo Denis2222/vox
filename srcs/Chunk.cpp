@@ -39,179 +39,23 @@ Chunk::Chunk(void)
 	nb = this->points.size() * 3;*/
 }
 
-bool	collide(std::map<int,std::map<int,int>> world, int x, int y, int z, int way)
-{
-	if (way == 1) // UP
-	{
-		if (world[x][z] > y + 1)
-		{
-			std::cout << "!!!!!!!!COLLIDE world x y : " << world[x][z] << std::endl;
-			std::cout << " x: " << x << " y: " << y << " z: " << z << std::endl;
-			return (true);
-		}
-		else
-		{
-			std::cout << "world x z : " << world[x][z] << std::endl;
-			std::cout << "kick one poly x: " << x << " y: " << y << " z: " << z << std::endl;
-			return (false);
-		}
-	}
-
-	if (way == 3) // EST
-	{
-		if (world[x+1][z] > y + 1)
-		{
-			return (true);
-		}
-		else
-		{
-			return (false);
-		}
-	}
-}
-
-void 	Chunk::customChunk(std::map<int,std::map<int,int>> world , int sx, int sy, int size){
+void 	Chunk::customChunk(Map *map, int sx, int sz, int size) {
 
 	int oneFace = ((sizeof(vertex) / 4)/6);
 	int oneFaceUV = ((sizeof(uv) / 4)/6);
 
 	for (int x = sx; x < size; x++)
 	{
-		for (int z = sy; z < size; z++)
-		{
-
-			for (int y = 0; y < world[x][z]; y++)
-			{
-				// UP
-				if (!collide(world, x, y, z, 1))
-				{
-					std::cout << "Show UP" << std::endl;
-					for (int i = 0; i < oneFace; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = 0; i < oneFaceUV; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
-					}
-				}
-				//EST
-				if (!collide(world, x, y, z, 3))
-				{
-					for (int i = oneFace * 2; i < oneFace * 3; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = oneFaceUV * 2; i < oneFaceUV * 3; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
-					}
-				}
-
-				//NORD
-				//if (!collide(world, x, y, z, 4))
-				//{
-					for (int i = oneFace * 3; i < oneFace * 4; i+=3)
-					{
-						glm::vec3 vec = glm::make_vec3(&vertex[i]);
-						vec.x += (float)x*1;
-						vec.y += (float)y*1;
-						vec.z += (float)z*1;
-						points.push_back(vec);
-					}
-
-					for (int i = oneFaceUV * 3; i < oneFaceUV * 4; i+=2)
-					{
-						glm::vec2 vec = glm::make_vec2(&uv[i]);
-						//std::cout << "vec: " << glm::to_string(vec) << std::endl;
-						uvs.push_back(vec);
-					}
-				//}
-
-			}
-		}
-	}
-
-
-	sizeuv = this->uvs.size() * sizeof(glm::vec2);
-	sizevert = this->points.size() * sizeof(glm::vec3);
-	nb = this->points.size() * 3;
-
-}
-
-
-bool	collide3d(std::map<int,std::map<int,std::map<int,int>>> world, int x, int y, int z, int way)
-{
-	if (way == 1) // UP
-	{
-		if (world[x][y + 1][z] > 0)
-			return (true);
-		return (false);
-	}
-
-	if (way == 2) // DOWN
-	{
-		if (world[x][y - 1][z] > 0)
-			return (true);
-		return (false);
-	}
-
-	if (way == 3) // EST
-	{
-		if (world[x+1][y][z] > 0)
-			return (true);
-		return (false);
-	}
-	if (way == 4) // OUEST
-	{
-		if (world[x-1][y][z] > 0)
-			return (true);
-		return (false);
-	}
-	if (way == 5) // NORD
-	{
-		if (world[x][y][z+1] > 0)
-			return (true);
-		return (false);
-	}
-	if (way == 6) // SUD
-	{
-		if (world[x][y][z-1] > 0)
-			return (true);
-		return (false);
-	}
-}
-
-void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, int sx, int sz, int size){
-
-	int oneFace = ((sizeof(vertex) / 4)/6);
-	int oneFaceUV = ((sizeof(uv) / 4)/6);
-
-	for (int x = sx; x < size; x++)
-	{
+		std::cout << x << std::endl;
 		for (int z = sz; z < size; z++)
 		{
 			for (int y = 0; y < size; y++)
 			{
-				std::cout << x<< y << z << std::endl;
-				if (world[x][y][z] > 0)
+				//std::cout << x<< y << z << std::endl;
+				if (map->world3d[x][y][z] > 0)
 				{
 					// UP ///////////////////////////////////////////
-					if (!collide3d(world, x, y, z, 1))
+					if (!map->collide3d(x, y, z, 1))
 					{
 						for (int i = 0; i < oneFace; i+=3)
 						{
@@ -231,7 +75,7 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 					}
 
 					// DOWN ////////////////////////////////////////////
-					if (!collide3d(world, x, y, z, 2))
+					if (!map->collide3d(x, y, z, 2))
 					{
 						for (int i = oneFace; i < oneFace * 2; i+=3)
 						{
@@ -251,7 +95,7 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 
 					//EST //////////////////////////////////////////////
 
-					if (!collide3d(world, x, y, z, 3))
+					if (!map->collide3d(x, y, z, 3))
 					{
 						for (int i = oneFace * 2; i < oneFace * 3; i+=3)
 						{
@@ -271,7 +115,7 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 					}
 
 					//OUEST ///////////////////////////////////////////////
-					if (!collide3d(world, x, y, z, 4))
+					if (!map->collide3d(x, y, z, 4))
 					{
 						for (int i = oneFace * 3; i < oneFace * 4; i+=3)
 						{
@@ -291,7 +135,7 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 					}
 
 					//NORD
-					if (!collide3d(world, x, y, z, 5))
+					if (!map->collide3d(x, y, z, 5))
 					{
 						for (int i = oneFace * 4; i < oneFace * 5; i+=3)
 						{
@@ -309,7 +153,7 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 						}
 					}
 					//SUD
-					if (!collide3d(world, x, y, z, 6))
+					if (!map->collide3d(x, y, z, 6))
 					{
 						for (int i = oneFace * 5; i < oneFace * 6; i+=3)
 						{
@@ -335,7 +179,6 @@ void 	Chunk::customChunk3D(std::map<int,std::map<int,std::map<int,int>>> world, 
 	sizeuv = this->uvs.size() * sizeof(glm::vec2);
 	sizevert = this->points.size() * sizeof(glm::vec3);
 	nb = (this->points.size());
-
 }
 
 

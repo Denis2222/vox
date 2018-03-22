@@ -16,6 +16,8 @@ NAME = ft_vox
 dir_guard=@mkdir -p $(@D)
 
 SRC =  	main.cpp \
+		glfw-init.cpp \
+		texture.cpp \
 		Shader.cpp \
 		Camera.cpp \
 		Chunk.cpp \

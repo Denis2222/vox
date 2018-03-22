@@ -57,7 +57,6 @@ const float t1 = 0.332;
 const float t2 = 0.667;
 
 float Chunk::uv[72] = {
-
 //FACE UP
 		t1 , t2,
 		0.0f , 1.0f,
@@ -108,7 +107,6 @@ t2 , t2,
 		t2 , t2,
 		t1 , t2,
 		t2, 0.999f,
-
 	};
 
 Chunk::Chunk(void)
@@ -117,7 +115,7 @@ Chunk::Chunk(void)
 
 }
 
-void 	Chunk::customChunk(int sx, int sz, int sy, int size) {
+void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 	Map map;
 
@@ -127,13 +125,12 @@ void 	Chunk::customChunk(int sx, int sz, int sy, int size) {
 
 	for (int x = sx; x < size + sx; x++)
 	{
-		std::cout << x << std::endl;
 		for (int z = sz; z < size + sz; z++)
 		{
 			for (int y = 0; y < size + sy; y++)
 			{
 				//std::cout << x<< y << z << std::endl;
-				if (map.world3d[x][y][z] > 0)
+				if (map.getWorld(x, y, z) > 1)
 				{
 					// UP ///////////////////////////////////////////
 					if (!map.collide3d(x, y, z, 1))
@@ -251,12 +248,10 @@ void 	Chunk::customChunk(int sx, int sz, int sy, int size) {
 		}
 	}
 
-
 	sizeuv = this->uvs.size() * sizeof(glm::vec2);
 	sizevert = this->points.size() * sizeof(glm::vec3);
 	nb = (this->points.size());
 }
-
 
 float	*Chunk::getVertices(void)
 {
@@ -279,4 +274,37 @@ size_t	Chunk::getSizeUVs(void)
 size_t	Chunk::getTriangle(void)
 {
 	return (nb);
+}
+
+
+unsigned int Chunk::buildVAO(void)
+{
+	/* BUFFER */
+	//this->VAO;
+	//unsigned int VBO[2];
+
+	glGenVertexArrays(1, &this->VAO);
+	glBindVertexArray(this->VAO);
+
+	glGenBuffers(2, &this->VBO_VERT);
+
+	//VBO
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_VERT);
+	glBufferData(GL_ARRAY_BUFFER, this->getSizeVertices(), this->getVertices(), GL_STATIC_DRAW);
+
+	//Positions
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(0);
+
+	//VBO
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_UV);
+	glBufferData(GL_ARRAY_BUFFER, this->getSizeUVs(), this->getUVs(), GL_STATIC_DRAW);
+	//UV texture coords
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(0));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	return (this->VAO);
 }

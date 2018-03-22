@@ -17,13 +17,16 @@
 #  define GL3_PROTOTYPES 1
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
+# include  <libnoise/noise.h>
 #  define OPENGL_VERSION_MAJOR 3
 #  define OPENGL_VERSION_MINOR 3
 # endif
 
+
 # ifdef __APPLE__
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
+# include  <noise/noise.h>
 #  define OPENGL_VERSION_MAJOR 4
 #  define OPENGL_VERSION_MINOR 0
 # endif
@@ -35,8 +38,6 @@
 # include <string.h>
 # include <libgen.h>
 # include <pthread.h>
-# include  <noise/noise.h>
-
 
 #include <string>
 #include <fstream>
@@ -64,12 +65,18 @@
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
-#define CHUNK_SIZE 200
+#define CHUNK_SIZE 32
 
 typedef struct		s_app
 {
 	unsigned int	width;
 	unsigned int	height;
+
+	unsigned int	VAO2;
+	unsigned int	chunk2size;
+
+	bool			test;
+
 	GLFWwindow		*window;
 }					t_app;
 
@@ -78,6 +85,10 @@ t_app				*root(void);
 int					init_glfw(t_app *app);
 GLuint				shader_load(const char *name);
 
+void				mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void				processInput(t_app *app);
+void				framebuffer_size_callback(GLFWwindow* window, int width, int height);
+unsigned int		loadTexture(const char *path);
 
 static int			g_oldstate;
 

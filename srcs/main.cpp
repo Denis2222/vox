@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 14:41:19 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/19 08:15:16 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/22 02:42:14 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,15 @@ int		main(int argc, char **argv)
 	  glm::vec3( 200.0f,  0.0f, 100.0f),
 	  glm::vec3(200.0f, 0.0f, 200.0f),
 	  glm::vec3(100.0f, 0.0f, 200.0f),
-	  glm::vec3(0.0f, 0.0f, 200.0f)
+	  glm::vec3(0.0f, 0.0f, 200.0f),
+	  glm::vec3(0.0f, 0.0f, 300.0f),
+	  glm::vec3(0.0f, 0.0f, 400.0f),
+	  glm::vec3(0.0f, 0.0f, 500.0f),
+	  glm::vec3(0.0f, 0.0f, 600.0f),
+	  glm::vec3(0.0f, 0.0f, 700.0f),
+	  glm::vec3(0.0f, 0.0f, 800.0f),
+	  glm::vec3(0.0f, 0.0f, 900.0f),
+	  glm::vec3(0.0f, 0.0f, 1000.0f)
 	  //glm::vec3(200.0f, 0.0f, 200.0f)
 	  /*,glm::vec3( 4.0f, 0.0f, 0.0f)*/
 	};
@@ -263,7 +271,7 @@ int		main(int argc, char **argv)
 
 
 	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	projection = glm::perspective(glm::radians(75.0f), (float)(4 / 3), 0.1f, 700.0f);
+	projection = glm::perspective(glm::radians(75.0f), ((float)app->width / (float)app->height), 0.1f, 700.0f);
 	program.setMat4("projection", projection);
 	glm::mat4 view(1.0f);
 
@@ -313,7 +321,7 @@ int		main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D, texture2);
 */
 		glBindVertexArray(VAO);
-		for(unsigned int i = 0; i < 9; i++)
+		for(unsigned int i = 0; i < 4; i++)
 		{
 		  glm::mat4 model;
 		  model = glm::translate(model, cubePositions[i]);

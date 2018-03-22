@@ -2,7 +2,8 @@
 #define CHUNK_H
 
 #include <vox.h>
-#include <Map.hpp>
+
+class Map;
 
 class Chunk
 {
@@ -59,6 +60,7 @@ class Chunk
 			-0.5f , -0.5f, -0.5f,
 			-0.5f , 0.5f, -0.5f
 		};
+
 		float uv[72] = {
 
 //FACE UP
@@ -115,23 +117,16 @@ class Chunk
 		size_t sizevert;
 		size_t nb;
 
-		//std::vector<float> uvs;
-
 		std::vector<glm::vec3> points;
 		std::vector<glm::vec2> uvs;
 
 				Chunk(void);
 		float	*getVertices(void);
 		size_t	getSizeVertices(void);
-
 		void 	customChunk(Map *map, int sx, int sz, int size);
 		float	*getUVs(void);
 		size_t	getSizeUVs(void);
-
 		size_t	getTriangle(void);
-
-		//void 	customChunk(std::map<int,std::map<int,int>> world , int x, int y, int size);
-
 };
 
 #endif

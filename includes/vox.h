@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   scop.h                                             :+:      :+:    :+:   */
+/*   vox.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/19 07:12:59 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/22 01:33:46 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 # include <string.h>
 # include <libgen.h>
 # include <pthread.h>
-# include  <libnoise/noise.h>
+# include  <noise/noise.h>
 
 
 #include <string>
@@ -46,8 +46,8 @@
 #include <map>
 #include <cmath>
 
-# define WIDTH 1024
-# define HEIGHT 768
+# define WIDTH 2500
+# define HEIGHT 1500
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
@@ -59,13 +59,10 @@
 
 #include "glm/gtx/string_cast.hpp"
 
+#include "Map.hpp"
 #include <Shader.hpp>
 #include <Camera.hpp>
-#include "Map.hpp"
-#include "Chunk.hpp"
-
-//#include <Map.hpp>
-
+#include <Chunk.hpp>
 
 
 typedef struct		s_app

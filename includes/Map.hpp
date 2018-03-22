@@ -9,9 +9,9 @@ class Map
 {
 	public:
 
-		std::map<int,std::map<int,int>> world;
+		std::map<int,std::map<int,int> > world;
 
-		std::map<int,std::map<int,std::map<int,int>>> world3d;
+		std::map<int,std::map<int,std::map<int,int> > > world3d;
 
 		noise::module::Perlin myModule;
 

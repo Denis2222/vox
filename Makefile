@@ -5,7 +5,7 @@ ifeq ($(UNAME), Linux)
 endif
 ifeq ($(UNAME), Darwin)
 	DL_INC = -I./includes -I $(HOME)/.brew/include
-	DL_FLAG = -L./libft -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread
+	DL_FLAG = -lnoise -L./libft -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread
 endif
 
 GCC_FLAG = -g

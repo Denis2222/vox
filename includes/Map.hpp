@@ -16,7 +16,7 @@ class Map
 		noise::module::Perlin myModule;
 
 				Map(void);
-		void 	generate();
+		void 	generate(int sx, int sy, int sz);
 		bool	collide3d(int x, int y, int z, int way);
 		//Chunk	getChunk(int x, int y);
 

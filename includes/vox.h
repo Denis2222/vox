@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/22 01:33:46 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/22 08:37:30 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@
 #include <map>
 #include <cmath>
 
-# define WIDTH 2500
-# define HEIGHT 1500
+# define WIDTH 800
+# define HEIGHT 600
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
@@ -64,6 +64,7 @@
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
+#define CHUNK_SIZE 200
 
 typedef struct		s_app
 {
@@ -71,8 +72,6 @@ typedef struct		s_app
 	unsigned int	height;
 	GLFWwindow		*window;
 }					t_app;
-
-
 
 t_app				*root(void);
 

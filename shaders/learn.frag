@@ -11,13 +11,14 @@ void main()
 {
 	if (pos.y <= 15)
 	{
-		FragColor = vec4(0,0,1,1);
+		FragColor = vec4(0.1,0.2,0.7,1);
 	}
 	else if (pos.y > 30)
 	{
-			FragColor = vec4(1,1,1,1);
+			FragColor = vec4(0.9,1,0.9,1);
 	} else
-    	FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.1);
+		FragColor = texture(texture1, TexCoord);
+    	//FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.1);
 	//FragColor = vec4(1,0,0,1);
 
 

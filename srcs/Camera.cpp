@@ -10,7 +10,6 @@ void 		Camera::ProcessInput()
 	float currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-
 	float deltaSpeed = speed * deltaTime;
 
 	if (glfwGetKey(root()->window, GLFW_KEY_W) == GLFW_PRESS)
@@ -25,9 +24,6 @@ void 		Camera::ProcessInput()
 
 glm::mat4	Camera::getView(void)
 {
-/*	std::cout << "Front:" << glm::to_string(front) << std::endl;
-	std::cout << "Yaw:" << yaw << std::endl;
-	std::cout << "Pitch:" << pitch << std::endl;*/
 	return (glm::lookAt(position, position + front, up));
 }
 

@@ -5,10 +5,10 @@ ifeq ($(UNAME), Linux)
 endif
 ifeq ($(UNAME), Darwin)
 	DL_INC = -I./includes -I $(HOME)/.brew/include
-	DL_FLAG = -lnoise -L./libft -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread
+	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lnoise -lpthread
 endif
 
-GCC_FLAG = -g
+GCC_FLAG = -g -std=c++11
 CC = g++ $(GCC_FLAG) $(DL_INC)
 
 NAME = ft_vox

@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 14:41:19 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/22 02:42:14 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/22 08:36:52 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ int		init_glfw(t_app *app) {
 	glfwSetInputMode(app->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	//glfwSwapInterval(0);//delete fps limit
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
 	//glDepthFunc(GL_LESS);
 	//glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -98,86 +98,20 @@ int		main(int argc, char **argv)
 		return (-1);
 	}
 	glfwSetCursorPosCallback(app->window, mouse_callback);
-	/*float vertices[] = {
-	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};*/
-
-	Map map;
+	//Map map;
 	Chunk chunk;
-
-	std::cout << "generate Chunk" << std::endl;
-	chunk.customChunk(&map, 0,0,100);
-	std::cout << "generate Chunk over" << std::endl;
+	Chunk chunk2;
+	chunk.customChunk(0,0,0, CHUNK_SIZE);
 
 	glm::vec3 cubePositions[] = {
-	  glm::vec3( 0.0f,  0.0f,  0.0f),
-	  glm::vec3( 100.0f,  0.0f, 0.0f),
-	  glm::vec3(0.0f, 0.0f, 100.0f),
-	  glm::vec3(100.0f, 0.0f, 100.0f),
-
-
-	  glm::vec3( 200.0f,  0.0f,  0.0f),
-	  glm::vec3( 200.0f,  0.0f, 100.0f),
-	  glm::vec3(200.0f, 0.0f, 200.0f),
-	  glm::vec3(100.0f, 0.0f, 200.0f),
-	  glm::vec3(0.0f, 0.0f, 200.0f),
-	  glm::vec3(0.0f, 0.0f, 300.0f),
-	  glm::vec3(0.0f, 0.0f, 400.0f),
-	  glm::vec3(0.0f, 0.0f, 500.0f),
-	  glm::vec3(0.0f, 0.0f, 600.0f),
-	  glm::vec3(0.0f, 0.0f, 700.0f),
-	  glm::vec3(0.0f, 0.0f, 800.0f),
-	  glm::vec3(0.0f, 0.0f, 900.0f),
-	  glm::vec3(0.0f, 0.0f, 1000.0f)
-	  //glm::vec3(200.0f, 0.0f, 200.0f)
-	  /*,glm::vec3( 4.0f, 0.0f, 0.0f)*/
+	  glm::vec3( 0.0f,  0.0f,  0.0f)
 	};
 
 
 	/* BUFFER */
 	unsigned int VAO;
 	unsigned int VBO[2];
-
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -192,23 +126,38 @@ int		main(int argc, char **argv)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
 
-
 	//VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, chunk.getSizeUVs(), chunk.getUVs(), GL_STATIC_DRAW);
 	//UV texture coords
 
-
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(0));
 	glEnableVertexAttribArray(1);
-
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 
+
+
+
+
+
+
+
+
+
+
+
 	Shader program("learn");
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+
+
+
+
+
+
 
 	stbi_set_flip_vertically_on_load(true);
 	/* TEXTURE  0*/
@@ -222,10 +171,10 @@ int		main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
-	unsigned char *data = stbi_load("./assets/grass2.jpg", &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load("./assets/tileset.png", &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -283,18 +232,19 @@ int		main(int argc, char **argv)
 			glfwWindowShouldClose(app->window) == 0)
 	{
 
-
 		// Measure speed
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1sec ago
 			// printf and reset
-			printf("%f ms/frame  fps:%d triangles:%d \n", 1000.0/double(nbFrames), nbFrames, chunk.getTriangle() / 3);
+			printf("%f ms/frame  fps:%d triangles:%zu \n", 1000.0/double(nbFrames), nbFrames, chunk.getTriangle() / 3);
 			nbFrames = 0;
 			lastTime += 1.0;
 
-			//std::cout << glm::to_string(camera.position) << std::endl;
-			//std::cout << glm::to_string(camera.front) << std::endl;
+			std::cout << glm::to_string(camera.position) << std::endl;
+			std::cout << glm::to_string(camera.front) << std::endl;
+			std::cout << "yaw : " << camera.yaw << std::endl;
+			std::cout << "pitch : " << camera.pitch << std::endl;
 		}
 
 		processInput(app);
@@ -310,7 +260,6 @@ int		main(int argc, char **argv)
 
 		glm::mat4 model(1.0f);
 
-
 		program.setMat4("model", model);
 		program.setMat4("view", view);
 
@@ -321,24 +270,17 @@ int		main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D, texture2);
 */
 		glBindVertexArray(VAO);
-		for(unsigned int i = 0; i < 4; i++)
+		for(unsigned int i = 0; i < 1; i++)
 		{
 		  glm::mat4 model;
 		  model = glm::translate(model, cubePositions[i]);
-		  //float angle = 20.0f * i;
-		  //	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(15.0f * cubePositions[i][0]), glm::vec3(0.5f, 1.0f, 0.0f));
 		  program.setMat4("model", model);
-
 		  glDrawArrays(GL_TRIANGLES, 0, chunk.getTriangle());
 		}
-
-
 
 		glfwSwapBuffers(app->window);
 		glfwPollEvents();
 	}
-
-	//sleep(1);
 
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO[0]);

@@ -1,51 +1,27 @@
 #include "Map.hpp"
-
 		Map::Map(void)
 {
 	std::cout << "New map" << std::endl;
-
-	this->generate();
 }
 
-void Map::generate(void) {
+void Map::generate(int sx, int sy, int sz) {
 	std::cout << "Generate" << std::endl;
-	//std::map<int,std::map<int,int>> m;
-/*
-	for (int x = 0; x < 2; x++)
+	int s = CHUNK_SIZE;
+	for (int x = sx; x < s + sx; x++)
 	{
-		for (int y = 0; y < 2; y++)
+		for (int z = sz; z < s + sz; z++)
 		{
-
-		//	world[x][y] = 2;//(int)(myModule.GetValue ((double)((double)x/20.0f), (double)((double)y/20.0f), 0.50) * 10) + 4;
-			if (world[x][y] <=1)
-			 	world[x][y] = 1;
+			int height = (int)(myModule.GetValue ((double)((double)(x+20)/40.0f), (double)((double)(z+20)/40.0f), 0.50) * 10) + 20;
+			for (int y = sy; y < s + sy; y++)
+			{
+				if (y <= height)
+					world3d[x][y][z] = 1;
+				else
+					world3d[x][y][z] = 0;
+			}
 		}
 	}
-*/
-
-int s = 100;
-for (int x = 0; x < s; x++)
-{
-
-	for (int z = 0; z < s; z++)
-	{
-
-		int height = (int)(myModule.GetValue ((double)((double)(x+20)/20.0f), (double)((double)(z+20)/20.0f), 0.50) * 10) + 20;
-		for (int y = 0; y < s; y++)
-		{
-			//std::cout << x << y << z << std::endl;
-			if (y <= height)
-				world3d[x][y][z] = 1;
-			else
-				world3d[x][y][z] = 0;
-		}
-	}
-}
-
 	std::cout << "generate Over" << std::endl;
-
-	//Chunk chunk;
-	//chunk.customChunk3D(world3d, 0,0,10);
 }
 
 bool	Map::collide3d(int x, int y, int z, int way)
@@ -56,14 +32,12 @@ bool	Map::collide3d(int x, int y, int z, int way)
 			return (true);
 		return (false);
 	}
-
 	if (way == 2) // DOWN
 	{
 		if (this->world3d[x][y - 1][z] > 0)
 			return (true);
 		return (false);
 	}
-
 	if (way == 3) // EST
 	{
 		if (this->world3d[x+1][y][z] > 0)
@@ -88,6 +62,7 @@ bool	Map::collide3d(int x, int y, int z, int way)
 			return (true);
 		return (false);
 	}
+	return (false);
 }
 
 /*

@@ -50,6 +50,10 @@
 #include <list>
 #include <cmath>
 
+#include <ctime>
+#include <ratio>
+#include <chrono>
+
 # define WIDTH 1024
 # define HEIGHT 768
 # define TITLE "Voxel"
@@ -63,6 +67,8 @@
 
 #include "glm/gtx/string_cast.hpp"
 
+#include "FastNoise.h"
+
 #include "static.h"
 
 #include "Map.hpp"
@@ -71,7 +77,7 @@
 #include <Chunk.hpp>
 
 #define CHUNK_SIZE 32
-#define FAR 160.0f
+#define FAR 256.0f
 
 typedef struct		s_app
 {
@@ -95,6 +101,8 @@ void				mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void				processInput(t_app *app);
 void				framebuffer_size_callback(GLFWwindow* window, int width, int height);
 unsigned int		loadTexture(const char *path);
+int 				getNoise(int x, int y);
+
 
 static int			g_oldstate;
 

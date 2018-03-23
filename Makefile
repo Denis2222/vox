@@ -8,7 +8,7 @@ ifeq ($(UNAME), Darwin)
 	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lnoise -lpthread
 endif
 
-GCC_FLAG = -g -std=c++11
+GCC_FLAG = -O3 -std=c++11
 CC = g++ $(GCC_FLAG) $(DL_INC)
 
 NAME = ft_vox
@@ -17,6 +17,8 @@ dir_guard=@mkdir -p $(@D)
 
 SRC =  	main.cpp \
 		glfw-init.cpp \
+		FastNoise.cpp \
+		noise.cpp \
 		texture.cpp \
 		Shader.cpp \
 		Camera.cpp \

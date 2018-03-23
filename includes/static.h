@@ -109,4 +109,58 @@ t2 , t2,
 		t1 , t2,
 		t2, 0.999f,
 	};
+
+	static float VCUBEUVWATER[72] = {
+	//FACE UP
+			t1 , 0,
+			0.0f , t1,
+			0.0f , 0,
+
+			t1 , 0,
+			t1 , t1,
+			0.0f , t1,
+	//FACE DOWN
+	t1 , 0,
+	0.0f , t1,
+	0.0f , 0,
+
+	t1 , 0,
+	t1 , t1,
+	0.0f , t1,
+	// FACE EST
+	t1 , 0,
+	0.0f , t1,
+	0.0f , 0,
+
+	t1 , 0,
+	t1 , t1,
+	0.0f , t1,
+
+	//face OUEST
+	t1 , 0,
+	0.0f , t1,
+	0.0f , 0,
+
+	t1 , 0,
+	t1 , t1,
+	0.0f , t1,
+	//FAce nord
+	t1 , 0,
+	0.0f , t1,
+	0.0f , 0,
+
+	t1 , 0,
+	t1 , t1,
+	0.0f , t1,
+	//FACE SUD
+
+	t1 , 0,
+	0.0f , t1,
+	0.0f , 0,
+
+	t1 , 0,
+	t1 , t1,
+	0.0f , t1
+		};
+
 #endif

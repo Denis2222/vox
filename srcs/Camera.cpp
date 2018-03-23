@@ -12,6 +12,9 @@ void 		Camera::ProcessInput()
 	lastFrame = currentFrame;
 	float deltaSpeed = speed * deltaTime;
 
+	if (glfwGetKey(root()->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		deltaSpeed*=5;
+
 	if (glfwGetKey(root()->window, GLFW_KEY_W) == GLFW_PRESS)
         position += deltaSpeed * front;
     if (glfwGetKey(root()->window, GLFW_KEY_S) == GLFW_PRESS)

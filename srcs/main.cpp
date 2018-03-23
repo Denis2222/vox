@@ -59,7 +59,7 @@ int		main(int argc, char **argv)
 
 
 	glm::mat4 projection(1.0f);
-	projection = glm::perspective(glm::radians(75.0f), ((float)app->width / (float)app->height), 0.1f, FAR + 600);
+	projection = glm::perspective(glm::radians(75.0f), ((float)app->width / (float)app->height), 0.1f, FAR);
 	program.setMat4("projection", projection);
 	glm::mat4 view(1.0f);
 
@@ -88,6 +88,16 @@ int		main(int argc, char **argv)
 			lastTime += 0.10f;
 
 			map->updatePosition(camera.position);
+			//std::cout << "Coord cam:" << glm::to_string(camera.position) << " " << camera.yaw << std::endl;
+
+			int x = (floor(camera.position.x / CHUNK_SIZE));
+			int y = (floor(camera.position.y / CHUNK_SIZE));
+			int z = (floor(camera.position.z / CHUNK_SIZE));
+
+
+
+
+			//std::cout << "Coord cam: x:" << x << " y:"<< y << "z:" << z << std::endl;
 			iter = map->chunkList.begin();
 			while(iter != map->chunkList.end())
 			{
@@ -101,7 +111,7 @@ int		main(int argc, char **argv)
 				{
 					c->cleanVAO();
 					c->state = 5;
-					//We are sure it's disale from render
+					//We are sure it's disable from render
 				}
 				iter++;
 			}
@@ -126,13 +136,25 @@ int		main(int argc, char **argv)
 		iter = map->chunkList.begin();
 		while(iter != map->chunkList.end())
 		{
-			c = (*iter);
-			//
+			c = (*iter);/*
+			if (((int)(abs(camera.yaw)))%180 > 80.0f && ((int)abs(camera.yaw))%120 < 140.0f && c->worldCoord.x < camera.position.x)
+			{
+				goto NEXT;
+				std::cout << "SKIP" << std::endl;
+			}
+
+			if (((int)(abs(camera.yaw)))%180 < 42.0f && ((int)abs(camera.yaw))%180 > 140.0f && c->worldCoord.x > camera.position.x)
+			{
+				goto NEXT;
+				std::cout << "SKIP" << std::endl;
+			}*/
+
 			if (c->state == 3)
 			{
 				glBindVertexArray(c->VAO);
 				glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
 			}
+			NEXT:
 			iter++;
 		}
 

@@ -27,24 +27,33 @@ class Chunk
 		std::vector<glm::vec3> points;
 		std::vector<glm::vec2> uvs;
 
-		noise::module::Perlin myModule;
+		//noise::module::Perlin myModule;
 
 		std::map<int,std::map<int,std::map<int,int> > > world;
+		int minheight = 256;
+		int maxheight = 0;
 
 				Chunk(void);
 				Chunk(int x, int y, int z);
 				~Chunk(void);
 		void	cleanVAO(void);
-		float	*getVertices(void);
-		size_t	getSizeVertices(void);
+
 		void	generate(void);
+
 		void 	build(void);
-		float	*getUVs(void);
-		size_t	getSizeUVs(void);
-		size_t	getTriangle(void);
+		void	buildFace(int n, int x, int y, int z, int val);
 
 		bool	collide(int x, int y, int z, int way);
 		int		getWorld(int x, int y, int z);
+
+
+		float	*getVertices(void);
+		size_t	getSizeVertices(void);
+		float	*getUVs(void);
+		size_t	getSizeUVs(void);
+
+		size_t	getTriangle(void);
+
 		unsigned int buildVAO();
 };
 

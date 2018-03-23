@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 14:41:19 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/23 08:22:04 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/23 15:34:52 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int		main(int argc, char **argv)
 	//chunk.buildVAO();
 
 	Shader program("learn");
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.527f, 0.804f, 0.918f, 1.0f);
 
 	unsigned int texture = loadTexture("./assets/tileset.png");
 
@@ -59,7 +59,7 @@ int		main(int argc, char **argv)
 
 
 	glm::mat4 projection(1.0f);
-	projection = glm::perspective(glm::radians(75.0f), ((float)app->width / (float)app->height), 0.1f, 700.0f);
+	projection = glm::perspective(glm::radians(75.0f), ((float)app->width / (float)app->height), 0.1f, FAR + 600);
 	program.setMat4("projection", projection);
 	glm::mat4 view(1.0f);
 
@@ -81,33 +81,30 @@ int		main(int argc, char **argv)
 		// Measure speed
 		double currentTime = glfwGetTime();
 		nbFrames++;
-		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1sec ago
+		if ( currentTime - lastTime >= 0.10 ){ // If last prinf() was more than 1sec ago
 			// printf and reset
-			printf("%f ms/frame  fps:%d \n", 1000.0/double(nbFrames), nbFrames);
+			printf("%f ms/frame  fps:%d chunks:%lu\n", 100.0/double(nbFrames), nbFrames * 10, map->chunkList.size());
 			nbFrames = 0;
-			lastTime += 1.0;
-			//std::cout << glm::to_string(camera.position) << std::endl;
-			//std::cout << glm::to_string(camera.front) << std::endl;
-			//std::cout << "yaw : " << camera.yaw << std::endl;
-			//std::cout << "pitch : " << camera.pitch << std::endl;
-			//std::cout << "app->test" <<  app->test << std::endl;
-			map->updatePosition(camera.position);
+			lastTime += 0.10f;
 
+			map->updatePosition(camera.position);
 			iter = map->chunkList.begin();
 			while(iter != map->chunkList.end())
 			{
 				c = (*iter);
-				//
 				if (c->state == 2)
 				{
 					c->buildVAO();
-					std::cout << "build VAO Done;" << std::endl;
-					//break;
 					c->state = 3;
+				}
+				if (c->state == 4)
+				{
+					c->cleanVAO();
+					c->state = 5;
+					//We are sure it's disale from render
 				}
 				iter++;
 			}
-
 
 		}
 
@@ -118,7 +115,6 @@ int		main(int argc, char **argv)
 		processInput(app);
 		camera.ProcessInput();
 
-
 		glm::mat4 model(1.0f);
 
 		program.setMat4("model", model);
@@ -127,7 +123,6 @@ int		main(int argc, char **argv)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-
 		iter = map->chunkList.begin();
 		while(iter != map->chunkList.end())
 		{
@@ -135,8 +130,8 @@ int		main(int argc, char **argv)
 			//
 			if (c->state == 3)
 			{
-					glBindVertexArray(c->VAO);
-					glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
+				glBindVertexArray(c->VAO);
+				glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
 			}
 			iter++;
 		}

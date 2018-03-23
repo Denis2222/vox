@@ -8,9 +8,18 @@
 
 		Chunk::Chunk(int x, int y, int z)
 		{
-			std::cout << "New Chunk : " << x << y << z << std::endl;
+			std::cout << "New Chunk : " << x << " " << y << " " << z << std::endl;
 			this->localCoord = glm::vec3(x, y, z);
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
+			this->state = 0;
+		}
+
+		Chunk::~Chunk(void)
+		{
+			std::cout << "Delete Chunk : " << this->worldCoord.x << " " << this->worldCoord.y << " " << this->worldCoord.z << std::endl;
+			//delete points;
+			//delete uvs;
+			//delete world;
 		}
 
 void	Chunk::generate(void)
@@ -24,13 +33,13 @@ void	Chunk::generate(void)
 	{
 		for (int z = sz; z < CHUNK_SIZE + sz; z++)
 		{
-			int height = (int)(noiseModule.GetValue ((double)((double)(x+20)/40.0f), (double)((double)(z+20)/40.0f), 0.40) * 10) + 20;
+			int height = (int)(myModule.GetValue ((double)((double)(x+20)/300.0f), (double)((double)(z+20)/300.0f), 1) * 50) + 50;
 			for (int y = sy; y < CHUNK_SIZE + sy; y++)
 			{
 				if (y <= height)
 					world[x][y][z] = 2;
-				else
-					world[x][y][z] = 1;
+				//else
+					//world[x][y][z] = 1;
 			}
 		}
 	}
@@ -255,6 +264,13 @@ unsigned int Chunk::buildVAO(void)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	return (this->VAO);
+}
+
+void	Chunk::cleanVAO(void)
+{
+	glDeleteVertexArrays(1, &this->VAO);
+	glDeleteBuffers(1, &this->VBO_VERT);
+	glDeleteBuffers(1, &this->VBO_UV);
 }
 
 float	*Chunk::getVertices(void)

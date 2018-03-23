@@ -8,8 +8,8 @@ class Map;
 class Chunk
 {
 	public:
-		static float vertex[108];
-		static	float uv[72];
+	//	static float vertex[108];
+	//	static	float uv[72];
 
 		int state = 0;
 
@@ -27,11 +27,14 @@ class Chunk
 		std::vector<glm::vec3> points;
 		std::vector<glm::vec2> uvs;
 
+		noise::module::Perlin myModule;
+
 		std::map<int,std::map<int,std::map<int,int> > > world;
-		noise::module::Perlin noiseModule;
 
 				Chunk(void);
 				Chunk(int x, int y, int z);
+				~Chunk(void);
+		void	cleanVAO(void);
 		float	*getVertices(void);
 		size_t	getSizeVertices(void);
 		void	generate(void);

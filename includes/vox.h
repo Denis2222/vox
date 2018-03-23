@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/23 08:19:30 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/23 15:59:41 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 #include <list>
 #include <cmath>
 
-# define WIDTH 1500
-# define HEIGHT 1000
+# define WIDTH 1024
+# define HEIGHT 768
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
@@ -71,6 +71,7 @@
 #include <Chunk.hpp>
 
 #define CHUNK_SIZE 32
+#define FAR 160.0f
 
 typedef struct		s_app
 {

@@ -38,19 +38,22 @@ class Map
 		std::thread tg;
 		std::thread tb;
 
+		glm::vec3 position;
+
 		std::mutex world3d_mutex;
 
 		noise::module::Perlin myModule;
 
 				Map(void);
-
+				~Map(void);
 		void 	generate(int sx, int sy, int sz);
 
 		void	setInfos(int x, int y, int z, Map::INFO info);
 		void	setChunkPtr(int x, int y, int z, Chunk *chunk);
 		void	updatePosition(glm::vec3 position);
-		void	threadGenerateChunk(Chunk *chunk);
 
+
+		void 	updateChunkToLoad(void);
 		void 	threadJobGenerate(void);
 		void 	threadJobBuild(void);
 		//Chunk	getChunk(int x, int y);

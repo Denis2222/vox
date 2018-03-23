@@ -109,11 +109,17 @@ t2 , t2,
 		t2, 0.999f,
 	};
 
-Chunk::Chunk(void)
-{
+		Chunk::Chunk(void)
+		{
 
 
-}
+		}
+
+		Chunk::Chunk(int x, int y, int z)
+		{
+			std::cout << "New Chunk : " << x << y << z << std::endl;
+			this->localCoord = glm::vec3(x, y, z);
+		}
 
 void 	Chunk::build(int sx, int sz, int sy, int size) {
 

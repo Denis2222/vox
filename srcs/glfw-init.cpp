@@ -34,7 +34,7 @@ int		init_glfw(t_app *app) {
 	glfwSetInputMode(app->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	//glfwSwapInterval(0);//delete fps limit
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
 	//glDepthFunc(GL_LESS);
 	//glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -63,17 +63,12 @@ void 	processInput(t_app *app) {
 
 		Chunk chunk2;
 
-		chunk2.build(50,0,0, CHUNK_SIZE);
+		chunk2.build(CHUNK_SIZE,0,0, CHUNK_SIZE);
 		app->VAO2 = chunk2.buildVAO();
 
 		app->chunk2size = chunk2.getTriangle();
 	}
 
-	if(glfwGetKey(app->window, GLFW_KEY_T) == GLFW_PRESS)
-	{
-		std::cout << "WTF" << std::endl;
-		app->test = 2;
-	}
 }
 
 

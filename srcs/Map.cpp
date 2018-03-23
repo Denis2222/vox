@@ -6,6 +6,7 @@
 
 void 	Map::generate(int sx, int sy, int sz) {
 	//std::cout << "Generate" << std::endl;
+	world3d_mutex.lock();
 	int s = CHUNK_SIZE;
 	for (int x = sx; x < s + sx; x++)
 	{
@@ -21,7 +22,17 @@ void 	Map::generate(int sx, int sy, int sz) {
 			}
 		}
 	}
-	this->setInfos(floor(sx / 50), floor(sy / 50), floor(sz / 50), INFO::GENERATE);
+
+	int localx, localy, localz;
+
+	localx = floor(sx / CHUNK_SIZE);
+	localy = floor(sy / CHUNK_SIZE);
+	localz = floor(sz / CHUNK_SIZE);
+
+	this->setInfos(localx, localy, localz, INFO::GENERATE);
+	Chunk *chunk = new Chunk(localx, localy, localz);
+	chunkList.push_back(chunk);
+	world3d_mutex.unlock();
 	//std::cout << "generate Over" << std::endl;
 }
 
@@ -75,8 +86,54 @@ void 	Map::setInfos(int x, int y, int z, Map::INFO info)
 	this->infos[x][y][z] = info;
 }
 
+static void 	thradBuildChunk(Chunk *c)
+{
+	std::cout << "Thread launch  DO SOMETHING " << std::endl;
+
+	c->state = 1;
+	return ;
+}
+
+static void 	thradGenerateMap(Map *map, int x, int y, int z)
+{
+	map->generate(x, y, z);
+}
+
 void 	Map::updatePosition(glm::vec3 position)
 {
+
+	std::cout << "NB Chunk in list " << this->chunkList.size() << std::endl;
+
+	std::list<Chunk*>::iterator iter;
+
+	iter = this->chunkList.begin();
+
+	//std::cout << "thread id :" << this->t1.get_id() << " thread::id "  << std::endl;
+
+	printf("====> %d <===", this->t1.get_id());
+	Chunk *c;
+
+	//if (t1.joignagle())
+	/*
+	while(iter != this->chunkList.end())
+	{
+		c = (*iter);
+	    //
+		if (c->state == 0)
+		{
+			//Launch thread
+			threadReady = 0;
+			std::cout << "launch thread" << std::endl;
+			std::thread t1(thradBuildChunk, c);
+			std::cout << "Launch " << glm::to_string(c->localCoord) << std::endl;
+			t1.detach();
+		}
+
+		iter++;
+	}*/
+
+	/*if (threadReady == 0)
+		return ;*/
 //	std::cout << "Map::updatePosition" << glm::to_string(position)<< std::endl;
 
 
@@ -99,16 +156,21 @@ void 	Map::updatePosition(glm::vec3 position)
 			for (int Z = -1; Z < 2; Z++)
 			{
 
-				if (this->world3d[(X+x) * CHUNK_SIZE][(Y+y) * CHUNK_SIZE][(Z+z) * CHUNK_SIZE] > 0)
+				if (this->infos[(X+x)][(Y+y)][(Z+z)] < INFO::START)
 				{
 					//std::cout << "HERE => " << X+x << " " << Y+y << " " << Z+z << " Value = " << this->world3d[X+x][Y+y][Z+z] << std::endl;
 				//	std::cout << "deja";
 				}
 				else
 				{
+					this->setInfos(X+x ,Y+y ,Z+z, INFO::START);
 					//TODO Add to worker list
-					//std::cout << "Gen : " << (X+x) * CHUNK_SIZE << " " << (Y+y) * CHUNK_SIZE << " " << (Z+z) * CHUNK_SIZE << std::endl;
-					this->generate((X+x) * CHUNK_SIZE, (Y+y) * CHUNK_SIZE, (Z+z) * CHUNK_SIZE);
+
+					std::thread t1(thradGenerateMap, this, (X+x) * CHUNK_SIZE, (Y+y) * CHUNK_SIZE, (Z+z) * CHUNK_SIZE);
+					std::cout << "Gen launch thread : " << (X+x) * CHUNK_SIZE << " " << (Y+y) * CHUNK_SIZE << " " << (Z+z) * CHUNK_SIZE << std::endl;
+
+					t1.detach();
+
 				}
 			}
 		}

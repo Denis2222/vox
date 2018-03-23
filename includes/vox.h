@@ -44,7 +44,10 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <thread>
+#include <mutex>
 #include <map>
+#include <list>
 #include <cmath>
 
 # define WIDTH 800
@@ -65,7 +68,7 @@
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
-#define CHUNK_SIZE 32
+#define CHUNK_SIZE 100
 
 typedef struct		s_app
 {

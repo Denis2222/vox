@@ -28,6 +28,7 @@ class Chunk
 		std::vector<glm::vec2> uvs;
 
 				Chunk(void);
+				Chunk(int x, int y, int z);
 		float	*getVertices(void);
 		size_t	getSizeVertices(void);
 		void 	build(int sx, int sy, int sz,int size);

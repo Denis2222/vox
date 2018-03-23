@@ -1,114 +1,5 @@
 #include "Chunk.hpp"
 
-float Chunk::vertex[108] = {
-
-//FACE UP
-	-0.5f , 0.5f, -0.5f,
-	0.5f , 0.5f, 0.5f,
-	0.5f , 0.5f, -0.5f,
-
-	-0.5f , 0.5f, -0.5f,
-	-0.5f , 0.5f, 0.5f,
-	0.5f , 0.5f, 0.5f,
-//FACE DOWN
-	0.5f , -0.5f, 0.5f,
-	-0.5f , -0.5f, -0.5f,
-	0.5f , -0.5f, -0.5f,
-
-	0.5f , -0.5f, 0.5f,
-	-0.5f , -0.5f, 0.5f,
-	-0.5f , -0.5f, -0.5f,
-// FACE EST
-	0.5f , 0.5f, -0.5f,
-	0.5f , -0.5f, 0.5f,
-	0.5f , -0.5f, -0.5f,
-
-	0.5f , 0.5f, -0.5f,
-	0.5f , 0.5f, 0.5f,
-	0.5f , -0.5f, 0.5f,
-
-//face ouest
-	-0.5f , -0.5f, 0.5f,
-	-0.5f , 0.5f, -0.5f,
-	-0.5f , -0.5f, -0.5f,
-
-	-0.5f , -0.5f, 0.5f,
-	-0.5f , 0.5f, 0.5f,
-	-0.5f , 0.5f, -0.5f,
-//FACE NORD
-	0.5f , 0.5f, 0.5f,
-	-0.5f , -0.5f, 0.5f,
-	0.5f , -0.5f, 0.5f,
-
-	0.5f , 0.5f, 0.5f,
-	-0.5f , 0.5f, 0.5f,
-	-0.5f , -0.5f, 0.5f,
-//FACE SUD
-	0.5f , -0.5f, -0.5f,
-	-0.5f , 0.5f, -0.5f,
-	0.5f , 0.5f, -0.5f,
-
-	0.5f , -0.5f, -0.5f,
-	-0.5f , -0.5f, -0.5f,
-	-0.5f , 0.5f, -0.5f
-};
-
-const float t1 = 0.332;
-const float t2 = 0.667;
-
-float Chunk::uv[72] = {
-//FACE UP
-		t1 , t2,
-		0.0f , 1.0f,
-		0.0f , t2,
-
-		t1 , t2,
-		t1 , 1.0f,
-		0.0f , 1.0f,
-//FACE DOWN
-		1.0f , 0.0f,
-		0.0f , 1.0f,
-		0.0f , 0.0f,
-
-		1.0f , 0.0f,
-		1.0f , 1.0f,
-		0.0f , 1.0f,
-// FACE EST
-		t1 , 1.0f,
-		t2 , t2,
-		t1 , t2,
-
-		t1 , 1.0f,
-		t2 , 1.0f,
-		t2 , t2,
-
-//face OUEST
-t2 , t2,
-		t1 , 1.0f,
-		t1 , t2,
-
-		t2 , t2,
-		t1 , 1.0f,
-		t2 , 1.0f,
-//FAce nord
-		t1 , 1.0f,
-		t2 , t2,
-		t1 , t2,
-
-		t1 , 1.0f,
-		t2 , 1.0f,
-		t2 , t2,
-//FACE SUD
-
-		t2 , t2,
-		t2 , 0.999f,
-		t1 , 0.999f,
-
-		t2 , t2,
-		t1 , t2,
-		t2, 0.999f,
-	};
-
 		Chunk::Chunk(void)
 		{
 
@@ -119,31 +10,104 @@ t2 , t2,
 		{
 			std::cout << "New Chunk : " << x << y << z << std::endl;
 			this->localCoord = glm::vec3(x, y, z);
+			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 		}
 
-void 	Chunk::build(int sx, int sz, int sy, int size) {
+void	Chunk::generate(void)
+{
+	int sx, sy, sz;
+	sx = this->worldCoord.x;
+	sy = this->worldCoord.y;
+	sz = this->worldCoord.z;
 
-	Map map;
-
-	map.generate(sx, sy, sz);
-	int oneFace = ((sizeof(vertex) / 4)/6);
-	int oneFaceUV = ((sizeof(uv) / 4)/6);
-
-	for (int x = sx; x < size + sx; x++)
+	for (int x = sx; x < CHUNK_SIZE + sx; x++)
 	{
-		for (int z = sz; z < size + sz; z++)
+		for (int z = sz; z < CHUNK_SIZE + sz; z++)
 		{
-			for (int y = 0; y < size + sy; y++)
+			int height = (int)(noiseModule.GetValue ((double)((double)(x+20)/40.0f), (double)((double)(z+20)/40.0f), 0.40) * 10) + 20;
+			for (int y = sy; y < CHUNK_SIZE + sy; y++)
+			{
+				if (y <= height)
+					world[x][y][z] = 2;
+				else
+					world[x][y][z] = 1;
+			}
+		}
+	}
+	this->state = 1;
+}
+
+bool	Chunk::collide(int x, int y, int z, int way)
+{
+	if (way == 1) // UP
+	{
+		if (this->world[x][y + 1][z] > 1)
+			return (true);
+		return (false);
+	}
+	if (way == 2) // DOWN
+	{
+		if (this->world[x][y - 1][z] > 1)
+			return (true);
+		return (false);
+	}
+	if (way == 3) // EST
+	{
+		if (this->world[x+1][y][z] > 1)
+			return (true);
+		return (false);
+	}
+	if (way == 4) // OUEST
+	{
+		if (this->world[x-1][y][z] > 1)
+			return (true);
+		return (false);
+	}
+	if (way == 5) // NORD
+	{
+		if (this->world[x][y][z+1] > 1)
+			return (true);
+		return (false);
+	}
+	if (way == 6) // SUD
+	{
+		if (this->world[x][y][z-1] > 1)
+			return (true);
+		return (false);
+	}
+	return (false);
+}
+
+int		Chunk::getWorld(int x, int y, int z)
+{
+	return (this->world[x][y][z]);
+}
+
+void 	Chunk::build(void)
+{
+	int sx, sy, sz;
+	sx = this->worldCoord.x;
+	sy = this->worldCoord.y;
+	sz = this->worldCoord.z;
+	//this->generate(sx, sy, sz);
+	int oneFace = ((sizeof(VCUBE) / 4)/6);
+	int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6);
+
+	for (int x = sx; x < CHUNK_SIZE + sx; x++)
+	{
+		for (int z = sz; z < CHUNK_SIZE + sz; z++)
+		{
+			for (int y = 0; y < CHUNK_SIZE + sy; y++)
 			{
 				//std::cout << x<< y << z << std::endl;
-				if (map.getWorld(x, y, z) > 1)
+				if (this->getWorld(x, y, z) > 1)
 				{
 					// UP ///////////////////////////////////////////
-					if (!map.collide3d(x, y, z, 1))
+					if (!this->collide(x, y, z, 1))
 					{
 						for (int i = 0; i < oneFace; i+=3)
 						{
-							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
 							vec.x += (float)x*1;
 							vec.y += (float)y*1;
 							vec.z += (float)z*1;
@@ -152,17 +116,17 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 						for (int i = 0; i < oneFaceUV; i+=2)
 						{
-							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
 							//std::cout << "vec: " << glm::to_string(vec) << std::endl;
 							uvs.push_back(vec);
 						}
 					}
 					// DOWN ////////////////////////////////////////////
-					if (!map.collide3d(x, y, z, 2))
+					if (!this->collide(x, y, z, 2))
 					{
 						for (int i = oneFace; i < oneFace * 2; i+=3)
 						{
-							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
 							vec.x += (float)x*1;
 							vec.y += (float)y*1;
 							vec.z += (float)z*1;
@@ -171,16 +135,16 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 						for (int i = oneFaceUV; i < oneFaceUV * 2; i+=2)
 						{
-							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
 							uvs.push_back(vec);
 						}
 					}
 					//EST //////////////////////////////////////////////
-					if (!map.collide3d(x, y, z, 3))
+					if (!this->collide(x, y, z, 3))
 					{
 						for (int i = oneFace * 2; i < oneFace * 3; i+=3)
 						{
-							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
 							vec.x += (float)x*1;
 							vec.y += (float)y*1;
 							vec.z += (float)z*1;
@@ -189,17 +153,17 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 						for (int i = oneFaceUV * 2; i < oneFaceUV * 3; i+=2)
 						{
-							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
 							//std::cout << "vec: " << glm::to_string(vec) << std::endl;
 							uvs.push_back(vec);
 						}
 					}
 					//OUEST ///////////////////////////////////////////////
-					if (!map.collide3d(x, y, z, 4))
+					if (!this->collide(x, y, z, 4))
 					{
 						for (int i = oneFace * 3; i < oneFace * 4; i+=3)
 						{
-							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
 							vec.x += (float)x*1;
 							vec.y += (float)y*1;
 							vec.z += (float)z*1;
@@ -208,17 +172,17 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 						for (int i = oneFaceUV * 3; i < oneFaceUV * 4; i+=2)
 						{
-							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
 							//std::cout << "vec: " << glm::to_string(vec) << std::endl;
 							uvs.push_back(vec);
 						}
 					}
 					//NORD
-					if (!map.collide3d(x, y, z, 5))
+					if (!this->collide(x, y, z, 5))
 					{
 						for (int i = oneFace * 4; i < oneFace * 5; i+=3)
 						{
-							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
 							vec.x += (float)x*1;
 							vec.y += (float)y*1;
 							vec.z += (float)z*1;
@@ -227,16 +191,16 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 						for (int i = oneFaceUV * 4; i < oneFaceUV * 5; i+=2)
 						{
-							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
 							uvs.push_back(vec);
 						}
 					}
 					//SUD
-					if (!map.collide3d(x, y, z, 6))
+					if (!this->collide(x, y, z, 6))
 					{
 						for (int i = oneFace * 5; i < oneFace * 6; i+=3)
 						{
-							glm::vec3 vec = glm::make_vec3(&vertex[i]);
+							glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
 							vec.x += (float)x*1;
 							vec.y += (float)y*1;
 							vec.z += (float)z*1;
@@ -245,7 +209,7 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 
 						for (int i = oneFaceUV * 5; i < oneFaceUV * 6; i+=2)
 						{
-							glm::vec2 vec = glm::make_vec2(&uv[i]);
+							glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
 							uvs.push_back(vec);
 						}
 					}
@@ -257,31 +221,9 @@ void 	Chunk::build(int sx, int sz, int sy, int size) {
 	sizeuv = this->uvs.size() * sizeof(glm::vec2);
 	sizevert = this->points.size() * sizeof(glm::vec3);
 	nb = (this->points.size());
-}
 
-float	*Chunk::getVertices(void)
-{
-	return (&this->points[0][0]);
+	this->state = 2;
 }
-size_t	Chunk::getSizeVertices(void)
-{
-	return (sizevert);
-}
-
-float	*Chunk::getUVs(void)
-{
-	return (&this->uvs[0][0]);
-}
-size_t	Chunk::getSizeUVs(void)
-{
-	return (sizeuv);
-}
-
-size_t	Chunk::getTriangle(void)
-{
-	return (nb);
-}
-
 
 unsigned int Chunk::buildVAO(void)
 {
@@ -313,4 +255,27 @@ unsigned int Chunk::buildVAO(void)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	return (this->VAO);
+}
+
+float	*Chunk::getVertices(void)
+{
+	return (&this->points[0][0]);
+}
+size_t	Chunk::getSizeVertices(void)
+{
+	return (sizevert);
+}
+
+float	*Chunk::getUVs(void)
+{
+	return (&this->uvs[0][0]);
+}
+size_t	Chunk::getSizeUVs(void)
+{
+	return (sizeuv);
+}
+
+size_t	Chunk::getTriangle(void)
+{
+	return (nb);
 }

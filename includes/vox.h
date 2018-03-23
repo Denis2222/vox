@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/22 08:37:30 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/23 08:19:30 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@
 #include <list>
 #include <cmath>
 
-# define WIDTH 800
-# define HEIGHT 600
+# define WIDTH 1500
+# define HEIGHT 1000
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
@@ -63,12 +63,14 @@
 
 #include "glm/gtx/string_cast.hpp"
 
+#include "static.h"
+
 #include "Map.hpp"
 #include <Shader.hpp>
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
-#define CHUNK_SIZE 100
+#define CHUNK_SIZE 32
 
 typedef struct		s_app
 {

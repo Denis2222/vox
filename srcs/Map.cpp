@@ -2,11 +2,14 @@
 		Map::Map(void)
 {
 	std::cout << "New map" << std::endl;
+	this->tg = this->threadGenerate();
+	this->tb = this->threadBuild();
+	//this->tg.detach();
 }
 
 void 	Map::generate(int sx, int sy, int sz) {
 	//std::cout << "Generate" << std::endl;
-	world3d_mutex.lock();
+	/*
 	int s = CHUNK_SIZE;
 	for (int x = sx; x < s + sx; x++)
 	{
@@ -22,7 +25,8 @@ void 	Map::generate(int sx, int sy, int sz) {
 			}
 		}
 	}
-
+	*/
+/*
 	int localx, localy, localz;
 
 	localx = floor(sx / CHUNK_SIZE);
@@ -31,73 +35,84 @@ void 	Map::generate(int sx, int sy, int sz) {
 
 	this->setInfos(localx, localy, localz, INFO::GENERATE);
 	Chunk *chunk = new Chunk(localx, localy, localz);
-	chunkList.push_back(chunk);
-	world3d_mutex.unlock();
+	chunkList.push_back(chunk);*/
 	//std::cout << "generate Over" << std::endl;
 }
 
-bool	Map::collide3d(int x, int y, int z, int way)
-{
-	if (way == 1) // UP
-	{
-		if (this->world3d[x][y + 1][z] > 1)
-			return (true);
-		return (false);
-	}
-	if (way == 2) // DOWN
-	{
-		if (this->world3d[x][y - 1][z] > 1)
-			return (true);
-		return (false);
-	}
-	if (way == 3) // EST
-	{
-		if (this->world3d[x+1][y][z] > 1)
-			return (true);
-		return (false);
-	}
-	if (way == 4) // OUEST
-	{
-		if (this->world3d[x-1][y][z] > 1)
-			return (true);
-		return (false);
-	}
-	if (way == 5) // NORD
-	{
-		if (this->world3d[x][y][z+1] > 1)
-			return (true);
-		return (false);
-	}
-	if (way == 6) // SUD
-	{
-		if (this->world3d[x][y][z-1] > 1)
-			return (true);
-		return (false);
-	}
-	return (false);
-}
-int		Map::getWorld(int x, int y, int z)
-{
-	return (this->world3d[x][y][z]);
-}
+
 
 void 	Map::setInfos(int x, int y, int z, Map::INFO info)
 {
 	this->infos[x][y][z] = info;
 }
 
-static void 	thradBuildChunk(Chunk *c)
+void 	Map::setChunkPtr(int x, int y, int z, Chunk *chunk)
 {
-	std::cout << "Thread launch  DO SOMETHING " << std::endl;
-
-	c->state = 1;
-	return ;
+	this->chunks[x][y][z] = chunk;
 }
 
-static void 	thradGenerateMap(Map *map, int x, int y, int z)
+void 	Map::threadJobGenerate(void)
 {
-	map->generate(x, y, z);
+	std::cout << "threadJobGenerate launch ()" << std::endl;
+
+	std::list<Chunk*>::iterator iter;
+	Chunk *c;
+
+	while (1)
+	{
+
+		iter = this->chunkList.begin();
+
+		while(iter != this->chunkList.end())
+		{
+			c = (*iter);
+		    //
+			if (c->state == 0)
+			{
+				c->generate();
+				std::cout << "generate Chunk Done;" << std::endl;
+			}
+			iter++;
+		}
+
+
+		std::cout << "threadJobGenerate() sleep " << std::endl;
+		sleep(1);
+	}
 }
+
+void 	Map::threadJobBuild(void)
+{
+	std::cout << "threadJobBuild launch ()" << std::endl;
+
+	std::list<Chunk*>::iterator iter;
+	Chunk *c;
+
+	while (1)
+	{
+
+		iter = this->chunkList.begin();
+
+		while(iter != this->chunkList.end())
+		{
+			c = (*iter);
+		    //
+			if (c->state == 1)
+			{
+				c->build();
+				std::cout << "build Chunk Done;" << std::endl;
+				//break;
+			}
+			iter++;
+		}
+
+
+		std::cout << "threadJobBuild() sleep " << std::endl;
+		sleep(1);
+	}
+}
+
+
 
 void 	Map::updatePosition(glm::vec3 position)
 {
@@ -110,7 +125,7 @@ void 	Map::updatePosition(glm::vec3 position)
 
 	//std::cout << "thread id :" << this->t1.get_id() << " thread::id "  << std::endl;
 
-	printf("====> %d <===", this->t1.get_id());
+	//printf("====> %d <===", this->t1.get_id());
 	Chunk *c;
 
 	//if (t1.joignagle())
@@ -147,7 +162,7 @@ void 	Map::updatePosition(glm::vec3 position)
 	int y = (floor(position.y / CHUNK_SIZE));
 	int z = (floor(position.z / CHUNK_SIZE));
 
-	//std::cout << "To load:" << std::endl;
+	std::cout << "To load:" << std::endl;
 
 	for (int X = -1; X < 2; X++)
 	{
@@ -155,27 +170,36 @@ void 	Map::updatePosition(glm::vec3 position)
 		{
 			for (int Z = -1; Z < 2; Z++)
 			{
-
-				if (this->infos[(X+x)][(Y+y)][(Z+z)] < INFO::START)
+				//std::cout << "Check if chunk " << X+x << " " << Y+y << " " << Z+z << "   => " << this->infos[(X+x)][(Y+y)][(Z+z)] << "< " <<  INFO::INIT <<std::endl;
+				if (this->infos[(X+x)][(Y+y)][(Z+z)] < INFO::INIT)
 				{
+					int lx, ly, lz;
+
+					lx = X+x;
+					ly = Y+y;
+					lz = Z+z;
+
+					this->setInfos(lx ,ly ,lz, INFO::INIT);
+					Chunk *chunk = new Chunk(lx ,ly ,lz);
+					this->chunkList.push_back(chunk);
+					this->setChunkPtr(lx ,ly ,lz, chunk);
+
 					//std::cout << "HERE => " << X+x << " " << Y+y << " " << Z+z << " Value = " << this->world3d[X+x][Y+y][Z+z] << std::endl;
-				//	std::cout << "deja";
+					//	std::cout << "deja";
 				}
 				else
 				{
-					this->setInfos(X+x ,Y+y ,Z+z, INFO::START);
+					/*this->setInfos(X+x ,Y+y ,Z+z, INFO::START);
 					//TODO Add to worker list
 
 					std::thread t1(thradGenerateMap, this, (X+x) * CHUNK_SIZE, (Y+y) * CHUNK_SIZE, (Z+z) * CHUNK_SIZE);
 					std::cout << "Gen launch thread : " << (X+x) * CHUNK_SIZE << " " << (Y+y) * CHUNK_SIZE << " " << (Z+z) * CHUNK_SIZE << std::endl;
-
-					t1.detach();
-
+					*/
+					//t1.detach();
 				}
 			}
 		}
 	}
-
 }
 
 /*

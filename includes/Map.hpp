@@ -10,35 +10,49 @@ class Chunk;
 class Map
 {
 	public:
-		std::map<int,std::map<int,std::map<int,int> > > world3d;
-		std::map<int,std::map<int,std::map<int,Chunk> > > chunks;
+		//std::map<int,std::map<int,std::map<int,int> > > world3d;
+		std::map<int,std::map<int,std::map<int,Chunk*> > > chunks;
 
 		std::list<Chunk*> chunkList;
 		enum INFO
 		{
 			  EMPTY, 	// Not used
 			  FREE,  	// Used & Free
-			  START,
+			  INIT,
 			  GENERATE, // In world
 			  CHUNK		// Chunk load
 		};
 
 		std::map<int,std::map<int,std::map<int,Map::INFO> > > infos;
 
-		std::thread t1;
-		int threadReady = 1;
+		std::thread threadDestroy;
+
+		std::thread threadGenerate() {
+			return std::thread(&Map::threadJobGenerate, this);
+		}
+
+		std::thread threadBuild() {
+			return std::thread(&Map::threadJobBuild, this);
+		}
+
+		std::thread tg;
+		std::thread tb;
+
 		std::mutex world3d_mutex;
 
 		noise::module::Perlin myModule;
 
 				Map(void);
-		int		getWorld(int x, int y, int z);
-		void 	generate(int sx, int sy, int sz);
-		bool	collide3d(int x, int y, int z, int way);
-		void 	setInfos(int x, int y, int z, Map::INFO info);
-		void	updatePosition(glm::vec3 position);
-		void 	threadBuildChunk(Chunk *chunk);
 
+		void 	generate(int sx, int sy, int sz);
+
+		void	setInfos(int x, int y, int z, Map::INFO info);
+		void	setChunkPtr(int x, int y, int z, Chunk *chunk);
+		void	updatePosition(glm::vec3 position);
+		void	threadGenerateChunk(Chunk *chunk);
+
+		void 	threadJobGenerate(void);
+		void 	threadJobBuild(void);
 		//Chunk	getChunk(int x, int y);
 };
 

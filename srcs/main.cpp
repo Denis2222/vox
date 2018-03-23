@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 14:41:19 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/22 08:36:52 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/23 08:22:04 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,27 @@ int		main(int argc, char **argv)
 		return (-1);
 	}
 
-	Map map;
-	Chunk chunk;
+	Map *map = new Map();
 
-	chunk.build(0,0,0, CHUNK_SIZE);
+	map->updatePosition(camera.position);
+
+	//map->updatePosition(camera.position);
+/*
+	while (1)
+	{
+		usleep(1000000);
+		std::cout << "." << std::endl;
+	}
+*///
+//return (0);
+	//Chunk chunk(0,0,0);
+
+	//chunk.generate();
+	//chunk.build();
 
 
 	/* BUFFER */
-	chunk.buildVAO();
+	//chunk.buildVAO();
 
 	Shader program("learn");
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -58,6 +71,9 @@ int		main(int argc, char **argv)
 
 	app->test = 0;
 
+
+	std::list<Chunk*>::iterator iter;
+	Chunk *c;
 	while (glfwGetKey(app->window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 			glfwWindowShouldClose(app->window) == 0)
 	{
@@ -67,21 +83,33 @@ int		main(int argc, char **argv)
 		nbFrames++;
 		if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1sec ago
 			// printf and reset
-			printf("%f ms/frame  fps:%d triangles:%zu \n", 1000.0/double(nbFrames), nbFrames, chunk.getTriangle() / 3);
+			printf("%f ms/frame  fps:%d \n", 1000.0/double(nbFrames), nbFrames);
 			nbFrames = 0;
 			lastTime += 1.0;
-
 			//std::cout << glm::to_string(camera.position) << std::endl;
 			//std::cout << glm::to_string(camera.front) << std::endl;
 			//std::cout << "yaw : " << camera.yaw << std::endl;
 			//std::cout << "pitch : " << camera.pitch << std::endl;
-
-
 			//std::cout << "app->test" <<  app->test << std::endl;
+			map->updatePosition(camera.position);
 
-			map.updatePosition(camera.position);
+			iter = map->chunkList.begin();
+			while(iter != map->chunkList.end())
+			{
+				c = (*iter);
+				//
+				if (c->state == 2)
+				{
+					c->buildVAO();
+					std::cout << "build VAO Done;" << std::endl;
+					//break;
+					c->state = 3;
+				}
+				iter++;
+			}
+
+
 		}
-
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -99,20 +127,25 @@ int		main(int argc, char **argv)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		glBindVertexArray(chunk.VAO);
-		glDrawArrays(GL_TRIANGLES, 0, chunk.getTriangle());
 
-		if (app->test >= 1)
-	 	{
-			glBindVertexArray(app->VAO2);
-			glDrawArrays(GL_TRIANGLES, 0, app->chunk2size);
+		iter = map->chunkList.begin();
+		while(iter != map->chunkList.end())
+		{
+			c = (*iter);
+			//
+			if (c->state == 3)
+			{
+					glBindVertexArray(c->VAO);
+					glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
+			}
+			iter++;
 		}
 
 		glfwSwapBuffers(app->window);
 		glfwPollEvents();
 	}
 
-	glDeleteVertexArrays(1, &chunk.VAO);
+	//glDeleteVertexArrays(1, &chunk.VAO);
 	//glDeleteBuffers(1, &VBO[0]);
 	//glDeleteBuffers(1, &VBO[1]);
 

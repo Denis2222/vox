@@ -61,9 +61,9 @@ void 	processInput(t_app *app) {
 	{
 		app->test = 1;
 
-		Chunk chunk2;
+		Chunk chunk2(CHUNK_SIZE, 0,0);
 
-		chunk2.build(CHUNK_SIZE,0,0, CHUNK_SIZE);
+		chunk2.build();
 		app->VAO2 = chunk2.buildVAO();
 
 		app->chunk2size = chunk2.getTriangle();

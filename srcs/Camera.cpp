@@ -2,7 +2,8 @@
 
 Camera::Camera(unsigned int id)
 {
-	ID = id;
+	this->ID = id;
+
 }
 
 void 		Camera::ProcessInput()
@@ -28,6 +29,13 @@ void 		Camera::ProcessInput()
 glm::mat4	Camera::getView(void)
 {
 	return (glm::lookAt(position, position + front, up));
+}
+glm::mat4	Camera::getProjection(void)
+{
+	t_app *app;
+
+	app = root();
+	return (glm::perspective(glm::radians(75.0f), ((float)app->width / (float)app->height), 0.1f, FAR));
 }
 
 void 		Camera::mouse_callback(double xpos, double ypos)

@@ -1,9 +1,18 @@
 #include "Map.hpp"
+
 		Map::Map(void)
 {
 	std::cout << "New map" << std::endl;
+
+	this->program = new Shader();
+	this->program->Load("chunk");
+
+	this->texture = loadTexture("./assets/tileset.png");
+
 	this->tg = this->threadGenerate();
 	this->tb = this->threadBuild();
+
+
 }
 
 void 	Map::setInfos(int x, int y, int z, Map::INFO info)
@@ -116,6 +125,57 @@ void 	Map::updateChunkToLoad(void)
 				this->setChunkPtr(lx ,0 ,lz, chunk);
 			}
 		}
+	}
+}
+
+void 	Map::onSlowRenderChunkVAOUpdate(void)
+{
+	std::list<Chunk*>::iterator	iter;
+	Chunk 						*c;
+
+	iter = this->chunkList.begin();
+	while(iter != this->chunkList.end())
+	{
+		c = (*iter);
+		if (c->state == Chunk::STATE::BUILD)
+		{
+			c->buildVAO();
+			c->state = Chunk::STATE::RENDER;
+		}
+		if (c->state == Chunk::STATE::DISABLE)
+		{
+			c->cleanVAO();
+			c->state = Chunk::STATE::DELETE;
+		}
+		iter++;
+	}
+}
+
+void 	Map::onRenderChunks(glm::mat4 view, glm::mat4 projection)
+{
+	std::list<Chunk*>::iterator	iter;
+	Chunk *c;
+
+	glm::mat4 model(1.0f);
+	this->program->use();
+	this->program->setInt("texture1", 0);
+	this->program->setMat4("projection", projection);
+	this->program->setMat4("model", model);
+	this->program->setMat4("view", view);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texture);
+
+	iter = this->chunkList.begin();
+	while(iter != this->chunkList.end())
+	{
+		c = (*iter);
+		if (c->state == 3)
+		{
+			glBindVertexArray(c->VAO);
+			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
+		}
+		iter++;
 	}
 }
 

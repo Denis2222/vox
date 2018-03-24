@@ -29,6 +29,7 @@ void Model::loadModel(std::string const &path)
 
 	// process ASSIMP's root node recursively
 	processNode(scene->mRootNode, scene);
+	std::cout << "Import Done ! " << std::endl;
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene)

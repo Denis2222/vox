@@ -2,9 +2,9 @@
 #define MAP_H
 
 #include <Chunk.hpp>
-
+#include <Shader.hpp>
 //using namespace noise;
-
+class Shader;
 class Chunk;
 
 class Map
@@ -23,26 +23,7 @@ class Map
 			  CHUNK		// Chunk load
 		};
 
-		std::map<int,std::map<int,std::map<int,Map::INFO> > > infos;
 
-		std::thread threadDestroy;
-
-		std::thread threadGenerate() {
-			return std::thread(&Map::threadJobGenerate, this);
-		}
-
-		std::thread threadBuild() {
-			return std::thread(&Map::threadJobBuild, this);
-		}
-
-		std::thread tg;
-		std::thread tb;
-
-		glm::vec3 position;
-
-		std::mutex world3d_mutex;
-
-		noise::module::Perlin myModule;
 
 				Map(void);
 				~Map(void);
@@ -56,7 +37,31 @@ class Map
 		void 	updateChunkToLoad(void);
 		void 	threadJobGenerate(void);
 		void 	threadJobBuild(void);
+
+		void	onSlowRenderChunkVAOUpdate(void);
+		void 	onRenderChunks(glm::mat4 view, glm::mat4 projection);
 		//Chunk	getChunk(int x, int y);
+
+
+	private:
+		std::map<int,std::map<int,std::map<int,Map::INFO> > > infos;
+
+		std::thread threadDestroy;
+
+		std::thread threadGenerate() {
+			return std::thread(&Map::threadJobGenerate, this);
+		}
+
+		std::thread threadBuild() {
+			return std::thread(&Map::threadJobBuild, this);
+		}
+
+		std::thread 			tg;
+		std::thread 			tb;
+		Shader 					*program;
+		GLuint					texture;
+
+		glm::vec3 				position;
 };
 
 #endif

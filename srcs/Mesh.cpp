@@ -45,6 +45,7 @@ void Mesh::Draw(Shader shader)
 
 	// always good practice to set everything back to defaults once configured.
 	glActiveTexture(GL_TEXTURE0);
+	//std::cout << "Draw VAO Model  ! :" << indices.size() <<  std::endl;
 }
 
 void Mesh::setupMesh()

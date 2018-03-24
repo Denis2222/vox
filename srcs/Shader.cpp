@@ -1,6 +1,11 @@
 #include "Shader.hpp"
 
-Shader::Shader(const GLchar *name)
+Shader::Shader()
+{
+	this->ID = 0;
+}
+
+void Shader::Load(const GLchar *name)
 {
 	std::string vertexCode;
 	std::string fragmentCode;

@@ -8,7 +8,7 @@ int		init_glfw(t_app *app) {
 	}
 	app->width = WIDTH;
 	app->height = HEIGHT;
-	glfwWindowHint(GLFW_SAMPLES, 1);
+	glfwWindowHint(GLFW_SAMPLES, 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -33,15 +33,14 @@ int		init_glfw(t_app *app) {
 	glfwSetInputMode(app->window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(app->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_MULTISAMPLE);
 	//glfwSwapInterval(0);//delete fps limit
 	glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
 	//glDepthFunc(GL_LESS);
-	//glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
 
 	glfwSetCursorPosCallback(app->window, mouse_callback);
+	glClearColor(0.527f, 0.804f, 0.918f, 1.0f);
 	return (1);
 }
 
@@ -60,6 +59,7 @@ void 	processInput(t_app *app) {
 
 	if(glfwGetKey(app->window, GLFW_KEY_P) == GLFW_PRESS && app->test == 0)
 	{
+		/*
 		app->test = 1;
 
 		Chunk chunk2(CHUNK_SIZE, 0,0);
@@ -68,6 +68,7 @@ void 	processInput(t_app *app) {
 		app->VAO2 = chunk2.buildVAO();
 
 		app->chunk2size = chunk2.getTriangle();
+		*/
 	}
 
 }

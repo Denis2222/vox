@@ -49,7 +49,6 @@
 #include <map>
 #include <list>
 #include <cmath>
-
 #include <ctime>
 #include <ratio>
 #include <chrono>
@@ -64,20 +63,23 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include "glm/gtx/string_cast.hpp"
 
-#include "FastNoise.h"
 
+//#include <Mesh.hpp>
+#include <Shader.hpp>
 #include "static.h"
 
 #include "Map.hpp"
-#include <Shader.hpp>
+
+
+//#include <Model.hpp>
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
 #define CHUNK_SIZE 32
-#define FAR 256.0f
+#define CHUNK_VIEW 8
+#define FAR 512.0f
 
 typedef struct		s_app
 {

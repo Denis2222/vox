@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <vox.h>
+#include <Chunk.hpp>
 
 //using namespace noise;
 

@@ -54,8 +54,8 @@ static float VCUBE[108] = {
 	-0.5f , 0.5f, -0.5f
 };
 
-const float t1 = 0.332;
-const float t2 = 0.667;
+const float t1 = 0.3333;
+const float t2 = 0.6666;
 
 static float VCUBEUV[72] = {
 //FACE UP
@@ -67,13 +67,13 @@ static float VCUBEUV[72] = {
 		t1 , 1.0f,
 		0.0f , 1.0f,
 //FACE DOWN
-		1.0f , 0.0f,
-		0.0f , 1.0f,
-		0.0f , 0.0f,
+		t2 , 0.0f,
+		t1 , t1,
+		t1 , 0.0f,
 
-		1.0f , 0.0f,
-		1.0f , 1.0f,
-		0.0f , 1.0f,
+		t2 , 0.0f,
+		t2 , t1,
+		t1 , t1,
 // FACE EST
 		t1 , 1.0f,
 		t2 , t2,
@@ -164,3 +164,57 @@ t2 , t2,
 		};
 
 #endif
+
+
+
+static float VCUBEUVEARTH[72] = {
+//FACE UP
+t2 , 0.01f,
+t1 , t1,
+t1 , 0.01f,
+
+t2 , 0.01f,
+t2 , t1,
+t1 , t1,
+//FACE DOWN
+t2 , 0.01f,
+t1 , t1,
+t1 , 0.01f,
+
+t2 , 0.01f,
+t2 , t1,
+t1 , t1,
+// FACE EST
+t2 , 0.0f,
+t1 , t1,
+t1 , 0.0f,
+
+t2 , 0.0f,
+t2 , t1,
+t1 , t1,
+
+//face OUEST
+t2 , 0.0f,
+t1 , t1,
+t1 , 0.0f,
+
+t2 , 0.0f,
+t2 , t1,
+t1 , t1,
+//FAce nord
+t2 , 0.0f,
+t1 , t1,
+t1 , 0.0f,
+
+t2 , 0.0f,
+t2 , t1,
+t1 , t1,
+//FACE SUD
+t2 , 0.0f,
+t1 , t1,
+t1 , 0.0f,
+
+t2 , 0.0f,
+t2 , t1,
+t1 , t1
+};

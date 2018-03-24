@@ -11,7 +11,10 @@
 			//std::cout << "New Chunk : " << x << " " << y << " " << z << std::endl;
 			this->localCoord = glm::vec3(x, y, z);
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
-			this->state = 0;
+			this->state = STATE::INIT;
+
+			//std::cout << "Chunk INIT" << std::endl;
+			//this->test = this->threadTest();
 		}
 
 		Chunk::~Chunk(void)
@@ -20,6 +23,7 @@
 			//delete points;
 			//delete uvs;
 			//delete world;
+			//this->test.join();
 		}
 
 void	Chunk::generate(void)
@@ -39,9 +43,11 @@ void	Chunk::generate(void)
 				if (y <= height)
 				{
 					if (y < 40)
-						world[x][y][z] = 2;
+						world[x][y][z] = 2; // Water
+					else if (y < height - 1)
+						world[x][y][z] = 4; // Rock
 					else
-						world[x][y][z] = 3;
+						world[x][y][z] = 3; // Grass
 
 					if (y >= this->maxheight)
 						this->maxheight = y+4;
@@ -56,7 +62,7 @@ void	Chunk::generate(void)
 		}
 	}
 	//std::cout << "minmax:" << this->minheight << this->maxheight << std::endl;
-	this->state = 1;
+	this->state = STATE::GENERATE;
 }
 
 bool	Chunk::collide(int x, int y, int z, int way)
@@ -137,10 +143,10 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val)
 	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=2)
 	{
 		glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
-		if (this->getWorld(x, y, z) == 2)
-		{
+		if (val == 2)
 			vec = glm::make_vec2(&VCUBEUVWATER[i]);
-		}
+		else if (val == 4)
+			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
 		uvs.push_back(vec);
 	}
 }
@@ -203,7 +209,7 @@ void 	Chunk::build(void)
 	sizevert = this->points.size() * sizeof(glm::vec3);
 	nb = (this->points.size());
 
-	this->state = 2;
+	this->state = STATE::BUILD;
 }
 
 unsigned int Chunk::buildVAO(void)
@@ -266,4 +272,23 @@ size_t	Chunk::getSizeUVs(void)
 size_t	Chunk::getTriangle(void)
 {
 	return (nb);
+}
+
+void 	Chunk::threadChunk(void)
+{
+	std::cout << "Chunk Thread start" << std::endl;
+	while (this->state != STATE::DELETE)
+	{
+		usleep(10000);
+		if (this->state == STATE::INIT)
+		{
+			this->generate();
+			continue;
+		}
+		if (this->state == STATE::GENERATE)
+		{
+			this->build();
+		}
+	}
+	return ;
 }

@@ -13,7 +13,7 @@ void 		Camera::ProcessInput()
 	float deltaSpeed = speed * deltaTime;
 
 	if (glfwGetKey(root()->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=5;
+		deltaSpeed*=20;
 
 	if (glfwGetKey(root()->window, GLFW_KEY_W) == GLFW_PRESS)
         position += deltaSpeed * front;
@@ -32,7 +32,7 @@ glm::mat4	Camera::getView(void)
 
 void 		Camera::mouse_callback(double xpos, double ypos)
 {
-	if(firstMouse) // this bool variable is initially set to true
+	if(firstMouse)
 	{
 	    lastX = xpos;
 	    lastY = ypos;
@@ -40,7 +40,7 @@ void 		Camera::mouse_callback(double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+	float yoffset = lastY - ypos;
 	lastX = xpos;
 	lastY = ypos;
 	xoffset *= sensitivity;

@@ -1,4 +1,5 @@
 #include <vox.h>
+#include "FastNoise.h"
 
 noise::module::Perlin noiseModule;
 
@@ -18,7 +19,7 @@ int getNoise(int x, int z)
 
 
 	//Pure speed
-	//int noise =  sin(x) * 2 +50 + cos(z)*2 + 15;
+	//int noise =  40;
 	return (noise);
 }
 

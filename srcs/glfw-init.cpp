@@ -8,7 +8,7 @@ int		init_glfw(t_app *app) {
 	}
 	app->width = WIDTH;
 	app->height = HEIGHT;
-	glfwWindowHint(GLFW_SAMPLES, 0);
+	glfwWindowHint(GLFW_SAMPLES, 1);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -33,6 +33,7 @@ int		init_glfw(t_app *app) {
 	glfwSetInputMode(app->window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(app->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 	//glfwSwapInterval(0);//delete fps limit
 	glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE

@@ -66,25 +66,22 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "glm/gtx/string_cast.hpp"
 
-
 //#include <Mesh.hpp>
 #include <Shader.hpp>
 #include "static.h"
 
 #include "Map.hpp"
 
-
 //#include <Model.hpp>
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
 #define CHUNK_SIZE 32
-#define CHUNK_VIEW 16
+#define CHUNK_VIEW 8
 #define FAR 1000.0f
 
-
-#define FAR_MAP 320.0f
-#define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
+#define FAR_MAP 360.0f
+#define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*0)
 
 typedef struct		s_app
 {
@@ -112,5 +109,7 @@ int 				getNoise(int x, int y);
 
 
 static int			g_oldstate;
+#include "FastNoise.h"
+static FastNoise myNoise;
 
 #endif

@@ -56,6 +56,9 @@ int		main(int argc, char **argv)
 {
 	t_app	*app;
 
+	myNoise.SetNoiseType(FastNoise::SimplexFractal);
+	myNoise.SetSeed(150);
+
 	app = root();
 	int i = init_glfw(app);
 
@@ -69,11 +72,11 @@ int		main(int argc, char **argv)
 	Shader modelShader;
 
 	modelShader.Load("model");
-	Model ourModel("assets/viper/viper.obj");
+	Model ourModel("assets/nanosuit/nanosuit.obj");
 
 	glm::mat4 modelObj(1.0f);
-	modelObj = glm::translate(modelObj, glm::vec3(0.0f, 80.0f, 0.0f)); // translate it down so it's at the center of the scene
-	modelObj = glm::scale(modelObj, glm::vec3(1.5f, 1.5f, 1.5f));	// it's a bit too big for our scene, so scale it down
+	modelObj = glm::translate(modelObj, glm::vec3(0.0f, getNoise(0,0), 10.0f)); // translate it down so it's at the center of the scene
+	modelObj = glm::scale(modelObj, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
 
 	Shader skyboxShader;
 	skyboxShader.Load("skybox");
@@ -166,11 +169,25 @@ int		main(int argc, char **argv)
 		camera.ProcessInput();
 
 		//Physics
-		/*
+
 		Chunk *p;
-		p = map->chunks[floor(camera.position.x / CHUNK_SIZE)][0][floor(camera.position.z / CHUNK_SIZE)];
-		if (p->world[floor(camera.position.x)][floor(camera.position.y)][floor(camera.position.z)] > 0){}else{camera.position.y-=0.1f;}
-		*/
+		float o = 0.5f;
+		glm::vec3 m = camera.position;
+		m = camera.position + glm::vec3(o,-1.5f,o);
+		//m = m / glm::vec3(CHUNK_SIZE, 1,CHUNK_SIZE);
+
+		p = map->getChunk(floor(m.x / CHUNK_SIZE), 0, floor(m.z / CHUNK_SIZE));
+		if (p != NULL)
+		{
+			if (p->getWorld(floor(m.x), floor(m.y), floor(m.z)) > 0)
+			{
+
+			}
+			else{
+				camera.position.y-=0.1f;
+			}
+		}
+
 
 		modelShader.use();
         modelShader.setMat4("projection", camera.getProjection());

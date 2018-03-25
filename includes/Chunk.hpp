@@ -40,7 +40,7 @@ class Chunk
 
 		//noise::module::Perlin myModule;
 
-		std::map<int,std::map<int,std::map<int,int> > > world;
+		std::map<int,std::map<int,std::map<int,char> > > world;
 		int minheight = 256;
 		int maxheight = 0;
 
@@ -55,8 +55,9 @@ class Chunk
 		void	buildFace(int n, int x, int y, int z, int val);
 
 		bool	collide(int x, int y, int z, int way);
-		int		getWorld(int x, int y, int z);
 
+		int		getWorld(int x, int y, int z);
+		void	setWorld(int x, int y, int z, int val);
 
 		float	*getVertices(void);
 		size_t	getSizeVertices(void);

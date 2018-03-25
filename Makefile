@@ -6,13 +6,13 @@ ifeq ($(UNAME), Linux)
 	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lnoise -lassimp
 endif
 ifeq ($(UNAME), Darwin)
-	GCC_FLAG = -Wall -Werror -Wextra
+	GCC_FLAG = -Wall -Werror -Wextra -g -fsanitize=address
 	DL_INC = -I./includes -I $(HOME)/.brew/include
 	DL_FLAG_DIR = -L./glmc -L./libft
 	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread
 endif
 
-GCC_FLAG = -Ofast -std=c++17
+GCC_FLAG = -Ofast -std=c++11
 CC = g++ $(GCC_FLAG) $(DL_INC)
 
 NAME = ft_vox

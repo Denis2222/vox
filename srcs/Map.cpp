@@ -20,27 +20,41 @@ void 	Map::setInfos(int x, int y, int z, Map::INFO info)
 	this->infos[x][0][z] = info;
 }
 
+Map::INFO	Map::getInfos(int x, int y, int z)
+{
+	return (this->infos[x][0][z]);
+}
+
 void 	Map::setChunkPtr(int x, int y, int z, Chunk *chunk)
 {
 	this->chunks[x][0][z] = chunk;
 }
 
+Chunk *Map::getChunk(int x, int y, int z)
+{
+	if (this->infos[x][y][z] > 0)
+		return (this->chunks[x][y][z]);
+	else
+		std::cout << "get Chunk inexistant !!" << std::endl;
+	return (NULL);
+}
+
 void 	generateAndBuildChunk(Chunk *c)
 {
-	//struct timespec start, end, middle;
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+	struct timespec start, end, middle;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
 	c->generate();
 
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
 
 	c->build();
 
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	//uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
 
-	//std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;
+	std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;
 }
 
 void 	Map::threadPoolJob(void)
@@ -102,27 +116,6 @@ void 	Map::threadJobGenerate(void)
 				this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
 				delete c;
 				break;
-			}
-
-			if (c->state == Chunk::STATE::INIT)
-			{
-/*
-
-
-*/
-/*
-				struct timespec start, end, middle;
-				clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
-				c->generate();
-				clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
-				c->build();
-
-				clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-
-				uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-				uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-				std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;*/
 			}
 			if (c->state == Chunk::STATE::RENDER)
 			{

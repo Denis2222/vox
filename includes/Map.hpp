@@ -27,8 +27,10 @@ class Map
 				~Map(void);
 		void 	generate(int sx, int sy, int sz);
 
-		void	setInfos(int x, int y, int z, Map::INFO info);
-		void	setChunkPtr(int x, int y, int z, Chunk *chunk);
+
+		Chunk 		*getChunk(int x, int y, int z);
+		Map::INFO	getInfos(int x, int y, int z);
+
 		void	updatePosition(glm::vec3 position);
 
 		void 	updateChunkToLoad(void);
@@ -58,6 +60,9 @@ class Map
 		GLuint					texture;
 
 		glm::vec3 				position;
+
+		void	setChunkPtr(int x, int y, int z, Chunk *chunk);
+		void	setInfos(int x, int y, int z, Map::INFO info);
 
 		float	distanceToChunk(Chunk *c);
 		float	distanceToChunk(int x, int y, int z);

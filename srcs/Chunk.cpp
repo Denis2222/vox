@@ -43,18 +43,19 @@ void	Chunk::generate(void)
 				if (y <= height)
 				{
 					if (y < 40)
-						world[x][y][z] = 2; // Water
-					else if (y < height - 1)
-						world[x][y][z] = 4; // Rock
+						setWorld(x, y, z, 2); // Water
+					else if (0)
+						setWorld(x, y, z, 4); // Rock
 					else
-						world[x][y][z] = 3; // Grass
+						setWorld(x, y, z, 3); // Grass
 
 					if (y >= this->maxheight)
 						this->maxheight = y+1;
-				}
-				else{ // DU VIDE
 					if (y <= this->minheight)
 						this->minheight = y-1;
+				}
+				else{ // DU VIDE
+
 				}
 				//else
 					//world[x][y][z] = 1;
@@ -72,7 +73,7 @@ bool	Chunk::collide(int x, int y, int z, int way)
 		if (y % CHUNK_SIZE == (CHUNK_SIZE - 1))
 			if (getNoise(x, z) > y)
 				return (true);
-		if (this->world[x][y + 1][z] > 1)
+		if (getWorld(x, y + 1, z) > 1)
 			return (true);
 		return (false);
 	}
@@ -81,7 +82,7 @@ bool	Chunk::collide(int x, int y, int z, int way)
 		if (y % CHUNK_SIZE == 0)
 			if (getNoise(x, z) > y)
 				return (true);
-		if (this->world[x][y - 1][z] > 1)
+		if (getWorld(x, y - 1, z) > 1)
 			return (true);
 		return (false);
 	}
@@ -89,7 +90,7 @@ bool	Chunk::collide(int x, int y, int z, int way)
 	{
 		if (getNoise(x + 1, z) >= y )
 			return (true);
-		if (this->world[x+1][y][z] > 1)
+		if (getWorld(x + 1, y, z) > 1)
 			return (true);
 		return (false);
 	}
@@ -97,7 +98,7 @@ bool	Chunk::collide(int x, int y, int z, int way)
 	{
 		if (getNoise(x - 1, z) >= y )
 			return (true);
-		if (this->world[x-1][y][z] > 1)
+		if (getWorld(x - 1 , y, z) > 1)
 			return (true);
 		return (false);
 	}
@@ -105,7 +106,7 @@ bool	Chunk::collide(int x, int y, int z, int way)
 	{
 		if (getNoise(x, z + 1) >= y )
 			return (true);
-		if (this->world[x][y][z+1] > 1)
+		if (getWorld(x, y, z + 1) > 1)
 			return (true);
 		return (false);
 	}
@@ -113,7 +114,7 @@ bool	Chunk::collide(int x, int y, int z, int way)
 	{
 		if (getNoise(x, z - 1) >= y )
 			return (true);
-		if (this->world[x][y][z-1] > 1)
+		if (getWorld(x, y, z - 1) > 1)
 			return (true);
 		return (false);
 	}
@@ -123,6 +124,11 @@ bool	Chunk::collide(int x, int y, int z, int way)
 int		Chunk::getWorld(int x, int y, int z)
 {
 	return (this->world[x][y][z]);
+}
+
+void	Chunk::setWorld(int x, int y, int z, int val)
+{
+	this->world[x][y][z] = val;
 }
 
 void	Chunk::buildFace(int n, int x, int y, int z, int val)
@@ -168,8 +174,9 @@ void 	Chunk::build(void)
 			for (int y = this->minheight; y < this->maxheight; y++)
 			{
 				//std::cout << x<< y << z << std::endl;
-				if (int val = this->getWorld(x, y, z) > 1)
+				if (this->getWorld(x, y, z) > 1)
 				{
+					int val = this->getWorld(x, y, z);
 					// UP ///////////////////////////////////////////
 					if (!this->collide(x, y, z, 1))
 					{

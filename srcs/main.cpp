@@ -56,9 +56,6 @@ int		main(int argc, char **argv)
 {
 	t_app	*app;
 
-	myNoise.SetNoiseType(FastNoise::SimplexFractal);
-	myNoise.SetSeed(150);
-
 	app = root();
 	int i = init_glfw(app);
 

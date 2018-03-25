@@ -33,7 +33,7 @@ int getNoise(int x, int z)
 	float what = 300.0f;
 	float that = 10;
 
-	//return ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), (double)((double)(z+that)/what), 1) * 50) + 50);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), (double)((double)(z+that)/what), 1) * 50) + 50);
 
 	//static std::map<std::pair<int,int>, int> bruit = makeBruit();
 
@@ -41,11 +41,12 @@ int getNoise(int x, int z)
 	//if (x > 1000 || x< -1000 | z > 1000 || z < -1000)
 	//	return (1);
 	//return (bruit[std::make_pair(x,z)]);
-
+	//myNoise.SetSeed(0);
+	//myNoise.SetNoiseType(FastNoise::Perlin);
 	//FastNoise Quick and dirty
 	//myNoise.SetNoiseType(FastNoise::SimplexFractal);
 	//myNoise.SetSeed(0);
-	int noise = (int)(myNoise.GetValue((float)x,(float)z) * 50 + 50);
+	//int noise = (int)(myNoise.GetValue((float)x,(float)z) * 50 + 50);
 
 
 	//Pure speed

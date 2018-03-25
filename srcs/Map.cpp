@@ -127,7 +127,7 @@ void 	Map::threadJobGenerate(void)
 			iter++;
 		}
 		this->updateChunkToLoad();
-		usleep(5000);
+		usleep(500);
 	}
 }
 

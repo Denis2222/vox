@@ -21,7 +21,7 @@ class Camera
 
 
 
-		float		speed = 3.0f;
+		float		speed = 5.0f;
 		float 		deltaTime = 0.0f;
 		float 		lastFrame = 0.0f;
 		float 		lastX = 400;

@@ -78,10 +78,10 @@
 
 #define CHUNK_SIZE 32
 #define CHUNK_VIEW 8
-#define FAR 1000.0f
+#define FAR 500.0f
 
 #define FAR_MAP 360.0f
-#define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*0)
+#define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 
 typedef struct		s_app
 {

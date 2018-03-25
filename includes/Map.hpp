@@ -33,16 +33,11 @@ class Map
 		void	setChunkPtr(int x, int y, int z, Chunk *chunk);
 		void	updatePosition(glm::vec3 position);
 
-
 		void 	updateChunkToLoad(void);
-		void 	threadJobGenerate(void);
-		void 	threadJobBuild(void);
-
-		void	onSlowRenderChunkVAOUpdate(void);
-		void 	onRenderChunks(glm::mat4 view, glm::mat4 projection);
-		//Chunk	getChunk(int x, int y);
 
 
+		void 	Render(glm::mat4 view, glm::mat4 projection);
+		void 	SlowRender(void);
 	private:
 		std::map<int,std::map<int,std::map<int,Map::INFO> > > infos;
 
@@ -62,6 +57,10 @@ class Map
 		GLuint					texture;
 
 		glm::vec3 				position;
+
+		void 	threadJobGenerate(void);
+		void 	threadJobBuild(void);
+
 };
 
 #endif

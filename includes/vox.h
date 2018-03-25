@@ -79,7 +79,7 @@
 #include <Chunk.hpp>
 
 #define CHUNK_SIZE 32
-#define CHUNK_VIEW 8
+#define CHUNK_VIEW 10
 #define FAR 512.0f
 
 typedef struct		s_app

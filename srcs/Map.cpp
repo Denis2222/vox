@@ -39,7 +39,6 @@ void 	Map::threadJobGenerate(void)
 
 			if (c->state == Chunk::STATE::DELETE)
 			{
-				//std::cout << "DELETE !!!!!!!!!!!!!!!!!!" << std::endl;
 				this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
 				this->chunkList.remove(c);
 				this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
@@ -49,6 +48,18 @@ void 	Map::threadJobGenerate(void)
 
 			if (c->state == Chunk::STATE::INIT)
 			{
+
+				int x = (floor(position.x / CHUNK_SIZE));
+				int z = (floor(position.z / CHUNK_SIZE));
+
+				if ((c->localCoord.x < x-CHUNK_VIEW || c->localCoord.x > x+CHUNK_VIEW) ||
+					(c->localCoord.z < z-CHUNK_VIEW || c->localCoord.z > z+CHUNK_VIEW))
+				{
+					c->state = Chunk::STATE::DELETE;
+					std::cout << "Direct delete ! " << std::endl;
+						continue;
+				}
+
 				struct timespec start, end, middle;
 				//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
@@ -128,10 +139,10 @@ void 	Map::updateChunkToLoad(void)
 	}
 }
 
-void 	Map::onSlowRenderChunkVAOUpdate(void)
+void 	Map::SlowRender(void)
 {
 	std::list<Chunk*>::iterator	iter;
-	Chunk 						*c;
+	Chunk *c;
 
 	iter = this->chunkList.begin();
 	while(iter != this->chunkList.end())
@@ -151,7 +162,7 @@ void 	Map::onSlowRenderChunkVAOUpdate(void)
 	}
 }
 
-void 	Map::onRenderChunks(glm::mat4 view, glm::mat4 projection)
+void 	Map::Render(glm::mat4 view, glm::mat4 projection)
 {
 	std::list<Chunk*>::iterator	iter;
 	Chunk *c;
@@ -170,7 +181,7 @@ void 	Map::onRenderChunks(glm::mat4 view, glm::mat4 projection)
 	while(iter != this->chunkList.end())
 	{
 		c = (*iter);
-		if (c->state == 3)
+		if (c->state == Chunk::STATE::RENDER)
 		{
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());

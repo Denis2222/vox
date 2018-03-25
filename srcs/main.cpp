@@ -34,8 +34,11 @@ int		main(int argc, char **argv)
 	Shader modelShader;
 
 	modelShader.Load("model");
-	Model ourModel("assets/nanosuit/nanosuit.obj");
+	Model ourModel("assets/viper/viper.obj");
 
+	glm::mat4 modelObj(1.0f);
+	modelObj = glm::translate(modelObj, glm::vec3(0.0f, 80.0f, 0.0f)); // translate it down so it's at the center of the scene
+	modelObj = glm::scale(modelObj, glm::vec3(1.5f, 1.5f, 1.5f));	// it's a bit too big for our scene, so scale it down
 
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
@@ -48,7 +51,7 @@ int		main(int argc, char **argv)
 			nbFrames = 0;
 			lastTime += 0.10f;
 			map->updatePosition(camera.position);
-			map->onSlowRenderChunkVAOUpdate();
+			map->SlowRender();
 		}
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -56,11 +59,20 @@ int		main(int argc, char **argv)
 		camera.ProcessInput();
 
 		//Physics
+		/*
 		Chunk *p;
 		p = map->chunks[floor(camera.position.x / CHUNK_SIZE)][0][floor(camera.position.z / CHUNK_SIZE)];
 		if (p->world[floor(camera.position.x)][floor(camera.position.y)][floor(camera.position.z)] > 0){}else{camera.position.y-=0.1f;}
+		*/
 
-		map->onRenderChunks(camera.getView(), camera.getProjection());
+		modelShader.use();
+        modelShader.setMat4("projection", camera.getProjection());
+        modelShader.setMat4("view", camera.getView());
+        modelShader.setMat4("model", modelObj);
+        ourModel.Draw(modelShader);
+
+		map->Render(camera.getView(), camera.getProjection());
+
 
 		glfwSwapBuffers(app->window);
 		glfwPollEvents();

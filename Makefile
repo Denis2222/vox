@@ -8,7 +8,7 @@ ifeq ($(UNAME), Darwin)
 	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lnoise -lpthread
 endif
 
-GCC_FLAG = -O3 -std=c++17
+GCC_FLAG = -Ofast -std=c++17
 CC = g++ $(GCC_FLAG) $(DL_INC)
 
 NAME = ft_vox

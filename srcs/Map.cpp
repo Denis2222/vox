@@ -25,6 +25,64 @@ void 	Map::setChunkPtr(int x, int y, int z, Chunk *chunk)
 	this->chunks[x][0][z] = chunk;
 }
 
+void 	generateAndBuildChunk(Chunk *c)
+{
+	//struct timespec start, end, middle;
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+	c->generate();
+
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+
+	c->build();
+
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	//uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+
+	//std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;
+}
+
+void 	Map::threadPoolJob(void)
+{
+	int nbWorker = 8;
+	int w = 0;
+
+	std::list<Chunk*>::iterator	iter;
+	Chunk						*c;
+
+	while (1)
+	{
+		if (w < 4)
+		{
+			iter = this->chunkList.begin();
+			while(iter != this->chunkList.end() && w < nbWorker)
+			{
+				c = (*iter);
+				if (c->state == Chunk::STATE::INIT) { //One Task !
+					if (this->distanceToChunk(c) > FAR_CHUNK+5)
+					{
+						c->state = Chunk::STATE::DELETE;
+						std::cout << "Direct delete ! " << std::endl;
+							continue;
+					}
+					c->state = Chunk::STATE::THREAD;
+					w++;
+					workers.push_back(std::thread(generateAndBuildChunk, c));
+				}
+				iter++;
+			}
+		}
+		for (auto &i : workers) {
+			if (i.joinable()) {
+				i.join();
+				w--;
+			}
+		}
+		usleep(5000);
+	}
+}
+
 void 	Map::threadJobGenerate(void)
 {
 	std::list<Chunk*>::iterator	iter;
@@ -48,38 +106,27 @@ void 	Map::threadJobGenerate(void)
 
 			if (c->state == Chunk::STATE::INIT)
 			{
+/*
 
-				int x = (floor(position.x / CHUNK_SIZE));
-				int z = (floor(position.z / CHUNK_SIZE));
 
-				if ((c->localCoord.x < x-CHUNK_VIEW || c->localCoord.x > x+CHUNK_VIEW) ||
-					(c->localCoord.z < z-CHUNK_VIEW || c->localCoord.z > z+CHUNK_VIEW))
-				{
-					c->state = Chunk::STATE::DELETE;
-					std::cout << "Direct delete ! " << std::endl;
-						continue;
-				}
-
+*/
+/*
 				struct timespec start, end, middle;
-				//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+				clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
 				c->generate();
-				//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
-
+				clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+				c->build();
 
 				clock_gettime(CLOCK_MONOTONIC_RAW, &end);
 
-				//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-				//uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-				//std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;
+				uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+				uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+				std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;*/
 			}
 			if (c->state == Chunk::STATE::RENDER)
 			{
-				int x = (floor(position.x / CHUNK_SIZE));
-				int z = (floor(position.z / CHUNK_SIZE));
-
-				if ((c->localCoord.x < x-CHUNK_VIEW || c->localCoord.x > x+CHUNK_VIEW) ||
-					(c->localCoord.z < z-CHUNK_VIEW || c->localCoord.z > z+CHUNK_VIEW))
+				if (this->distanceToChunk(c) > FAR_CHUNK)
 				{
 					c->state = Chunk::STATE::DISABLE;
 				}
@@ -105,12 +152,30 @@ void 	Map::threadJobBuild(void)
 			c = (*iter);
 			if (c->state == Chunk::STATE::GENERATE)
 			{
-				c->build();
+				//c->build();
 			}
 			iter++;
 		}
 		usleep(5000);
 	}
+}
+
+float	Map::distanceToChunk(Chunk *c)
+{
+	return (this->distanceToChunk(c->localCoord.x, c->localCoord.y, c->localCoord.z));
+}
+
+float	Map::distanceToChunk(int x, int y, int z)
+{
+
+	glm::vec3 c(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
+
+	glm::vec3 chunkCenter(CHUNK_SIZE / 2,CHUNK_SIZE / 2,CHUNK_SIZE / 2);
+	glm::vec3 center = c + chunkCenter;
+
+	float d = distance(center, this->position);
+	//std::cout << "Distance avec le chunk 0 0 0 :" << d << std::endl;
+	return (d);
 }
 
 void 	Map::updateChunkToLoad(void)
@@ -124,16 +189,20 @@ void 	Map::updateChunkToLoad(void)
 		int Y=0;
 		for (int Z = -CHUNK_VIEW; Z <= CHUNK_VIEW; Z++)
 		{
-			if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT)
+			if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
 			{
-				int lx, ly, lz;
-				lx = X+x;
-				ly = Y+y;
-				lz = Z+z;
-				this->setInfos(lx ,0 ,lz, INFO::INIT);
-				Chunk *chunk = new Chunk(lx ,0 ,lz);
-				this->chunkList.push_back(chunk);
-				this->setChunkPtr(lx ,0 ,lz, chunk);
+				//std::cout << "Add to render" << std::endl;
+				if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT)
+				{
+					int lx, ly, lz;
+					lx = X+x;
+					ly = Y+y;
+					lz = Z+z;
+					this->setInfos(lx ,0 ,lz, INFO::INIT);
+					Chunk *chunk = new Chunk(lx ,0 ,lz);
+					this->chunkList.push_back(chunk);
+					this->setChunkPtr(lx ,0 ,lz, chunk);
+				}
 			}
 		}
 	}

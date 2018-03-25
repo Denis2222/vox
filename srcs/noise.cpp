@@ -8,14 +8,15 @@ static FastNoise myNoise; // Create a FastNoise object
 
 int getNoise(int x, int z)
 {
-
-	//int noise = (int)(noiseModule.GetValue ((double)((double)(x+20)/300.0f), (double)((double)(z+20)/300.0f), 1) * 50) + 50;
+	float what = 300.0f;
+	float that = 100;
+	int noise = (int)(noiseModule.GetValue ((double)((double)(x+that)/what), (double)((double)(z+that)/what), 1) * 50) + 50;
 
 
 	//FastNoise Quick and dirty
 	//myNoise.SetNoiseType(FastNoise::SimplexFractal);
 	//myNoise.SetSeed(0);
-	int noise = (int)(myNoise.GetValue((float)x,(float)z) * 40 + 50);
+	//int noise = (int)(myNoise.GetValue((float)x,(float)z) * 40 + 50);
 
 
 	//Pure speed

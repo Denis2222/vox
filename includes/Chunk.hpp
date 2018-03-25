@@ -15,6 +15,7 @@ class Chunk
 		{
 			  INIT, 	//Just New
 			  GENERATE, //World ready
+			  THREAD,   //Thread Processing
 			  BUILD,	//Vertex & UV ready to bind
 			  RENDER,	//Bind & In render while
 			  DISABLE,	//Out render and clean VAO from main thread
@@ -33,11 +34,6 @@ class Chunk
 		size_t sizeuv;
 		size_t sizevert;
 		size_t nb;
-
-		std::thread test;
-		std::thread threadTest() {
-			return std::thread(&Chunk::threadChunk, this);
-		}
 
 		std::vector<glm::vec3> points;
 		std::vector<glm::vec2> uvs;
@@ -69,8 +65,6 @@ class Chunk
 
 		size_t	getTriangle(void);
 
-
-		void 	threadChunk(void);
 
 		unsigned int buildVAO();
 };

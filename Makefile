@@ -1,11 +1,15 @@
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
-	DL_INC = -Iexternal/glfw-3.1.2/include -I./includes  -I/usr/include/
-	DL_FLAG = -lnoise -lGLU -lGL -Lexternal/glfw-3.1.2/src -lglfw3 -lGLEW -lGLU -lGL -lXrandr -ldl -lm -lpthread -lXinerama -lXi -lXxf86vm -lXcursor -lX11 -lassimp
+	GCC_FLAG =
+	DL_INC = -I./includes -I./glmc -I./libft
+	DL_FLAG_DIR =
+	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lnoise -lassimp
 endif
 ifeq ($(UNAME), Darwin)
+	GCC_FLAG = -Wall -Werror -Wextra
 	DL_INC = -I./includes -I $(HOME)/.brew/include
-	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lnoise -lpthread
+	DL_FLAG_DIR = -L./glmc -L./libft
+	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread
 endif
 
 GCC_FLAG = -Ofast -std=c++17

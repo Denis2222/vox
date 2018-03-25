@@ -50,11 +50,11 @@ void	Chunk::generate(void)
 						world[x][y][z] = 3; // Grass
 
 					if (y >= this->maxheight)
-						this->maxheight = y+4;
+						this->maxheight = y+1;
 				}
 				else{ // DU VIDE
 					if (y <= this->minheight)
-						this->minheight = y-4;
+						this->minheight = y-1;
 				}
 				//else
 					//world[x][y][z] = 1;
@@ -272,23 +272,4 @@ size_t	Chunk::getSizeUVs(void)
 size_t	Chunk::getTriangle(void)
 {
 	return (nb);
-}
-
-void 	Chunk::threadChunk(void)
-{
-	std::cout << "Chunk Thread start" << std::endl;
-	while (this->state != STATE::DELETE)
-	{
-		usleep(10000);
-		if (this->state == STATE::INIT)
-		{
-			this->generate();
-			continue;
-		}
-		if (this->state == STATE::GENERATE)
-		{
-			this->build();
-		}
-	}
-	return ;
 }

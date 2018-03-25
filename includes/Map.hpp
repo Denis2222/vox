@@ -23,8 +23,6 @@ class Map
 			  CHUNK		// Chunk load
 		};
 
-
-
 				Map(void);
 				~Map(void);
 		void 	generate(int sx, int sy, int sz);
@@ -48,8 +46,11 @@ class Map
 		}
 
 		std::thread threadBuild() {
-			return std::thread(&Map::threadJobBuild, this);
+			return std::thread(&Map::threadPoolJob, this);
 		}
+
+		std::vector<std::thread>	workers;
+		std::vector<int>			workersReady;
 
 		std::thread 			tg;
 		std::thread 			tb;
@@ -58,8 +59,15 @@ class Map
 
 		glm::vec3 				position;
 
+		float	distanceToChunk(Chunk *c);
+		float	distanceToChunk(int x, int y, int z);
+
 		void 	threadJobGenerate(void);
 		void 	threadJobBuild(void);
+		void 	threadPoolJob(void);
+
+		//static void 	generateAndBuildChunk(Chunk *c);
+
 
 };
 

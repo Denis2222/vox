@@ -76,6 +76,8 @@
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
+#include <Terrain.hpp>
+
 #define CHUNK_SIZE 32
 #define CHUNK_VIEW 8
 #define FAR 500.0f

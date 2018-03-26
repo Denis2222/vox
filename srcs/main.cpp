@@ -64,7 +64,15 @@ int		main(int argc, char **argv)
 		printf("Failed to INIT GLFW\n");
 		return (-1);
 	}
+
+//	Terrain *terrain = new Terrain();
+
+
+
+
 	Map *map = new Map();
+
+
 
 	Shader modelShader;
 

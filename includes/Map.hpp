@@ -39,6 +39,9 @@ class Map
 		void 	Render(glm::mat4 view, glm::mat4 projection);
 		void 	SlowRender(void);
 	private:
+
+		int chunkInit = 0; // Nb chunk in Chunk::STATE::INIT;
+
 		std::map<int,std::map<int,std::map<int,Map::INFO> > > infos;
 
 		std::thread threadDestroy;
@@ -47,15 +50,21 @@ class Map
 			return std::thread(&Map::threadJobGenerate, this);
 		}
 
-		std::thread threadBuild() {
+		std::thread threadPool() {
 			return std::thread(&Map::threadPoolJob, this);
 		}
 
+		std::thread threadBuild() {
+			return std::thread(&Map::threadJobBuild, this);
+		}
+
 		std::vector<std::thread>	workers;
-		std::vector<int>			workersReady;
+		std::vector<Chunk*>			workersTask;
 
 		std::thread 			tg;
+		std::thread 			tp;
 		std::thread 			tb;
+
 		Shader 					*program;
 		GLuint					texture;
 

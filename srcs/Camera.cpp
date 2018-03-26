@@ -14,7 +14,7 @@ void 		Camera::ProcessInput()
 	float deltaSpeed = speed * deltaTime;
 
 	if (glfwGetKey(root()->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=30;
+		deltaSpeed*=15;
 
 	float posY = position.y;
 

@@ -11,6 +11,7 @@
 
 	this->tg = this->threadGenerate();
 	this->tb = this->threadBuild();
+	this->tp = this->threadPool();
 
 
 }
@@ -39,8 +40,9 @@ Chunk *Map::getChunk(int x, int y, int z)
 	return (NULL);
 }
 
-void 	generateAndBuildChunk(Chunk *c)
+void 	generateAndBuildChunk(Chunk *c, int i)
 {
+	std::cout << "START:" << i << std::endl;
 	struct timespec start, end, middle;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
@@ -52,9 +54,9 @@ void 	generateAndBuildChunk(Chunk *c)
 
 	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
 	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	uint64_t delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 
-	std::cout << "Time to do : generate : " << delta_middle << " All : " << delta_us << std::endl;
+	std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 }
 
 void 	Map::threadPoolJob(void)
@@ -70,7 +72,8 @@ void 	Map::threadPoolJob(void)
 		if (w < 4)
 		{
 			iter = this->chunkList.begin();
-			while(iter != this->chunkList.end() && w < nbWorker)
+			int del = 0;
+			while(iter != this->chunkList.end() && w < nbWorker && !del)
 			{
 				c = (*iter);
 				if (c->state == Chunk::STATE::INIT) { //One Task !
@@ -78,22 +81,40 @@ void 	Map::threadPoolJob(void)
 					{
 						c->state = Chunk::STATE::DELETE;
 						std::cout << "Direct delete ! " << std::endl;
-							continue;
+					} else {
+						c->state = Chunk::STATE::THREAD;
+						workersTask.push_back(c);
+						workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
+						w++;
 					}
-					c->state = Chunk::STATE::THREAD;
-					w++;
-					workers.push_back(std::thread(generateAndBuildChunk, c));
+				}
+				if (c->state == Chunk::STATE::DELETE)
+				{
+					this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
+					this->chunkList.remove(c);
+					this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
+					delete c;
+					del = 1;
 				}
 				iter++;
 			}
 		}
+		int u = 0;
 		for (auto &i : workers) {
 			if (i.joinable()) {
-				i.join();
-				w--;
+				c = workersTask.at(u);
+				if (c->state != Chunk::STATE::THREAD)
+				{
+					i.join();
+					workers.erase(workers.begin() + u);
+					workersTask.erase(workersTask.begin() + u);
+					w--;
+				}
 			}
+			u++;
 		}
-		usleep(5000);
+		//std::cout << "Workers.size:" << workers.size() << std::endl;
+		usleep(500);
 	}
 }
 
@@ -108,15 +129,6 @@ void 	Map::threadJobGenerate(void)
 		while(iter != this->chunkList.end())
 		{
 			c = (*iter);
-
-			if (c->state == Chunk::STATE::DELETE)
-			{
-				this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
-				this->chunkList.remove(c);
-				this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
-				delete c;
-				break;
-			}
 			if (c->state == Chunk::STATE::RENDER)
 			{
 				if (this->distanceToChunk(c) > FAR_CHUNK)
@@ -127,7 +139,7 @@ void 	Map::threadJobGenerate(void)
 			iter++;
 		}
 		this->updateChunkToLoad();
-		usleep(500);
+		usleep(5000);
 	}
 }
 
@@ -137,18 +149,42 @@ void 	Map::threadJobBuild(void)
 	std::list<Chunk*>::iterator iter;
 	Chunk *c;
 
+
+
 	while (1)
 	{
+		int init = 0;
+		int render = 0;
+		int disable = 0;
+		int del = 0;
 		iter = this->chunkList.begin();
 		while(iter != this->chunkList.end())
 		{
 			c = (*iter);
-			if (c->state == Chunk::STATE::GENERATE)
+			if (c->state == Chunk::STATE::INIT)
 			{
+				init++;
+				//c->build();
+			}
+			if (c->state == Chunk::STATE::RENDER)
+			{
+				render++;
+				//c->build();
+			}
+			if (c->state == Chunk::STATE::DISABLE)
+			{
+				disable++;
+				//c->build();
+			}
+			if (c->state == Chunk::STATE::DELETE)
+			{
+				del++;
 				//c->build();
 			}
 			iter++;
 		}
+		this->chunkInit = init;
+		//std::cout << "init:" << init << "render:" << render << "disable:" << disable << "del:" << del << std::endl;
 		usleep(5000);
 	}
 }
@@ -177,10 +213,22 @@ void 	Map::updateChunkToLoad(void)
 	int y = (floor(position.y / CHUNK_SIZE));
 	int z = (floor(position.z / CHUNK_SIZE));
 
-	for (int X = -CHUNK_VIEW; X <= CHUNK_VIEW; X++)
+	int priority = CHUNK_VIEW;
+
+	if (this->chunkInit > 10)
+		priority = 1;
+
+/*
+	if (this->chunkList.size() < CHUNK_VIEW * 2)
+		priority = CHUNK_VIEW / 4;
+	else if (this->chunkList.size() < CHUNK_VIEW * 4)
+		priority = CHUNK_VIEW / 2;
+*/
+	//std::cout << "Priority:" << priority << std::endl;
+	for (int X = -priority; X <= priority; X++)
 	{
 		int Y=0;
-		for (int Z = -CHUNK_VIEW; Z <= CHUNK_VIEW; Z++)
+		for (int Z = -priority; Z <= priority; Z++)
 		{
 			if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
 			{

@@ -3,37 +3,18 @@
 
 noise::module::Perlin noiseModule;
 
- // Create a FastNoise object
-
-
-std::map<std::pair<int,int>, int> makeBruit(void)
-{
-	float what = 300.0f;
-	float that = 10;
-	std::map<std::pair<int,int>, int> bruit;
-
-	for (int x = -1000; x < 1000; x++)
-	{
-		for (int z = -1000; z < 1000; z++)
-		{
-			int noise = (int)(noiseModule.GetValue ((double)((double)(x+that)/what), (double)((double)(z+that)/what), 1) * 50) + 50;
-			std::cout << x << " x " <<  z << " z " << noise << "     ";
-			bruit[std::make_pair(x,z)] = noise;
-			z++;
-		}
-		x++;
-	}
-	return (bruit);
-}
-
 
 
 int getNoise(int x, int z)
 {
 	float what = 300.0f;
 	float that = 10;
+	int min = 1;
 
-	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), (double)((double)(z+that)/what), 1) * 50) + 50);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 50,  (double)((double)(z+that)/what)) * 50) + 20);
+
+	if (noise < 1)
+		noise = 1;
 
 	//static std::map<std::pair<int,int>, int> bruit = makeBruit();
 

@@ -3,6 +3,8 @@
 
 #include <Chunk.hpp>
 #include <Shader.hpp>
+#include <mutex>
+
 //using namespace noise;
 class Shader;
 class Chunk;
@@ -12,6 +14,7 @@ class Map
 	public:
 		std::map<int,std::map<int,std::map<int,Chunk*> > > 	chunks;
 		std::list<Chunk*> 									chunkList;
+		std::mutex											mutexList;
 
 		enum INFO
 		{
@@ -25,7 +28,6 @@ class Map
 				Map(void);
 				~Map(void);
 		void 	generate(int sx, int sy, int sz);
-
 
 		Chunk 		*getChunk(int x, int y, int z);
 		Map::INFO	getInfos(int x, int y, int z);

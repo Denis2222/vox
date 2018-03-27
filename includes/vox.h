@@ -79,13 +79,13 @@
 #include <Terrain.hpp>
 
 #define CHUNK_SIZE 16
-#define CHUNK_VIEW 8
+#define CHUNK_VIEW 16
 
 #define FAR 500.0f
 
-#define CHUNK_HEIGHT 100
+#define CHUNK_HEIGHT 200
 
-#define FAR_MAP 160.0f
+#define FAR_MAP 320.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 
 typedef struct		s_app

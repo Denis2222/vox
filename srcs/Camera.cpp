@@ -3,7 +3,7 @@
 Camera::Camera(unsigned int id)
 {
 	this->ID = id;
-	this->position.y = getNoise((int)position.y, (int)position.z)+40.0f;
+	//this->position.y = getNoise((int)position.y, (int)position.z)+40.0f;
 }
 
 void 		Camera::ProcessInput()
@@ -14,7 +14,7 @@ void 		Camera::ProcessInput()
 	float deltaSpeed = speed * deltaTime;
 
 	if (glfwGetKey(root()->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=15;
+		deltaSpeed*=10;
 
 	float posY = position.y;
 
@@ -26,6 +26,9 @@ void 		Camera::ProcessInput()
         position -= glm::normalize(glm::cross(front, up)) * deltaSpeed;
     if (glfwGetKey(root()->window, GLFW_KEY_D) == GLFW_PRESS)
         position += glm::normalize(glm::cross(front, up)) * deltaSpeed;
+
+	if (glfwGetKey(root()->window, GLFW_KEY_F) == GLFW_PRESS)
+		std::cout << "Block:" << glm::to_string(this->position) << std::endl;
 
 	//position.y = posY;
 }

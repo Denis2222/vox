@@ -6,7 +6,7 @@
 
 		}
 
-		Chunk::Chunk(int x, int y, int z)
+		Chunk::Chunk(int x, int y, int z, Map *map)
 		{
 			//std::cout << "New Chunk : " << x << " " << y << " " << z << std::endl;
 			this->localCoord = glm::vec3(x, y, z);
@@ -15,6 +15,7 @@
 
 			//std::cout << "Chunk INIT" << std::endl;
 			//this->test = this->threadTest();
+			this->map = map;
 		}
 
 		Chunk::~Chunk(void)
@@ -25,6 +26,24 @@
 			//delete world;
 			//this->test.join();
 		}
+
+int		getBlockType(int x, int y, int z, int height)
+{
+	int type = 0;
+	if (y < 41)
+		type = 2; // Water
+	else if (y < 42)
+		type =  4; // Rock
+	else if (y <= height && y > (height - 3))
+		type = 3; //  Grass
+	else
+		type = 4; // Rock
+
+	if (y > 80)
+		type = 5; // Snow
+
+	return (type);
+}
 
 void	Chunk::generate(void)
 {
@@ -38,16 +57,11 @@ void	Chunk::generate(void)
 		for (int z = sz; z < CHUNK_SIZE + sz; z++)
 		{
 			int height = getNoise(x, z);
-			for (int y = 0; y < 256; y++)
+			for (int y = 0; y < CHUNK_HEIGHT; y++)
 			{
 				if (y <= height)
 				{
-					if (y < 40)
-						setWorld(x, y, z, 2); // Water
-					else if (0)
-						setWorld(x, y, z, 4); // Rock
-					else
-						setWorld(x, y, z, 3); // Grass
+					setWorld(x, y, z, getBlockType(x, y, z, height)); // Grass
 
 					if (y >= this->maxheight)
 						this->maxheight = y+1;
@@ -66,54 +80,111 @@ void	Chunk::generate(void)
 	this->state = STATE::GENERATE;
 }
 
+void Chunk::interact(int x, int y, int z)
+{
+	this->setWorld(x, y, z, 0);
+	this->state = STATE::TOUPDATE;
+	if ((x == this->worldCoord.x || z == this->worldCoord.z ||
+		x == this->worldCoord.x + CHUNK_SIZE-1 || z == this->worldCoord.z + CHUNK_SIZE-1))
+	{
+		Chunk *c = this->map->getChunk(floor((x + 1) / CHUNK_SIZE), 0, floor((z + 1) / CHUNK_SIZE));
+		c->state = STATE::TOUPDATE;
+		c = this->map->getChunk(floor((x - 1) / CHUNK_SIZE), 0, floor((z + 1) / CHUNK_SIZE));
+		c->state = STATE::TOUPDATE;
+		c = this->map->getChunk(floor((x + 1) / CHUNK_SIZE), 0, floor((z - 1) / CHUNK_SIZE));
+		c->state = STATE::TOUPDATE;
+		c = this->map->getChunk(floor((x - 1) / CHUNK_SIZE), 0, floor((z - 1) / CHUNK_SIZE));
+		c->state = STATE::TOUPDATE;
+	}
+}
+
+
 bool	Chunk::collide(int x, int y, int z, int way)
 {
+
+	//std::cout << "PATATOR: X" << x << " " << this->worldCoord.x << " Y " <<  y << " " << this->worldCoord.y << " Z:" <<  z << " " << this->worldCoord.z << std::endl;
+
+	if ((x == this->worldCoord.x || z == this->worldCoord.z ||
+		x == this->worldCoord.x + CHUNK_SIZE-1 || z == this->worldCoord.z + CHUNK_SIZE-1) && way != 1 && way != 2 )
+	{
+		//std::cout << "Externe" << std::endl;
+		int info = -1;
+
+		int qx = x;
+		int qy = y;
+		int qz = z;
+
+		if (way == 1) // UP
+			qy = qy + 1;
+		if (way == 2) // DOWN
+			qy = qy - 1;
+		if (way == 3) // EST
+			qx = qx + 1;
+		if (way == 4) // OUEST
+			qx = qx - 1;
+		if (way == 5) // NORD
+			qz = qz + 1;
+		if (way == 6) // SUD
+			qz = qz - 1;
+
+
+		info = this->map->getBlockInfo(qx, qy, qz);
+
+		//info = -1;
+		bool retour;
+			//std::cout << "info: " << info << std::endl;
+		if (info > 1)
+			retour = true;
+		else if (info  <= 0)
+		{
+			if (getNoise(qx, qz) >= qy)
+					retour = true;
+			else
+				retour = false;
+		}
+		else
+			retour = false;
+
+		//std::cout << "Externe x:"<< x <<" y:" << y << " bool:" << retour << " way:" << way << "info:" << info << std::endl;
+		return (retour);
+	}
+	//std::cout << "Interne " << std::endl;
+
+
+	//std::cout << "getWorld:" << getWorld(x, y, z) << "getBlockInfo():" << this->map->getBlockInfo(x, y, z) << std::endl;
+
 	if (way == 1) // UP
 	{
-		if (y % CHUNK_SIZE == (CHUNK_SIZE - 1))
-			if (getNoise(x, z) > y)
-				return (true);
 		if (getWorld(x, y + 1, z) > 1)
 			return (true);
 		return (false);
 	}
 	if (way == 2) // DOWN
 	{
-		if (y % CHUNK_SIZE == 0)
-			if (getNoise(x, z) > y)
-				return (true);
 		if (getWorld(x, y - 1, z) > 1)
 			return (true);
 		return (false);
 	}
 	if (way == 3) // EST
 	{
-		if (getNoise(x + 1, z) >= y )
-			return (true);
 		if (getWorld(x + 1, y, z) > 1)
 			return (true);
 		return (false);
 	}
 	if (way == 4) // OUEST
 	{
-		if (getNoise(x - 1, z) >= y )
-			return (true);
 		if (getWorld(x - 1 , y, z) > 1)
 			return (true);
 		return (false);
 	}
 	if (way == 5) // NORD
 	{
-		if (getNoise(x, z + 1) >= y )
-			return (true);
 		if (getWorld(x, y, z + 1) > 1)
 			return (true);
 		return (false);
 	}
 	if (way == 6) // SUD
 	{
-		if (getNoise(x, z - 1) >= y )
-			return (true);
 		if (getWorld(x, y, z - 1) > 1)
 			return (true);
 		return (false);
@@ -133,16 +204,27 @@ void	Chunk::setWorld(int x, int y, int z, int val)
 
 void	Chunk::buildFace(int n, int x, int y, int z, int val)
 {
-	static int oneFace = ((sizeof(VCUBE) / 4)/6);
-	static int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6);
+	static int oneFace = ((sizeof(VCUBE) / 4)/6/2);
+	static int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6/2);
 	int u = n + 1;
+
+	//std::cout << "oneFace:" << oneFace << std::endl; 18 !
 
 	for (int i = oneFace * n; i < oneFace * u; i+=3)
 	{
 		glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
-		vec.x += (float)x*1;
-		vec.y += (float)y*1;
-		vec.z += (float)z*1;
+		vec.x = vec.x*0.5f + (float)x*1;
+		vec.y = vec.y*0.5f +(float)y*1;
+		vec.z = vec.z*0.5f +(float)z*1;
+		points.push_back(vec);
+	}
+
+	for (int i = oneFace * n + 54; i < oneFace * u + 54; i+=3)
+	{
+		glm::vec3 vec = glm::make_vec3(&VCUBE[i]);
+		vec.x = vec.x*0.5f + (float)x*1;
+		vec.y = vec.y*0.5f +(float)y*1;
+		vec.z = vec.z*0.5f +(float)z*1;
 		points.push_back(vec);
 	}
 
@@ -153,8 +235,23 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val)
 			vec = glm::make_vec2(&VCUBEUVWATER[i]);
 		else if (val == 4)
 			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
+		else if (val == 5)
+			vec = glm::make_vec2(&VCUBEUVSNOW[i]);
 		uvs.push_back(vec);
 	}
+
+	for (int i = oneFaceUV * n + 36; i < oneFaceUV * u + 36; i+=2)
+	{
+		glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
+		if (val == 2)
+			vec = glm::make_vec2(&VCUBEUVWATER[i]);
+		else if (val == 4)
+			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
+		else if (val == 5)
+			vec = glm::make_vec2(&VCUBEUVSNOW[i]);
+		uvs.push_back(vec);
+	}
+
 }
 
 void 	Chunk::build(void)
@@ -180,32 +277,32 @@ void 	Chunk::build(void)
 					// UP ///////////////////////////////////////////
 					if (!this->collide(x, y, z, 1))
 					{
-						this->buildFace(0, x, y, z, val);
+						this->buildFace(1, x - sx, y, z - sz, val);
 					}
 					// DOWN ////////////////////////////////////////////
 					if (!this->collide(x, y, z, 2))
 					{
-						this->buildFace(1, x, y, z, val);
+						this->buildFace(0, x - sx, y, z - sz, val);
 					}
 					//EST //////////////////////////////////////////////
 					if (!this->collide(x, y, z, 3))
 					{
-						this->buildFace(2, x, y, z, val);
+						this->buildFace(2, x - sx, y, z - sz, val);
 					}
 					//OUEST ///////////////////////////////////////////////
 					if (!this->collide(x, y, z, 4))
 					{
-						this->buildFace(3, x, y, z, val);
+						this->buildFace(4, x - sx, y, z - sz, val);
 					}
 					//NORD
 					if (!this->collide(x, y, z, 5))
 					{
-						this->buildFace(4, x, y, z, val);
+						this->buildFace(3, x - sx, y, z - sz, val);
 					}
 					//SUD
 					if (!this->collide(x, y, z, 6))
 					{
-						this->buildFace(5, x, y, z, val);
+						this->buildFace(5, x - sx, y, z - sz, val);
 					}
 				}
 			}
@@ -228,7 +325,7 @@ unsigned int Chunk::buildVAO(void)
 	glGenVertexArrays(1, &this->VAO);
 	glBindVertexArray(this->VAO);
 
-	glGenBuffers(2, &this->VBO_VERT);
+	glGenBuffers(1, &this->VBO_VERT);
 
 	//VBO
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_VERT);
@@ -238,6 +335,7 @@ unsigned int Chunk::buildVAO(void)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);
 
+	glGenBuffers(1, &this->VBO_UV);
 	//VBO
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_UV);
 	glBufferData(GL_ARRAY_BUFFER, this->getSizeUVs(), this->getUVs(), GL_STATIC_DRAW);
@@ -251,11 +349,17 @@ unsigned int Chunk::buildVAO(void)
 	return (this->VAO);
 }
 
+void	Chunk::updateVAO(void)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_VERT);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, this->getSizeVertices(), this->getVertices());
+}
+
 void	Chunk::cleanVAO(void)
 {
-	glDeleteVertexArrays(1, &this->VAO);
 	glDeleteBuffers(1, &this->VBO_VERT);
 	glDeleteBuffers(1, &this->VBO_UV);
+	glDeleteVertexArrays(1, &this->VAO);
 }
 
 float	*Chunk::getVertices(void)

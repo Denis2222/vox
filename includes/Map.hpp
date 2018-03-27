@@ -35,7 +35,7 @@ class Map
 
 		void 	updateChunkToLoad(void);
 
-
+		int		getBlockInfo(int x, int y, int z);
 		void 	Render(glm::mat4 view, glm::mat4 projection);
 		void 	SlowRender(void);
 	private:

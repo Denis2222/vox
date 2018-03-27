@@ -18,6 +18,8 @@ class Chunk
 			  THREAD,   //Thread Processing
 			  BUILD,	//Vertex & UV ready to bind
 			  RENDER,	//Bind & In render while
+			  TOUPDATE, //Need Update
+			  UPDATE,	//Update ready
 			  DISABLE,	//Out render and clean VAO from main thread
 			  DELETE	//Ready to be delete
 		};
@@ -35,9 +37,13 @@ class Chunk
 		size_t sizevert;
 		size_t nb;
 
+		Map *map;
 		std::vector<glm::vec3> points;
 		std::vector<glm::vec2> uvs;
 
+
+		bool	update = 0;
+		void 	interact(int x, int y, int z);
 		//noise::module::Perlin myModule;
 
 		std::map<int,std::map<int,std::map<int,char> > > world;
@@ -45,9 +51,9 @@ class Chunk
 		int maxheight = 0;
 
 				Chunk(void);
-				Chunk(int x, int y, int z);
+				Chunk(int x, int y, int z, Map *map);
 				~Chunk(void);
-		void	cleanVAO(void);
+
 
 		void	generate(void);
 
@@ -67,7 +73,9 @@ class Chunk
 		size_t	getTriangle(void);
 
 
-		unsigned int buildVAO();
+		unsigned int	buildVAO();
+		void			updateVAO(void);
+		void			cleanVAO(void);
 };
 
 #endif

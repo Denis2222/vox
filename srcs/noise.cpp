@@ -11,14 +11,20 @@ int getNoise(int x, int z)
 	float that = 10;
 	int min = 1;
 
-	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 50,  (double)((double)(z+that)/what)) * 50) + 20);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 40);
 
-	if (noise < 1)
-		noise = 1;
+	if (noise < 40)
+		noise = 40;
 
 	//static std::map<std::pair<int,int>, int> bruit = makeBruit();
 
 
+
+	if (x==10 && z == 10)
+		noise = 60;
+
+	if (x==10 && z == 20)
+		noise = 45;
 	//if (x > 1000 || x< -1000 | z > 1000 || z < -1000)
 	//	return (1);
 	//return (bruit[std::make_pair(x,z)]);
@@ -31,7 +37,7 @@ int getNoise(int x, int z)
 
 
 	//Pure speed
-	//int noise =  40;
+	//int noise =  30;
 	return (noise);
 }
 

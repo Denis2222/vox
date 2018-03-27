@@ -35,28 +35,45 @@ Chunk *Map::getChunk(int x, int y, int z)
 {
 	if (this->infos[x][y][z] > 0)
 		return (this->chunks[x][y][z]);
-	else
-		std::cout << "get Chunk inexistant !!" << std::endl;
+	//else
+		//std::cout << "get Chunk inexistant !!" << std::endl;
 	return (NULL);
+}
+
+int		Map::getBlockInfo(int x, int y, int z)
+{
+	//Where chunk we are talking about
+	int cx = floor(x / CHUNK_SIZE);
+	int cy = 0;
+	int cz = floor(z / CHUNK_SIZE);
+
+	Chunk *c = getChunk(cx, cy, cz);
+	if (c)
+	{
+		if (c->state > Chunk::STATE::INIT)
+			return (c->getWorld(x, y, z));
+	}
+	//std::cout << "Chunk access not found" << x << ":" << y << ":" << z << std::endl;
+	return (-1);
 }
 
 void 	generateAndBuildChunk(Chunk *c, int i)
 {
-	std::cout << "START:" << i << std::endl;
-	struct timespec start, end, middle;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+	//std::cout << "START:" << i << std::endl;
+	//struct timespec start, end, middle;
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
 	c->generate();
 
-	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
 
 	c->build();
 
-	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	//uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 
-	std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
+	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 }
 
 void 	Map::threadPoolJob(void)
@@ -69,18 +86,19 @@ void 	Map::threadPoolJob(void)
 
 	while (1)
 	{
+		int del = 0;
 		if (w < 4)
 		{
 			iter = this->chunkList.begin();
-			int del = 0;
+			del = 0;
 			while(iter != this->chunkList.end() && w < nbWorker && !del)
 			{
 				c = (*iter);
 				if (c->state == Chunk::STATE::INIT) { //One Task !
-					if (this->distanceToChunk(c) > FAR_CHUNK+5)
+					if (this->distanceToChunk(c) > FAR_CHUNK+5 || this->chunkInit > 50 && this->distanceToChunk(c) > FAR_CHUNK/3)
 					{
 						c->state = Chunk::STATE::DELETE;
-						std::cout << "Direct delete ! " << std::endl;
+						//std::cout << "Direct delete ! " << std::endl;
 					} else {
 						c->state = Chunk::STATE::THREAD;
 						workersTask.push_back(c);
@@ -114,7 +132,8 @@ void 	Map::threadPoolJob(void)
 			u++;
 		}
 		//std::cout << "Workers.size:" << workers.size() << std::endl;
-		usleep(500);
+		if (!del)
+			usleep(10000);
 	}
 }
 
@@ -129,6 +148,14 @@ void 	Map::threadJobGenerate(void)
 		while(iter != this->chunkList.end())
 		{
 			c = (*iter);
+			if (c->state == Chunk::STATE::TOUPDATE)
+			{
+				std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
+				c->points.clear();
+				c->uvs.clear();
+				c->build();
+				c->state = Chunk::STATE::UPDATE;
+			}
 			if (c->state == Chunk::STATE::RENDER)
 			{
 				if (this->distanceToChunk(c) > FAR_CHUNK)
@@ -139,7 +166,7 @@ void 	Map::threadJobGenerate(void)
 			iter++;
 		}
 		this->updateChunkToLoad();
-		usleep(5000);
+		usleep(50000);
 	}
 }
 
@@ -185,7 +212,7 @@ void 	Map::threadJobBuild(void)
 		}
 		this->chunkInit = init;
 		//std::cout << "init:" << init << "render:" << render << "disable:" << disable << "del:" << del << std::endl;
-		usleep(5000);
+		usleep(10000);
 	}
 }
 
@@ -214,10 +241,10 @@ void 	Map::updateChunkToLoad(void)
 	int z = (floor(position.z / CHUNK_SIZE));
 
 	int priority = CHUNK_VIEW;
-
+/*
 	if (this->chunkInit > 10)
 		priority = 1;
-
+*/
 /*
 	if (this->chunkList.size() < CHUNK_VIEW * 2)
 		priority = CHUNK_VIEW / 4;
@@ -225,24 +252,31 @@ void 	Map::updateChunkToLoad(void)
 		priority = CHUNK_VIEW / 2;
 */
 	//std::cout << "Priority:" << priority << std::endl;
-	for (int X = -priority; X <= priority; X++)
+
+	int chunkAddPerPassage = 0;
+
+	for (priority = 0; priority <= CHUNK_VIEW && chunkAddPerPassage<50 && this->chunkInit < 50; priority++)
 	{
-		int Y=0;
-		for (int Z = -priority; Z <= priority; Z++)
+		for (int X = -priority; X <= priority; X++)
 		{
-			if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
+			int Y=0;
+			for (int Z = -priority; Z <= priority; Z++)
 			{
-				//std::cout << "Add to render" << std::endl;
-				if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT)
+				if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
 				{
-					int lx, ly, lz;
-					lx = X+x;
-					ly = Y+y;
-					lz = Z+z;
-					this->setInfos(lx ,0 ,lz, INFO::INIT);
-					Chunk *chunk = new Chunk(lx ,0 ,lz);
-					this->chunkList.push_back(chunk);
-					this->setChunkPtr(lx ,0 ,lz, chunk);
+					//std::cout << "Add to render" << std::endl;
+					if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT)
+					{
+						chunkAddPerPassage++;
+						int lx, ly, lz;
+						lx = X+x;
+						ly = Y+y;
+						lz = Z+z;
+						this->setInfos(lx ,0 ,lz, INFO::INIT);
+						Chunk *chunk = new Chunk(lx ,0 ,lz, this);
+						this->chunkList.push_back(chunk);
+						this->setChunkPtr(lx ,0 ,lz, chunk);
+					}
 				}
 			}
 		}
@@ -277,6 +311,7 @@ void 	Map::Render(glm::mat4 view, glm::mat4 projection)
 	std::list<Chunk*>::iterator	iter;
 	Chunk *c;
 
+	glm::mat4 modelidentity(1.0f);
 	glm::mat4 model(1.0f);
 	this->program->use();
 	this->program->setInt("texture1", 0);
@@ -291,8 +326,16 @@ void 	Map::Render(glm::mat4 view, glm::mat4 projection)
 	while(iter != this->chunkList.end())
 	{
 		c = (*iter);
-		if (c->state == Chunk::STATE::RENDER)
+		if (c->state == Chunk::STATE::UPDATE)
 		{
+			c->cleanVAO();
+			c->buildVAO();
+			c->state = Chunk::STATE::RENDER;
+		}
+		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE)
+		{
+			model = glm::translate(modelidentity , glm::vec3(c->worldCoord.x, c->worldCoord.y, c->worldCoord.z));
+			this->program->setMat4("model", model);
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
 		}

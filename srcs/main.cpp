@@ -167,6 +167,13 @@ int		main(int argc, char **argv)
 			lastTime += 0.10f;
 			map->updatePosition(camera.position);
 			map->SlowRender();
+
+
+			if (glfwGetKey(root()->window, GLFW_KEY_E) == GLFW_PRESS)
+			{
+				std::cout << "info 10:39:19 > " << map->getBlockInfo(10, 39, 16) << std::endl;
+			}
+
 		}
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -178,18 +185,27 @@ int		main(int argc, char **argv)
 		Chunk *p;
 		float o = 0.5f;
 		glm::vec3 m = camera.position;
-		m = camera.position + glm::vec3(o,-1.5f,o);
+		m = camera.position + glm::vec3(o,0.0f,o);
 		//m = m / glm::vec3(CHUNK_SIZE, 1,CHUNK_SIZE);
 
 		p = map->getChunk(floor(m.x / CHUNK_SIZE), 0, floor(m.z / CHUNK_SIZE));
 		if (p != NULL)
 		{
-			if (p->getWorld(floor(m.x), floor(m.y), floor(m.z)) > 0)
-			{
 
+
+			if (p->getWorld(floor(m.x + 1.0f), floor(m.y), floor(m.z)) > 0)
+			{
+				p->interact( floor(m.x + 1.0), floor(m.y), floor(m.z));
+				p->interact( floor(m.x + 1.0), floor(m.y+1.0f), floor(m.z));
 			}
-			else{
-				camera.position.y-=0.1f;
+			if (p->getWorld(floor(m.x + -1.0f), floor(m.y), floor(m.z)) > 0)
+			{
+				p->interact( floor(m.x - 1.0), floor(m.y), floor(m.z));
+				p->interact( floor(m.x + 1.0), floor(m.y-1.0f), floor(m.z));
+			}
+
+			if (0) {
+				//camera.position.y-=0.1f;
 			}
 		}
 

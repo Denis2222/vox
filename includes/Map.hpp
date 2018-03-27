@@ -10,10 +10,9 @@ class Chunk;
 class Map
 {
 	public:
-		//std::map<int,std::map<int,std::map<int,int> > > world3d;
-		std::map<int,std::map<int,std::map<int,Chunk*> > > chunks;
+		std::map<int,std::map<int,std::map<int,Chunk*> > > 	chunks;
+		std::list<Chunk*> 									chunkList;
 
-		std::list<Chunk*> chunkList;
 		enum INFO
 		{
 			  EMPTY, 	// Not used
@@ -30,59 +29,45 @@ class Map
 
 		Chunk 		*getChunk(int x, int y, int z);
 		Map::INFO	getInfos(int x, int y, int z);
+		Chunk		*getChunkWorld(int x, int y, int z);
+		int			getBlockInfo(int x, int y, int z);
+		void 		getBlockInfoReallyMore(int qx,int qy,int  qz);
 
-		void	updatePosition(glm::vec3 position);
+		void		updatePosition(glm::vec3 position);
+		void 		updateChunkToLoad(void);
+		void 		Render(glm::mat4 view, glm::mat4 projection);
+		void 		SlowRender(void);
 
-		void 	updateChunkToLoad(void);
-
-		int		getBlockInfo(int x, int y, int z);
-		void 	Render(glm::mat4 view, glm::mat4 projection);
-		void 	SlowRender(void);
 	private:
+		int 		chunkInit = 0;
+		std::map<int,std::map<int,std::map<int,Map::INFO> > >	infos;
 
-		int chunkInit = 0; // Nb chunk in Chunk::STATE::INIT;
+		std::vector<std::thread>								workers;
+		std::vector<Chunk*>										workersTask;
 
-		std::map<int,std::map<int,std::map<int,Map::INFO> > > infos;
+		std::thread 											tg;
+		std::thread 											tp;
 
-		std::thread threadDestroy;
+		Shader 													*program;
+		GLuint													texture;
+		glm::vec3 												position;
 
-		std::thread threadGenerate() {
-			return std::thread(&Map::threadJobGenerate, this);
+		std::thread threadUpdate() {
+			return std::thread(&Map::threadUpdateJob, this);
 		}
 
 		std::thread threadPool() {
 			return std::thread(&Map::threadPoolJob, this);
 		}
 
-		std::thread threadBuild() {
-			return std::thread(&Map::threadJobBuild, this);
-		}
+		void		setChunkPtr(int x, int y, int z, Chunk *chunk);
+		void		setInfos(int x, int y, int z, Map::INFO info);
 
-		std::vector<std::thread>	workers;
-		std::vector<Chunk*>			workersTask;
+		float		distanceToChunk(Chunk *c);
+		float		distanceToChunk(int x, int y, int z);
 
-		std::thread 			tg;
-		std::thread 			tp;
-		std::thread 			tb;
-
-		Shader 					*program;
-		GLuint					texture;
-
-		glm::vec3 				position;
-
-		void	setChunkPtr(int x, int y, int z, Chunk *chunk);
-		void	setInfos(int x, int y, int z, Map::INFO info);
-
-		float	distanceToChunk(Chunk *c);
-		float	distanceToChunk(int x, int y, int z);
-
-		void 	threadJobGenerate(void);
-		void 	threadJobBuild(void);
-		void 	threadPoolJob(void);
-
-		//static void 	generateAndBuildChunk(Chunk *c);
-
-
+		void 		threadUpdateJob(void);
+		void 		threadPoolJob(void);
 };
 
 #endif

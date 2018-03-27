@@ -78,8 +78,9 @@
 
 #include <Terrain.hpp>
 
-#define CHUNK_SIZE 32
-#define CHUNK_VIEW 12
+#define CHUNK_SIZE 16
+#define CHUNK_VIEW 8
+
 #define FAR 500.0f
 
 #define CHUNK_HEIGHT 100

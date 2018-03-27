@@ -11,7 +11,7 @@ int getNoise(int x, int z)
 	float that = 10;
 	int min = 1;
 
-	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 40);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 50) + 50);
 
 	if (noise < 40)
 		noise = 40;
@@ -20,11 +20,14 @@ int getNoise(int x, int z)
 
 
 
-	if (x==10 && z == 10)
-		noise = 60;
+	if (x==0 && z == 0)
+		noise = 50;
 
-	if (x==10 && z == 20)
+	if (x==0 && z == 10)
 		noise = 45;
+
+	if (x==0 && z == 1)
+		noise = 35;
 	//if (x > 1000 || x< -1000 | z > 1000 || z < -1000)
 	//	return (1);
 	//return (bruit[std::make_pair(x,z)]);

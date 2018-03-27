@@ -57,7 +57,17 @@ int		main(int argc, char **argv)
 	t_app	*app;
 
 	app = root();
+
+
+	//printf("%d %d ", sizeof(char), sizeof(int));
+
+
+	//return (0);
 	int i = init_glfw(app);
+
+
+
+
 
 	if (!i)
 	{
@@ -67,17 +77,20 @@ int		main(int argc, char **argv)
 
 //	Terrain *terrain = new Terrain();
 
-
-
+	std::cout << (floor(-1 / CHUNK_SIZE)) << " " << std::endl;
+	std::cout << (floor(-3 / CHUNK_SIZE)) << " " << std::endl;
+	std::cout << (floor(18 / CHUNK_SIZE)) << " " << std::endl;
+	std::cout << (floor(1 / CHUNK_SIZE)) << " " << std::endl;
+//return 0;
 
 	Map *map = new Map();
-
+	map->updatePosition(camera.position);
 
 
 	Shader modelShader;
 
 	modelShader.Load("model");
-	Model ourModel("assets/nanosuit/nanosuit.obj");
+	Model ourModel("assets/ncube_snow.obj");
 
 	glm::mat4 modelObj(1.0f);
 	modelObj = glm::translate(modelObj, glm::vec3(0.0f, getNoise(0,0), 10.0f)); // translate it down so it's at the center of the scene
@@ -153,12 +166,15 @@ int		main(int argc, char **argv)
 	};
 	unsigned int cubemapTexture = loadCubemap(faces);
 
-
+	int cursorx;
+	int cursory;
+	int cursorz;
 
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
 	while (RENDER)
 	{
+		Chunk *p;
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if ( currentTime - lastTime >= 0.10 ){
@@ -169,11 +185,6 @@ int		main(int argc, char **argv)
 			map->SlowRender();
 
 
-			if (glfwGetKey(root()->window, GLFW_KEY_E) == GLFW_PRESS)
-			{
-				std::cout << "info 10:39:19 > " << map->getBlockInfo(10, 39, 16) << std::endl;
-			}
-
 		}
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -182,32 +193,55 @@ int		main(int argc, char **argv)
 
 		//Physics
 
-		Chunk *p;
+
 		float o = 0.5f;
 		glm::vec3 m = camera.position;
 		m = camera.position + glm::vec3(o,0.0f,o);
 		//m = m / glm::vec3(CHUNK_SIZE, 1,CHUNK_SIZE);
 
-		p = map->getChunk(floor(m.x / CHUNK_SIZE), 0, floor(m.z / CHUNK_SIZE));
-		if (p != NULL)
+		Chunk *c;
+		if (glfwGetKey(root()->window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		{
-
-
-			if (p->getWorld(floor(m.x + 1.0f), floor(m.y), floor(m.z)) > 0)
+			c = map->getChunkWorld(m.x, m.y, m.z);
+			if (c != NULL)
 			{
-				p->interact( floor(m.x + 1.0), floor(m.y), floor(m.z));
-				p->interact( floor(m.x + 1.0), floor(m.y+1.0f), floor(m.z));
-			}
-			if (p->getWorld(floor(m.x + -1.0f), floor(m.y), floor(m.z)) > 0)
-			{
-				p->interact( floor(m.x - 1.0), floor(m.y), floor(m.z));
-				p->interact( floor(m.x + 1.0), floor(m.y-1.0f), floor(m.z));
-			}
-
-			if (0) {
-				//camera.position.y-=0.1f;
+				c->interact( floor(m.x+0.5f), floor(m.y), floor(m.z), 4);
 			}
 		}
+
+		if (glfwGetKey(root()->window, GLFW_KEY_E) == GLFW_PRESS)
+		{
+			c = map->getChunkWorld(m.x, m.y, m.z);
+			if (p)
+			{
+
+				//std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nGetBlockInfo: " << x << " " << y << " " << z << " " << std::endl;
+				//map->getBlockInfoReallyMore(x, y, z);
+				//std::cout << "collide up:" << p->collideDebug(floor(m.x+1.0f), floor(m.y), floor(m.z), 1) << std::endl;
+				//std::cout << "collide down:" << p->collideDebug(floor(m.x+1.0f), floor(m.y), floor(m.z), 2) << std::endl;
+				//std::cout << "collide est:" << p->collideDebug(floor(m.x+1.0f), floor(m.y), floor(m.z), 3) << std::endl;
+				//std::cout << "collide ouest:" << p->collideDebug(floor(m.x+1.0f), floor(m.y), floor(m.z), 4) << std::endl;
+				///std::cout << "collide nord:" << p->collideDebug(floor(m.x+1.0f), floor(m.y), floor(m.z), 5) << std::endl;
+				//std::cout << "collide sud:" << p->collideDebug(floor(m.x+1.0f), floor(m.y), floor(m.z), 6) << std::endl;
+			}
+			//std::cout << "info 2:35:5 > " << map->getBlockInfo(2, 35, 5) << std::endl;
+		}
+
+		if ( glfwGetMouseButton(root()->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		{
+			c = map->getChunkWorld(m.x, m.y, m.z);
+			if (c != NULL)
+			{
+				if (c->getWorld(floor(m.x+0.5f), floor(m.y), floor(m.z)))
+				{
+					c->interact( floor(m.x+0.5f), floor(m.y), floor(m.z), 1);
+				}
+				if (0) {
+					//camera.position.y-=0.1f;
+				}
+			}
+		}
+
 
 
 		modelShader.use();

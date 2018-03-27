@@ -8,9 +8,6 @@ class Map;
 class Chunk
 {
 	public:
-	//	static float vertex[108];
-	//	static	float uv[72];
-
 		enum STATE
 		{
 			  INIT, 	//Just New
@@ -24,53 +21,51 @@ class Chunk
 			  DELETE	//Ready to be delete
 		};
 
-		Chunk::STATE state;
+		Chunk::STATE 									state;
+		glm::vec3 										worldCoord;
+		glm::vec3 										localCoord;
 
-		glm::vec3 worldCoord;
-		glm::vec3 localCoord;
+		unsigned int 									VAO;
+		unsigned int 									VBO_VERT;
+		unsigned int 									VBO_UV;
 
-		unsigned int VAO;
-		unsigned int VBO_VERT;
-		unsigned int VBO_UV;
+		size_t 											sizeuv;
+		size_t 											sizevert;
+		size_t 											nb;
 
-		size_t sizeuv;
-		size_t sizevert;
-		size_t nb;
+		Map 											*map;
+		std::vector<glm::vec3> 							points;
+		std::vector<glm::vec2> 							uvs;
 
-		Map *map;
-		std::vector<glm::vec3> points;
-		std::vector<glm::vec2> uvs;
+		std::map<int,std::map<int,std::map<int,int> > > world;
 
-
-		bool	update = 0;
-		void 	interact(int x, int y, int z);
-		//noise::module::Perlin myModule;
-
-		std::map<int,std::map<int,std::map<int,char> > > world;
-		int minheight = 256;
-		int maxheight = 0;
-
-				Chunk(void);
-				Chunk(int x, int y, int z, Map *map);
-				~Chunk(void);
+		int 											minheight = 256;
+		int 											maxheight = 0;
 
 
-		void	generate(void);
+					Chunk(void);
+					Chunk(int x, int y, int z, Map *map);
+					~Chunk(void);
 
-		void 	build(void);
-		void	buildFace(int n, int x, int y, int z, int val);
+		void 		interact(int x, int y, int z, int val);
+		void		generate(void);
 
-		bool	collide(int x, int y, int z, int way);
 
-		int		getWorld(int x, int y, int z);
-		void	setWorld(int x, int y, int z, int val);
 
-		float	*getVertices(void);
-		size_t	getSizeVertices(void);
-		float	*getUVs(void);
-		size_t	getSizeUVs(void);
+		void 		build(void);
+		int 		getBlockType(int x, int y, int z, int height);
+		void		buildFace(int n, int x, int y, int z, int val);
 
-		size_t	getTriangle(void);
+		bool		collide(int x, int y, int z, int way);
+		bool		collideDebug(int x, int y, int z, int way);
+		int			getWorld(int x, int y, int z);
+		void		setWorld(int x, int y, int z, int val);
+
+		float		*getVertices(void);
+		size_t		getSizeVertices(void);
+		float		*getUVs(void);
+		size_t		getSizeUVs(void);
+		size_t		getTriangle(void);
 
 
 		unsigned int	buildVAO();

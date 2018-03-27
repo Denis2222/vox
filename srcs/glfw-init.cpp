@@ -35,6 +35,7 @@ int		init_glfw(t_app *app) {
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_MULTISAMPLE);
 	//glfwSwapInterval(0);//delete fps limit
+	glfwSetInputMode(app->window, GLFW_STICKY_MOUSE_BUTTONS, 1);
 	glEnable(GL_CULL_FACE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
 	//glDepthFunc(GL_LESS);

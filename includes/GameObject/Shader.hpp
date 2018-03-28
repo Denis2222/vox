@@ -7,7 +7,7 @@ class Shader
 {
 	public:
 		unsigned int ID;
-		Shader();
+		Shader(void);
 		void Load(const GLchar* name);
 
 		void use();

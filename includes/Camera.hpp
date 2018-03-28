@@ -8,11 +8,18 @@
 #include <sstream>
 #include <iostream>
 
+class Map;
+
 class Camera
 {
 	public:
 		unsigned int ID;
-		glm::vec3	position = glm::vec3(0.5f, 50.0f,  0.5f);
+
+		unsigned int width;
+		unsigned int height;
+		GLFWwindow	*window;
+
+		glm::vec3	position = glm::vec3(2.0f, 50.0f,  2.0f);
 		//glm::vec3	position = glm::vec3(0.0f, 0.0f,  -3.0f);
 		//glm::vec3	front = glm::vec3(0.0f, 0.0f,  1.0f);
 		glm::vec3	front = glm::vec3(-1.6f, -0.0f,  0.0f);
@@ -32,8 +39,9 @@ class Camera
 
 		bool		firstMouse = true;
 
+					Camera(unsigned int id, unsigned int w, unsigned int h, GLFWwindow *win);
 					Camera(unsigned int id);
-		void 		ProcessInput();
+		void 		ProcessInput(Map *map);
 		glm::mat4 	getView();
 		glm::mat4 	getProjection();
 		void 		mouse_callback(double xpos, double ypos);

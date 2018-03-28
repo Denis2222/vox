@@ -1,11 +1,13 @@
-#include "Map.hpp"
+#include <GameObject/Map/Map.hpp>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 	Map::Map(void) {
 		this->nbWorker = 4;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
-		this->texture = loadTexture("./assets/tileset.png");
+		this->texture = this->loadTexture("./assets/tileset.png");
 		this->tg = this->threadUpdate();
 		this->tp = this->threadPool();
 	}
@@ -338,4 +340,32 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection) {
 		iter++;
 	}
 	//std::cout << "Print triangle:" << nbtriangle << "Average:" << (nbtriangle / (nbchunks + 1) ) << " nbchunk:" <<nbchunks<< std::endl;
+}
+
+unsigned int Map::loadTexture(const char *path)
+{
+	stbi_set_flip_vertically_on_load(true);
+	/* TEXTURE  0*/
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, STBI_rgb_alpha);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture : " << std::endl;
+	}
+	stbi_image_free(data);
+	return (texture);
 }

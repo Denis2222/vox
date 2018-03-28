@@ -1,4 +1,4 @@
-#include "Chunk.hpp"
+#include <GameObject/Map/Chunk.hpp>
 
 		Chunk::Chunk(int x, int y, int z, Map *map)
 		{

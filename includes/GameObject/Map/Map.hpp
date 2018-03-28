@@ -1,9 +1,9 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <Chunk.hpp>
-#include <Shader.hpp>
 #include <mutex>
+#include <GameObject/Map/Chunk.hpp>
+#include <GameObject/Shader.hpp>
 
 //using namespace noise;
 class Shader;
@@ -65,14 +65,16 @@ class Map
 			return std::thread(&Map::threadPoolJob, this);
 		}
 
-		void		setChunkPtr(int x, int y, int z, Chunk *chunk);
-		void		setInfos(int x, int y, int z, Map::INFO info);
+		void			setChunkPtr(int x, int y, int z, Chunk *chunk);
+		void			setInfos(int x, int y, int z, Map::INFO info);
 
-		float		distanceToChunk(Chunk *c);
-		float		distanceToChunk(int x, int y, int z);
+		float			distanceToChunk(Chunk *c);
+		float			distanceToChunk(int x, int y, int z);
 
-		void 		threadUpdateJob(void);
-		void 		threadPoolJob(void);
+		void 			threadUpdateJob(void);
+		void 			threadPoolJob(void);
+
+		unsigned int	loadTexture(const char *path);
 };
 
 #endif

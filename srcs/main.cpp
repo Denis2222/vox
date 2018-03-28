@@ -10,106 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <vox.h>
-#include <Model.hpp>
-
-#define RENDER glfwGetKey(app->window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(app->window) == 0
-
-#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
-#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
-
-
-Camera camera(0);
-
-
-int parseLine(char* line){
-    // This assumes that a digit will be found and the line ends in " Kb".
-    int i = strlen(line);
-    const char* p = line;
-    while (*p <'0' || *p > '9') p++;
-    line[i-3] = '\0';
-    i = atoi(p);
-    return i;
-}
-
-int getValue(){ //Note: this value is in KB!
-    FILE* file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-
-    while (fgets(line, 128, file) != NULL){
-        if (strncmp(line, "VmSize:", 7) == 0){
-            result = parseLine(line);
-            break;
-        }
-    }
-    fclose(file);
-	result = result / 1024;
-    return result;
-}
-
-unsigned int loadCubemap(std::vector<std::string> faces)
-{
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-    int width, height, nrChannels;
-    for (unsigned int i = 0; i < faces.size(); i++)
-    {
-		stbi_set_flip_vertically_on_load(false);
-        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-        if (data)
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-            );
-            stbi_image_free(data);
-        }
-        else
-        {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-            stbi_image_free(data);
-        }
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return textureID;
-}
+#include <Voxel.hpp>
 
 int		main(int argc, char **argv)
 {
-	t_app	*app;
-
-	long kbusestart = getValue();
-	std::cout << "Memory use at start :" << kbusestart << std::endl;
-
-	sleep(2);
-
-	app = root();
-	int i = init_glfw(app);
-	if (!i)
-	{
-		printf("Failed to INIT GLFW\n");
-		return (-1);
-	}
-
-
-
-	//return 0;
-
-
+	Voxel start;
+	return (0);
+}
+/*
 	GLint nCurAvailMemoryInKBStart = 0;
 	glGetIntegerv( GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &nCurAvailMemoryInKBStart );
 
 	Map *map = new Map();
 	map->updatePosition(camera.position);
 
+	long kbusestart = getValue();
+
+*/
 /*
 	Shader modelShader;
 
@@ -190,10 +107,15 @@ int		main(int argc, char **argv)
 	};
 	unsigned int cubemapTexture = loadCubemap(faces);
 */
-	int cursorx;
+
+
+/*	int cursorx;
 	int cursory;
 	int cursorz;
+*/
 
+
+/*
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
 	while (RENDER)
@@ -220,6 +142,7 @@ int		main(int argc, char **argv)
 			std::cout << "Memory use :" << (getValue() - kbusestart) << std::endl;
 
 		}
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		processInput(app);
@@ -277,16 +200,16 @@ int		main(int argc, char **argv)
 		}
 
 
-/*
+
 		modelShader.use();
         modelShader.setMat4("projection", camera.getProjection());
         modelShader.setMat4("view", camera.getView());
         modelShader.setMat4("model", modelObj);
         ourModel.Draw(modelShader);
-*/
+
 		map->Render(camera.getView(), camera.getProjection());
 
-/*
+
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 		skyboxShader.use();
@@ -300,7 +223,7 @@ int		main(int argc, char **argv)
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
-*/
+
 
 		glfwSwapBuffers(app->window);
 		glfwPollEvents();
@@ -319,9 +242,10 @@ int		main(int argc, char **argv)
 	sleep(10);
 
 	return (0);
-}
-
+	*/
+//}
+/*
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	camera.mouse_callback(xpos,ypos);
-}
+}*/

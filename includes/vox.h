@@ -18,8 +18,8 @@
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
 # include  <libnoise/noise.h>
-#  define OPENGL_VERSION_MAJOR 3
-#  define OPENGL_VERSION_MINOR 3
+#  define OPENGL_VERSION_MAJOR 4
+#  define OPENGL_VERSION_MINOR 4
 # endif
 
 
@@ -53,6 +53,8 @@
 #include <ratio>
 #include <chrono>
 
+# include <stb_image.h>
+
 # define WIDTH 2500
 # define HEIGHT 2000
 # define TITLE "Voxel"
@@ -66,54 +68,35 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "glm/gtx/string_cast.hpp"
 
-//#include <Mesh.hpp>
-#include <Shader.hpp>
 #include "static.h"
 
-#include "Map.hpp"
-
-//#include <Model.hpp>
 #include <Camera.hpp>
-#include <Chunk.hpp>
+#include <GameObject/Map/Map.hpp>
+#include <GameObject/Map/Chunk.hpp>
+#include <GameObject/Shader.hpp>
+#include <GameObject/Skybox.hpp>
+#include <Voxel.hpp>
 
 
 #define CHUNK_SIZE 16
-#define CHUNK_VIEW 2
+#define CHUNK_VIEW 16
 
 #define FAR 500.0f
 
 #define CHUNK_HEIGHT 256
 
-#define FAR_MAP 40.0f
+#define FAR_MAP 256.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 
-typedef struct		s_app
-{
-	unsigned int	width;
-	unsigned int	height;
 
-	unsigned int	VAO2;
-	unsigned int	chunk2size;
+//NVIDIA VRAM
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
-	bool			test;
-
-	GLFWwindow		*window;
-}					t_app;
-
-t_app				*root(void);
-
-int					init_glfw(t_app *app);
-GLuint				shader_load(const char *name);
-
-void				mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void				processInput(t_app *app);
-void				framebuffer_size_callback(GLFWwindow* window, int width, int height);
-unsigned int		loadTexture(const char *path);
-int 				getNoise(int x, int y);
-
+int					getNoise(int x, int y);
+int					parseLine(char* line);
+int					getValue();
 
 static int			g_oldstate;
-#include "FastNoise.h"
-static FastNoise myNoise;
 
 #endif

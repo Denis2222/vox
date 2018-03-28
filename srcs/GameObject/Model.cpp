@@ -1,4 +1,4 @@
-#include <Model.hpp>
+#include <GameObject/Model.hpp>
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &path, bool gamma)

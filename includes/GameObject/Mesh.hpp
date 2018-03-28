@@ -9,7 +9,10 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
-#include <Shader.hpp>
+
+#include <GameObject/Shader.hpp>
+
+class Shader;
 
 struct Vertex {
     // position

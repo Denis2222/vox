@@ -2,11 +2,10 @@
 #define MODEL_H
 
 # include <vox.h>
-# include <stb_image.h>
 # include <assimp/Importer.hpp>
 # include <assimp/scene.h>
 # include <assimp/postprocess.h>
-# include <Mesh.hpp>
+# include <GameObject/Mesh.hpp>
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 

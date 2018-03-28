@@ -1,6 +1,6 @@
-#include "Shader.hpp"
+#include <GameObject/Shader.hpp>
 
-Shader::Shader()
+Shader::Shader(void)
 {
 	this->ID = 0;
 }

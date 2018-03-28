@@ -8,9 +8,11 @@
 			this->map = map;
 		}
 
-		Chunk::~Chunk(void)
+		Chunk::~Chunk()
 		{
-
+			points.clear();;
+			uvs.clear();;
+			world.clear();
 		}
 
 int		Chunk::getBlockType(int x, int y, int z, int height)

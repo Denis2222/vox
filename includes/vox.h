@@ -76,16 +76,15 @@
 #include <Camera.hpp>
 #include <Chunk.hpp>
 
-#include <Terrain.hpp>
 
 #define CHUNK_SIZE 16
-#define CHUNK_VIEW 16
+#define CHUNK_VIEW 2
 
 #define FAR 500.0f
 
-#define CHUNK_HEIGHT 200
+#define CHUNK_HEIGHT 256
 
-#define FAR_MAP 320.0f
+#define FAR_MAP 40.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 
 typedef struct		s_app

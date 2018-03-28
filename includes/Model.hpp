@@ -8,8 +8,6 @@
 # include <assimp/postprocess.h>
 # include <Mesh.hpp>
 
-//using namespace std;
-
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 
 class Model

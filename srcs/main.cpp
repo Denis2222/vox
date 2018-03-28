@@ -15,8 +15,38 @@
 
 #define RENDER glfwGetKey(app->window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(app->window) == 0
 
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+
+
 Camera camera(0);
 
+
+int parseLine(char* line){
+    // This assumes that a digit will be found and the line ends in " Kb".
+    int i = strlen(line);
+    const char* p = line;
+    while (*p <'0' || *p > '9') p++;
+    line[i-3] = '\0';
+    i = atoi(p);
+    return i;
+}
+
+int getValue(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmSize:", 7) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+	result = result / 1024;
+    return result;
+}
 
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
@@ -56,37 +86,31 @@ int		main(int argc, char **argv)
 {
 	t_app	*app;
 
+	long kbusestart = getValue();
+	std::cout << "Memory use at start :" << kbusestart << std::endl;
+
+	sleep(2);
+
 	app = root();
-
-
-	//printf("%d %d ", sizeof(char), sizeof(int));
-
-
-	//return (0);
 	int i = init_glfw(app);
-
-
-
-
-
 	if (!i)
 	{
 		printf("Failed to INIT GLFW\n");
 		return (-1);
 	}
 
-//	Terrain *terrain = new Terrain();
 
-	std::cout << (floor(-1 / CHUNK_SIZE)) << " " << std::endl;
-	std::cout << (floor(-3 / CHUNK_SIZE)) << " " << std::endl;
-	std::cout << (floor(18 / CHUNK_SIZE)) << " " << std::endl;
-	std::cout << (floor(1 / CHUNK_SIZE)) << " " << std::endl;
-//return 0;
+
+	//return 0;
+
+
+	GLint nCurAvailMemoryInKBStart = 0;
+	glGetIntegerv( GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &nCurAvailMemoryInKBStart );
 
 	Map *map = new Map();
 	map->updatePosition(camera.position);
 
-
+/*
 	Shader modelShader;
 
 	modelShader.Load("model");
@@ -165,7 +189,7 @@ int		main(int argc, char **argv)
 	    "./assets/skybox/back.jpg"
 	};
 	unsigned int cubemapTexture = loadCubemap(faces);
-
+*/
 	int cursorx;
 	int cursory;
 	int cursorz;
@@ -184,6 +208,16 @@ int		main(int argc, char **argv)
 			map->updatePosition(camera.position);
 			map->SlowRender();
 
+			//GLint nTotalMemoryInKB = 0;
+			//glGetIntegerv( GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &nTotalMemoryInKB );
+
+			GLint nCurAvailMemoryInKB = 0;
+			glGetIntegerv( GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &nCurAvailMemoryInKB );
+
+
+			std::cout << "VRAM use: " << ((nCurAvailMemoryInKBStart - nCurAvailMemoryInKB)/1024) << std::endl;
+
+			std::cout << "Memory use :" << (getValue() - kbusestart) << std::endl;
 
 		}
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -243,16 +277,16 @@ int		main(int argc, char **argv)
 		}
 
 
-
+/*
 		modelShader.use();
         modelShader.setMat4("projection", camera.getProjection());
         modelShader.setMat4("view", camera.getView());
         modelShader.setMat4("model", modelObj);
         ourModel.Draw(modelShader);
-
+*/
 		map->Render(camera.getView(), camera.getProjection());
 
-
+/*
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 		skyboxShader.use();
@@ -266,12 +300,24 @@ int		main(int argc, char **argv)
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
-
+*/
 
 		glfwSwapBuffers(app->window);
 		glfwPollEvents();
 	}
 	glfwTerminate();
+
+	delete map;
+
+	GLint nCurAvailMemoryInKB = 0;
+	glGetIntegerv( GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &nCurAvailMemoryInKB );
+
+
+	std::cout << "VRAM use: " << ((nCurAvailMemoryInKBStart - nCurAvailMemoryInKB)/1024) << std::endl;
+	std::cout << "Memory use :" << (getValue() - kbusestart) << std::endl;
+
+	sleep(10);
+
 	return (0);
 }
 

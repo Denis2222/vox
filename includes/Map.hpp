@@ -14,6 +14,7 @@ class Map
 	public:
 		std::map<int,std::map<int,std::map<int,Chunk*> > > 	chunks;
 		std::list<Chunk*> 									chunkList;
+		std::list<Chunk*> 									renderList;
 		std::mutex											mutexList;
 
 		enum INFO
@@ -44,6 +45,8 @@ class Map
 		int 		chunkInit = 0;
 		std::map<int,std::map<int,std::map<int,Map::INFO> > >	infos;
 
+		unsigned int											nbWorker;
+		unsigned int 											thread;
 		std::vector<std::thread>								workers;
 		std::vector<Chunk*>										workersTask;
 

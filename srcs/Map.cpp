@@ -1,11 +1,39 @@
 #include "Map.hpp"
 
 	Map::Map(void) {
+		this->nbWorker = 4;
+		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
 		this->texture = loadTexture("./assets/tileset.png");
 		this->tg = this->threadUpdate();
 		this->tp = this->threadPool();
+	}
+
+	Map::~Map(void) {
+		std::cout << "Delete map ask :" << std::endl;
+		this->nbWorker = 0;
+		while (workers.size()>0)
+			usleep(5000);
+		this->thread = 0;
+		std::cout << "Worker stoped" << std::endl;
+		tg.join();
+		tp.join();
+		std::cout << "Thread Join" << std::endl;
+
+		std::list<Chunk*>::iterator	iter;
+		Chunk						*c;
+		iter = this->chunkList.begin();
+
+		while(iter != this->chunkList.end())
+		{
+			c = (*iter);
+			delete c;
+			iter++;
+		}
+		std::cout << "Chunk List delete" << std::endl;
+
+		sleep(1);
 	}
 
 void 		Map::setInfos(int x, int y, int z, Map::INFO info) {
@@ -98,14 +126,15 @@ void 		generateAndBuildChunk(Chunk *c, int i) {
 	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 }
 
+
 void 		Map::threadPoolJob(void) {
-	int nbWorker = 8;
+	int nbWorker = this->nbWorker;
 	int w = 0;
 
 	std::list<Chunk*>::iterator	iter;
 	Chunk						*c;
 
-	while (1)
+	while (this->thread)
 	{
 		int del = 0;
 		if (w < 4)
@@ -120,7 +149,7 @@ void 		Map::threadPoolJob(void) {
 					if (this->distanceToChunk(c) > FAR_CHUNK+5 || this->chunkInit > 50 && this->distanceToChunk(c) > FAR_CHUNK/3)
 					{
 						c->state = Chunk::STATE::DELETE;
-						std::cout << "Direct delete ! " << std::endl;
+						//std::cout << "Direct delete ! " << std::endl;
 					} else if (w < nbWorker) {
 						c->state = Chunk::STATE::THREAD;
 						workersTask.push_back(c);
@@ -128,13 +157,15 @@ void 		Map::threadPoolJob(void) {
 						w++;
 					}
 				}
-				if (c->state == Chunk::STATE::DELETE)
+				if (c->state == Chunk::STATE::DELETE && mutexList.try_lock())
 				{
+
 					this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
 					this->chunkList.remove(c);
 					this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
 					delete c;
 					del = 1;
+					mutexList.unlock();
 				}
 				if (c->state == Chunk::STATE::RENDER)
 				{
@@ -170,16 +201,17 @@ void 		Map::threadUpdateJob(void) {
 	Chunk						*c;
 
 
-	while (1)
+	while (this->thread)
 	{
 		int init = 0;
 		int render = 0;
 		int disable = 0;
 		int del = 0;
 		iter = this->chunkList.begin();
-		while(iter != this->chunkList.end())
+		while(iter != this->chunkList.end() && mutexList.try_lock())
 		{
 			c = (*iter);
+			mutexList.unlock();
 			if (c->state == Chunk::STATE::TOUPDATE)
 			{
 				std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
@@ -200,7 +232,7 @@ void 		Map::threadUpdateJob(void) {
 		}
 		this->chunkInit = init;
 		this->updateChunkToLoad();
-		usleep(5000);
+		usleep(20000);
 	}
 }
 
@@ -225,7 +257,7 @@ void 		Map::updateChunkToLoad(void) {
 
 				if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
 				{
-					if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT)
+					if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT/* && mutexList.try_lock()*/)
 					{
 						chunkAddPerPassage++;
 						int lx, ly, lz;
@@ -234,8 +266,10 @@ void 		Map::updateChunkToLoad(void) {
 						lz = Z+z;
 						this->setInfos(lx ,0 ,lz, INFO::INIT);
 						Chunk *chunk = new Chunk(lx ,0 ,lz, this);
+						mutexList.lock();
 						this->chunkList.push_back(chunk);
 						this->setChunkPtr(lx ,0 ,lz, chunk);
+						mutexList.unlock();
 					}
 				}
 			}
@@ -251,14 +285,21 @@ void 		Map::SlowRender(void) {
 	while(iter != this->chunkList.end())
 	{
 		c = (*iter);
+		if (c->state == Chunk::STATE::UPDATE)
+		{
+			c->updateVAO();
+			c->state = Chunk::STATE::RENDER;
+		}
 		if (c->state == Chunk::STATE::BUILD)
 		{
 			c->buildVAO();
 			c->state = Chunk::STATE::RENDER;
+			this->renderList.push_back(c);
 		}
 		if (c->state == Chunk::STATE::DISABLE)
 		{
 			c->cleanVAO();
+			this->renderList.remove(c);
 			c->state = Chunk::STATE::DELETE;
 		}
 		iter++;
@@ -280,20 +321,21 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture);
 
-	iter = this->chunkList.begin();
-	while(iter != this->chunkList.end())
+	iter = this->renderList.begin();
+	//long nbtriangle = 0;
+	//int nbchunks = 0;
+	while(iter != this->renderList.end())
 	{
 		c = (*iter);
-		if (c->state == Chunk::STATE::UPDATE)
-		{
-			c->updateVAO();
-			c->state = Chunk::STATE::RENDER;
-		}
+
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE)
 		{
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
+			//nbtriangle+=c->getTriangle();
+			//nbchunks++;
 		}
 		iter++;
 	}
+	//std::cout << "Print triangle:" << nbtriangle << "Average:" << (nbtriangle / (nbchunks + 1) ) << " nbchunk:" <<nbchunks<< std::endl;
 }

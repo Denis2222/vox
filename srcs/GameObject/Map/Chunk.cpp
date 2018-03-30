@@ -11,9 +11,9 @@
 
 		Chunk::~Chunk()
 		{
-			points.clear();;
-			uvs.clear();;
-			world.clear();
+			points.clear();
+			uvs.clear();
+			bzero(&this->worldChar, CHUNK_SIZE * CHUNK_SIZE * (CHUNK_HEIGHT + 1));
 		}
 
 int		Chunk::getWorld(int x, int y, int z)
@@ -30,14 +30,10 @@ int		Chunk::getWorld(int x, int y, int z)
 
 	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
 	{
-		//printf("get: %d %d %d from %d %d %d \n", X, Y, Z, x, y, z);
-		//exit(0);
 		return (0);
 	}
 
 	return (this->worldChar[X][Y][Z]);
-
-	//return (this->world[x][y][z]);
 }
 
 void	Chunk::setWorld(int x, int y, int z, int val)
@@ -49,13 +45,10 @@ void	Chunk::setWorld(int x, int y, int z, int val)
 
 	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
 	{
-		//printf("set: %d %d %d from %d %d %d \n", X, Y, Z, x, y, z);
-		//exit(0);
 		return ;
 	}
 
 	this->worldChar[X][Y][Z] = val;
-	//this->world[x][y][z] = val;
 }
 
 int		Chunk::getBlockType(int x, int y, int z, int height)

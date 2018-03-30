@@ -12,10 +12,11 @@ class Chunk;
 class Map
 {
 	public:
-		std::map<int,std::map<int,std::map<int,Chunk*> > > 	chunks;
+		std::map<int,std::map<int,Chunk*> > 	chunks;
 		std::list<Chunk*> 									chunkList;
 		std::list<Chunk*> 									renderList;
-		std::mutex											mutexList;
+		std::mutex											mutex_infos;
+		std::mutex											mutex_chunks;
 
 		enum INFO
 		{
@@ -43,7 +44,7 @@ class Map
 
 	private:
 		int 		chunkInit = 0;
-		std::map<int,std::map<int,std::map<int,Map::INFO> > >	infos;
+		std::map<int,std::map<int,Map::INFO> >	infos;
 
 		unsigned int											nbWorker;
 		unsigned int 											thread;

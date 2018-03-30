@@ -39,21 +39,38 @@
 	}
 
 void 		Map::setInfos(int x, int y, int z, Map::INFO info) {
-	this->infos[x][0][z] = info;
+	this->mutex_infos.lock();
+		this->infos[x][z] = info;
+	this->mutex_infos.unlock();
 }
 
 Map::INFO	Map::getInfos(int x, int y, int z) {
-	return (this->infos[x][0][z]);
+	Map::INFO info;
+
+	this->mutex_infos.lock();
+		info = this->infos[x][z];
+	this->mutex_infos.unlock();
+
+	return (info);
 }
 
 void 		Map::setChunkPtr(int x, int y, int z, Chunk *chunk) {
-	this->chunks[x][0][z] = chunk;
+	this->mutex_chunks.lock();
+	this->chunks[x][z] = chunk;
+	this->mutex_chunks.unlock();
 }
 
 Chunk 		*Map::getChunk(int x, int y, int z) {
-	if (this->infos[x][y][z] > 0)
-		return (this->chunks[x][y][z]);
-	return (NULL);
+	Chunk *c;
+
+	c = NULL;
+	if (this->getInfos(x, 0, z) > 0)
+	{
+		this->mutex_chunks.lock();
+		c = this->chunks[x][z];
+		this->mutex_chunks.unlock();
+	}
+	return (c);
 }
 
 Chunk		*Map::getChunkWorld(int x, int y, int z) {
@@ -169,7 +186,7 @@ void 		Map::threadPoolJob(void) {
 						w++;
 					}
 				}
-				if (c->state == Chunk::STATE::DELETE && mutexList.try_lock())
+				if (c->state == Chunk::STATE::DELETE)
 				{
 
 					this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
@@ -177,7 +194,6 @@ void 		Map::threadPoolJob(void) {
 					this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
 					delete c;
 					del = 1;
-					mutexList.unlock();
 					break;
 				}
 				if (c->state == Chunk::STATE::RENDER)
@@ -224,7 +240,7 @@ void 		Map::threadUpdateJob(void) {
 		int disable = 0;
 		int del = 0;/*
 		iter = this->chunkList.begin();
-		while(iter != this->chunkList.end() && mutexList.try_lock())
+		while(iter != this->chunkList.end())
 		{
 			c = (*iter);
 			if (c->state == Chunk::STATE::INIT)
@@ -264,7 +280,7 @@ void 		Map::updateChunkToLoad(void) {
 
 				if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
 				{
-					if (this->infos[(X+x)][0][(Z+z)] < INFO::INIT/* && mutexList.try_lock()*/)
+					if (this->getInfos((X+x),0,(Z+z)) < INFO::INIT)
 					{
 						chunkAddPerPassage++;
 						int lx, ly, lz;
@@ -273,10 +289,8 @@ void 		Map::updateChunkToLoad(void) {
 						lz = Z+z;
 						this->setInfos(lx ,0 ,lz, INFO::INIT);
 						Chunk *chunk = new Chunk(lx ,0 ,lz, this);
-						mutexList.lock();
 						this->chunkList.push_back(chunk);
 						this->setChunkPtr(lx ,0 ,lz, chunk);
-						mutexList.unlock();
 					}
 				}
 			}

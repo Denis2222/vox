@@ -3,7 +3,7 @@
 		Voxel::Voxel(void) {
 			std::cout << "Lets GO " << std::endl;
 			this->glfwStart();
-			this->camera = new Camera(0, WIDTH, HEIGHT, this->window);
+			this->camera = new Camera(0, this->width, this->height, this->window);
 			this->map = new Map();
 			this->map->updatePosition(this->camera->position);
 			//this->map->updateChunkToLoad();
@@ -57,7 +57,14 @@
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-			this->window = glfwCreateWindow(WIDTH, HEIGHT, TITLE, NULL, NULL);
+
+
+			const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+			this->width = mode->width;
+			this->height = mode->height;
+
+			this->window = glfwCreateWindow(this->width, this->height, TITLE, glfwGetPrimaryMonitor(), NULL);
 			if (this->window == NULL)
 			{
 				std::cout << "Failed to open GLFW window.\n" << std::endl;

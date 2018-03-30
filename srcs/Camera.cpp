@@ -5,6 +5,8 @@ Camera::Camera(unsigned int id, unsigned int w, unsigned int h, GLFWwindow *win)
 	this->ID = id;
 
 	this->window = win;
+
+
 	this->height = h;
 	this->width = w;
 	//this->position.y = getNoise((int)position.y, (int)position.z)+40.0f;
@@ -140,7 +142,8 @@ glm::mat4	Camera::getView(void)
 }
 glm::mat4	Camera::getProjection(void)
 {
-	return (glm::perspective(glm::radians(75.0f), ((float)this->width / (float)this->height), 0.1f, FAR));
+
+	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.1f, FAR));
 }
 
 void 		Camera::mouse_callback(double xpos, double ypos)

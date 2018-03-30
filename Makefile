@@ -6,7 +6,7 @@ ifeq ($(UNAME), Linux)
 	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lnoise -lassimp
 endif
 ifeq ($(UNAME), Darwin)
-	GCC_FLAG = -Wall -Werror -Wextra -g -fsanitize=address
+	GCC_FLAG = -Wall -Wextra -std=c++14
 	DL_INC = -I./includes -I $(HOME)/.brew/include
 	DL_FLAG_DIR = -L./glmc -L./libft
 	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread -lnoise -lassimp

@@ -3,13 +3,16 @@
 #include "stb_image.h"
 
 	Map::Map(void) {
-		this->nbWorker = 8;
+		this->nbWorker = 6;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
 		this->texture = this->loadTexture("./assets/tileset.png");
 		this->tg = this->threadUpdate();
 		this->tp = this->threadPool();
+		this->chunkInit = 0;
+
+
 	}
 
 	Map::~Map(void) {
@@ -175,9 +178,10 @@ void 		Map::threadPoolJob(void) {
 					c->state = Chunk::STATE::UPDATE;
 				}
 				if (c->state == Chunk::STATE::INIT) { //One Task !
-					if (this->distanceToChunk(c) > FAR_CHUNK+5 || this->chunkInit > 50 && this->distanceToChunk(c) > FAR_CHUNK/3)
+					if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
 					{
 						c->state = Chunk::STATE::DELETE;
+						this->chunkInit--;
 						//std::cout << "Direct delete ! " << std::endl;
 					} else if (w < nbWorker) {
 						c->state = Chunk::STATE::THREAD;
@@ -213,6 +217,7 @@ void 		Map::threadPoolJob(void) {
 				if (c->state != Chunk::STATE::THREAD)
 				{
 					i.join();
+					this->chunkInit--;
 					workers.erase(workers.begin() + u);
 					workersTask.erase(workersTask.begin() + u);
 					w--;
@@ -229,6 +234,7 @@ void 		Map::threadPoolJob(void) {
 }
 
 void 		Map::threadUpdateJob(void) {
+	/*
 	std::list<Chunk*>::iterator	iter;
 	Chunk						*c;
 
@@ -238,7 +244,7 @@ void 		Map::threadUpdateJob(void) {
 		int init = 0;
 		int render = 0;
 		int disable = 0;
-		int del = 0;/*
+		int del = 0;
 		iter = this->chunkList.begin();
 		while(iter != this->chunkList.end())
 		{
@@ -252,11 +258,10 @@ void 		Map::threadUpdateJob(void) {
 			if (c->state == Chunk::STATE::DELETE)
 				del++;
 			iter++;
-		}*/
-		this->chunkInit = 30;
+		}
 
 		usleep(20000);
-	}
+	}*/
 }
 
 void 		Map::updateChunkToLoad(void) {
@@ -268,14 +273,14 @@ void 		Map::updateChunkToLoad(void) {
 
 	int chunkAddPerPassage = 0;
 
-	for (priority = 0; priority <= CHUNK_VIEW && chunkAddPerPassage<50 && this->chunkInit < 50; priority++)
+	for (priority = 0; priority <= CHUNK_VIEW && chunkAddPerPassage<MAX_CHUNK_INIT && this->chunkInit < MAX_CHUNK_INIT; priority++)
 	{
 
-		for (int X = -priority; X <= priority; X++)
+		for (int X = -priority; X <= priority && this->chunkInit < MAX_CHUNK_INIT; X++)
 		{
 
 			int Y=0;
-			for (int Z = -priority; Z <= priority; Z++)
+			for (int Z = -priority; Z <= priority && this->chunkInit < MAX_CHUNK_INIT; Z++)
 			{
 
 				if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
@@ -291,6 +296,7 @@ void 		Map::updateChunkToLoad(void) {
 						Chunk *chunk = new Chunk(lx ,0 ,lz, this);
 						this->chunkList.push_back(chunk);
 						this->setChunkPtr(lx ,0 ,lz, chunk);
+						this->chunkInit++;
 					}
 				}
 			}

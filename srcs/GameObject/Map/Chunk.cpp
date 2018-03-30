@@ -6,19 +6,25 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
-			bzero(&this->worldChar, CHUNK_SIZE * CHUNK_SIZE * (CHUNK_HEIGHT + 1));
+			bzero(this->worldChar, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
+			//memset(this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
+
+
+			//memset(&this->worldChar, 3, sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
+			//printf("%d", this->worldChar[(CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT) - 10]);
+			//exit(0);
 		}
 
 		Chunk::~Chunk()
 		{
 			points.clear();
 			uvs.clear();
-			bzero(&this->worldChar, CHUNK_SIZE * CHUNK_SIZE * (CHUNK_HEIGHT + 1));
+			//memset(&this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 		}
 
 int		Chunk::getWorld(int x, int y, int z)
 {
-	unsigned int X, Y, Z;
+	int X, Y, Z;
 
 	X = x;
 	Y = y;
@@ -38,7 +44,7 @@ int		Chunk::getWorld(int x, int y, int z)
 
 void	Chunk::setWorld(int x, int y, int z, int val)
 {
-	unsigned int X, Y, Z;
+	int X, Y, Z;
 
 	X = x;
 	Y = y;
@@ -48,9 +54,9 @@ void	Chunk::setWorld(int x, int y, int z, int val)
 	{
 		return ;
 	}
-	if (y > this->maxheight)
+	if (val > 1 && y > this->maxheight)
 		this->maxheight = y;
-	if (y < this->minheight)
+	if (val > 1 && y < this->minheight)
 		this->minheight = y;
 	this->worldChar[X][Y][Z] = val;
 }
@@ -90,16 +96,11 @@ void	Chunk::generate(void) {
 		for (int z = 0; z < CHUNK_SIZE; z++)
 		{
 			int height = getNoise(x + sx, z + sz);
-			for (int y = 0; y < CHUNK_HEIGHT; y++)
+			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++)
 			{
 				if (y <= height)
 				{
-					//if (z == 0 || z == CHUNK_SIZE - 1)
-						setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
-					//else if (x == 0 || x == CHUNK_SIZE - 1)
-					//	setWorld(x, y, z, 2); //getBlockType(x + sx, y, z + sz, height)
-					//else
-						//setWorld(x, y, z, 3); //getBlockType(x + sx, y, z + sz, height)
+					setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
 				}
 			}
 		}
@@ -306,8 +307,6 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 
 void 	Chunk::build(void) {
 	int sx, sy, sz;
-	int oneFace = ((sizeof(VCUBE) / 4)/6);
-	int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6);
 
 	sx = this->worldCoord.x;
 	sy = this->worldCoord.y;

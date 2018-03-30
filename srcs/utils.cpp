@@ -9,9 +9,8 @@ int getNoise(int x, int z)
 {
 	float what = 300.0f;
 	float that = 10;
-	int min = 1;
 
-	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 50) + 50);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 50);
 
 	if (noise < 40)
 		noise = 40;

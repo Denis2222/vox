@@ -30,7 +30,7 @@ void 		Camera::ProcessInput(Map *map)
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=10;
+		deltaSpeed*=20;
 
 	float posY = position.y;
 	float posX = position.x;
@@ -56,7 +56,9 @@ void 		Camera::ProcessInput(Map *map)
 		glfwSetWindowShouldClose(this->window, true);
 	}
 
-
+	(void)posX;
+	(void)posY;
+	(void)posZ;
 	//Get where i am !
 	glm::vec3 m = glm::floor(this->position + 0.5f);
 
@@ -77,10 +79,7 @@ void 		Camera::ProcessInput(Map *map)
 		{
 			if (c->state == Chunk::STATE::RENDER)
 			{
-
-
 				x = x - c->worldCoord.x;
-				y = y;
 				z = z - c->worldCoord.z;
 /*
 				printf("Chunk localCoord X:%f Y:%f Z:%f\n",c->localCoord.x, c->localCoord.y, c->localCoord.z);

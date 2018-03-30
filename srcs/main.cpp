@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 14:41:19 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/03/23 15:34:52 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/03/30 16:17:51 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int		main(int argc, char **argv)
 {
+	(void)argc;
+	(void)argv;
 	Voxel start;
 	return (0);
 }

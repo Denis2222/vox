@@ -37,7 +37,7 @@ class Chunk
 		std::vector<glm::vec3> 							points;
 		std::vector<glm::vec2> 							uvs;
 
-		unsigned char	worldChar[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE+1];
+		unsigned char	worldChar[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 
 		int  											minheight;
 		int 											maxheight;

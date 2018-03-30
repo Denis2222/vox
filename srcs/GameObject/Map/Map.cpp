@@ -3,7 +3,7 @@
 #include "stb_image.h"
 
 	Map::Map(void) {
-		this->nbWorker = 4;
+		this->nbWorker = 8;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
@@ -72,6 +72,7 @@ Chunk		*Map::getChunkWorld(int x, int y, int z) {
 
 int			Map::getBlockInfo(int x, int y, int z) {
 	Chunk *c = getChunkWorld(x, y, z);
+	//printf("getBlockInfo()\n");
 	if (c)
 		if (c->state > Chunk::STATE::BUILD)
 			return (c->getWorld(x, y, z));
@@ -107,11 +108,11 @@ void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
 	cz = (floor(z)-CHUNK_SIZE) / CHUNK_SIZE;
 
 	Chunk *c = getChunk(cx, cy, cz);
-	std::cout << "ChunkCoord:" << cx << " " << cy << " " << cz << " " << std::endl;
+	//std::cout << "ChunkCoord:" << cx << " " << cy << " " << cz << " " << std::endl;
 	if (c)
 	{
-		std::cout << "VALUE:  x:" << x<< " y:" << y<< " z:" << z << " !! : " <<  c->world[x][y][z] << std::endl;
-		std::cout << "LocalCoord:" << c->localCoord.x << " " << c->localCoord.y << " " << c->localCoord.z << " " << std::endl;
+		//std::cout << "VALUE:  x:" << x<< " y:" << y<< " z:" << z << " !! : " <<  c->world[x][y][z] << std::endl;
+		//std::cout << "LocalCoord:" << c->localCoord.x << " " << c->localCoord.y << " " << c->localCoord.z << " " << std::endl;
 	}
 }
 
@@ -147,6 +148,14 @@ void 		Map::threadPoolJob(void) {
 			{
 				//std::cout << "HERE" << std::endl;
 				c = (*iter);
+				if (c->state == Chunk::STATE::TOUPDATE)
+				{
+					//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
+					c->points.clear();
+					c->uvs.clear();
+					c->build();
+					c->state = Chunk::STATE::UPDATE;
+				}
 				if (c->state == Chunk::STATE::INIT) { //One Task !
 					if (this->distanceToChunk(c) > FAR_CHUNK+5 || this->chunkInit > 50 && this->distanceToChunk(c) > FAR_CHUNK/3)
 					{
@@ -168,6 +177,7 @@ void 		Map::threadPoolJob(void) {
 					delete c;
 					del = 1;
 					mutexList.unlock();
+					break;
 				}
 				if (c->state == Chunk::STATE::RENDER)
 				{
@@ -193,8 +203,9 @@ void 		Map::threadPoolJob(void) {
 			}
 			u++;
 		}
+		this->updateChunkToLoad();
 		if (!del)
-			usleep(5000);
+			usleep(10000);
 	}
 }
 
@@ -208,20 +219,11 @@ void 		Map::threadUpdateJob(void) {
 		int init = 0;
 		int render = 0;
 		int disable = 0;
-		int del = 0;
+		int del = 0;/*
 		iter = this->chunkList.begin();
 		while(iter != this->chunkList.end() && mutexList.try_lock())
 		{
 			c = (*iter);
-			mutexList.unlock();
-			if (c->state == Chunk::STATE::TOUPDATE)
-			{
-				std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
-				c->points.clear();
-				c->uvs.clear();
-				c->build();
-				c->state = Chunk::STATE::UPDATE;
-			}
 			if (c->state == Chunk::STATE::INIT)
 				init++;
 			if (c->state == Chunk::STATE::RENDER)
@@ -231,9 +233,9 @@ void 		Map::threadUpdateJob(void) {
 			if (c->state == Chunk::STATE::DELETE)
 				del++;
 			iter++;
-		}
-		this->chunkInit = init;
-		this->updateChunkToLoad();
+		}*/
+		this->chunkInit = 30;
+
 		usleep(20000);
 	}
 }

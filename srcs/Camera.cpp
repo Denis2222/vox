@@ -44,7 +44,7 @@ void 		Camera::ProcessInput(Map *map)
     if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
         position += glm::normalize(glm::cross(front, up)) * deltaSpeed;
 
-	if (1)//NO GOD MODE
+	if (0)//NO GOD MODE
 		position.y-= 0.1f;
 
 	if (glfwGetKey(this->window, GLFW_KEY_F) == GLFW_PRESS)
@@ -56,9 +56,35 @@ void 		Camera::ProcessInput(Map *map)
 
 
 	//Get where i am !
-	glm::vec3 p = this->position;
-	p+=0.5f;
+	glm::vec3 m = glm::floor(this->position + 0.5f);
 
+
+
+	//m = m / glm::vec3(CHUNK_SIZE, 1,CHUNK_SIZE);
+
+	Chunk *c;
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		c = map->getChunkWorld((int)round(m.x), (int)round(m.y), (int)round(m.z));
+		if (c != NULL)
+		{
+			if (c->state == Chunk::STATE::RENDER)
+			{
+				//usleep(50000);
+				system("clear");
+				printf("X:%d Y:%d Z:%d\n",(int)round(m.x), (int)round(m.y), (int)round(m.z));
+				printf("X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
+				printf("debug x+1 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 3));
+				printf("debug x-1 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 4));
+				printf("debug z+1 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 5));
+				printf("debug z11 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 6));
+				printf("===============================\n");
+				//c->interact( floor(m.x+0.5f), floor(m.y), floor(m.z), 0);
+			}
+		}
+	}
+
+/*
 	if (map->getBlockInfo(p.x, floor(p.y-1.5f), p.z) > 1)
 		position.y = posY;
 
@@ -79,7 +105,7 @@ void 		Camera::ProcessInput(Map *map)
 	if (map->getBlockInfo(p.x, floor(p.y-0.5f), p.z - 0.2f) >1)
 		position.z = posZ+0.01f;
 	//Get block arroud;
-
+*/
 
 
 

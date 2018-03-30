@@ -6,6 +6,18 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
+			//printf("JE SAIS PLUS FAIRE UN PUTAIN DE MALLOC !!!\n");
+			//this->worldChar = (unsigned char ***)malloc(CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * (sizeof(unsigned char) + 1));
+			/*if (!this->worldChar){
+				printf("Malloc Fail");
+				exit(0);
+			}*/
+			//printf("Malloc Work\n");
+			bzero(&this->worldChar, CHUNK_SIZE * CHUNK_SIZE * (CHUNK_HEIGHT + 1));
+
+			//this->worldChar[0][0][0] = 255;
+			//sleep(12);
+			//exit(0);
 		}
 
 		Chunk::~Chunk()
@@ -14,6 +26,50 @@
 			uvs.clear();;
 			world.clear();
 		}
+
+
+
+int		Chunk::getWorld(int x, int y, int z)
+{
+	unsigned int X, Y, Z;
+
+	X = x - this->worldCoord.x;
+	Y = y;
+	Z = z - this->worldCoord.z;
+	if (Y == -1)
+		return (0);
+	if (Y >= CHUNK_HEIGHT)
+		return (0);
+
+	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
+	{
+		//printf("get: %d %d %d from %d %d %d \n", X, Y, Z, x, y, z);
+		//exit(0);
+		return (0);
+	}
+
+	return (this->worldChar[X][Y][Z]);
+
+	//return (this->world[x][y][z]);
+}
+
+void	Chunk::setWorld(int x, int y, int z, int val)
+{
+	unsigned int X, Y, Z;
+	X = x - this->worldCoord.x;
+	Y = y;
+	Z = z - this->worldCoord.z;
+
+	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
+	{
+		//printf("set: %d %d %d from %d %d %d \n", X, Y, Z, x, y, z);
+		//exit(0);
+		return ;
+	}
+
+	this->worldChar[X][Y][Z] = val;
+	//this->world[x][y][z] = val;
+}
 
 int		Chunk::getBlockType(int x, int y, int z, int height)
 {
@@ -53,11 +109,12 @@ void	Chunk::generate(void)
 					if (y >= this->maxheight)
 						this->maxheight = y+1;
 					if (y <= this->minheight)
-						this->minheight = y-1;
+						this->minheight = y;
 				}
 			}
 		}
 	}
+	//printf("Generate : %d %d\n", this->minheight, this->maxheight);
 	this->state = STATE::GENERATE;
 }
 
@@ -81,74 +138,60 @@ void Chunk::interact(int x, int y, int z, int val)
 
 bool	Chunk::collide(int x, int y, int z, int way)
 {
-
+	/*
+	printf("collide(%d, %d, %d) \n", x, y, z);
+	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
 	bool retour = false;
 	int info = -1;
-	if ((x <= this->worldCoord.x || z <= this->worldCoord.z ||
-		x >= this->worldCoord.x + CHUNK_SIZE-1 || z >= this->worldCoord.z + CHUNK_SIZE-1) && way != 1 && way != 2 )
-	{
-		int qx = x;
-		int qy = y;
-		int qz = z;
 
-		if (way == 1) // UP
-			qy = qy + 1;
-		if (way == 2) // DOWN
-			qy = qy - 1;
-		if (way == 3) // EST
-			qx = qx + 1;
-		if (way == 4) // OUEST
-			qx = qx - 1;
-		if (way == 5) // NORD
-			qz = qz + 1;
-		if (way == 6) // SUD
-			qz = qz - 1;
+
+	//printf("extern\n");
+	int qx = x;
+	int qy = y;
+	int qz = z;
+
+	if (way == 1) // UP
+		qy = qy + 1;
+	if (way == 2) // DOWN
+		qy = qy - 1;
+	if (way == 3) // EST
+		qx = qx + 1;
+	if (way == 4) // OUEST
+		qx = qx - 1;
+	if (way == 5) // NORD
+		qz = qz + 1;
+	if (way == 6) // SUD
+		qz = qz - 1;
+
+
+	//Haut ou bas, facile
+	if (way != 1 && way != 2)
+	{
+		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+	}
+	else if (qx >= this->worldCoord.x &&
+		qx < this->worldCoord.x + CHUNK_SIZE &&
+		qz >= this->worldCoord.z &&
+		qz < this->worldCoord.z + CHUNK_SIZE)
+	{
+		//On est dans le chunk
+		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+	}
+	else {
+		//On est hors du chunk on demande a la map
 		info = this->map->getBlockInfo(qx, qy, qz);
 		if (info > 1)
 			retour = true;
-		else if (info  < 1)
+		else if (info < 1)
 		{
-			if (getNoise(qx, qz) >= qy)
-					retour = true;
-			else
-				retour = false;
-		}
-		else if (info == 0)
+			//La map le connais pas
+			info = getBlockType(qx, qy, qz, getNoise(qx, qz));
+			if (info > 1)
+				retour = true;
+		} else {
 			retour = false;
-		else
-			retour = false;
-	} else {
-		if (way == 1) // UP
-		{
-			if (getWorld(x, y + 1, z) > 1)
-				retour = true;
-		}
-		if (way == 2) // DOWN
-		{
-			if (y == 0)
-				retour = true;
-			if (getWorld(x, y - 1, z) > 1)
-				retour = true;
-		}
-		if (way == 3) // EST
-		{
-			if (getWorld(x + 1, y, z) > 1)
-				retour = true;
-		}
-		if (way == 4) // OUEST
-		{
-			if (getWorld(x - 1 , y, z) > 1)
-				retour = true;
-		}
-		if (way == 5) // NORD
-		{
-			if (getWorld(x, y, z + 1) > 1)
-				retour = true;
-		}
-		if (way == 6) // SUD
-		{
-			if (getWorld(x, y, z - 1) > 1)
-				retour = true;
 		}
 	}
 	return (retour);
@@ -156,100 +199,60 @@ bool	Chunk::collide(int x, int y, int z, int way)
 
 bool	Chunk::collideDebug(int x, int y, int z, int way)
 {
-
-	//std::cout << "PATATOR: X" << x << " " << this->worldCoord.x << " Y " <<  y << " " << this->worldCoord.y << " Z:" <<  z << " " << this->worldCoord.z << std::endl;
+	/*
+	printf("collide(%d, %d, %d) \n", x, y, z);
+	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
 	bool retour = false;
 	int info = -1;
-	if ((x <= this->worldCoord.x || z <= this->worldCoord.z ||
-		x >= this->worldCoord.x + CHUNK_SIZE-1 || z >= this->worldCoord.z + CHUNK_SIZE-1) && way != 1 && way != 2 )
+
+	//printf("extern\n");
+	int qx = x;
+	int qy = y;
+	int qz = z;
+	if (way == 1) // UP
+		qy = qy + 1;
+	if (way == 2) // DOWN
+		qy = qy - 1;
+	if (way == 3) // EST
+		qx = qx + 1;
+	if (way == 4) // OUEST
+		qx = qx - 1;
+	if (way == 5) // NORD
+		qz = qz + 1;
+	if (way == 6) // SUD
+		qz = qz - 1;
+
+	//Haut ou bas, facile
+	if (way == 1 && way == 2)
 	{
-		//std::cout << "Externe" << std::endl;
-
-
-		int qx = x;
-		int qy = y;
-		int qz = z;
-
-		if (way == 1) // UP
-			qy = qy + 1;
-		if (way == 2) // DOWN
-			qy = qy - 1;
-		if (way == 3) // EST
-			qx = qx + 1;
-		if (way == 4) // OUEST
-			qx = qx - 1;
-		if (way == 5) // NORD
-			qz = qz + 1;
-		if (way == 6) // SUD
-			qz = qz - 1;
-
-
+		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+	}
+	else if (qx >= this->worldCoord.x &&
+		qx < this->worldCoord.x + CHUNK_SIZE &&
+		qz >= this->worldCoord.z &&
+		qz < this->worldCoord.z + CHUNK_SIZE)
+	{
+		//On est dans le chunk
+		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+	}
+	else {
+		//On est hors du chunk on demande a la map
 		info = this->map->getBlockInfo(qx, qy, qz);
-
-		//info = -1;
-
-			//std::cout << "info: " << info << std::endl;
 		if (info > 1)
 			retour = true;
-		else if (info  < 1)
+		else if (info < 1)
 		{
-			//std::cout << "info < 0" << "Tu va prendre ton noise ! " << std::endl;
-			if (getNoise(qx, qz) >= qy)
-					retour = true;
-			else
-				retour = false;
+			//La map le connais pas
+			info = getBlockType(qx, qy, qz, getNoise(qx, qz));
+			if (info > 1)
+				retour = true;
+		} else {
+			retour = false;
 		}
-		else if (info == 0)
-			retour = false;
-		else
-			retour = false;
-
-				std::cout << "Externe " << std::endl;
-				this->map->getBlockInfoReallyMore(qx, qy, qz);
-				//std::cout << "Externe x:"<< x <<" y:" << y <<" z:" << z<< " bool:" << retour << " way:" << way << " info:" << info << std::endl;
-
-	} else {
-		std::cout << "Interne " << std::endl;
-
-		//std::cout << "getWorld:" << getWorld(x, y, z) << "getBlockInfo():" << this->map->getBlockInfo(x, y, z) << std::endl;
-		int value = -10;
-
-
-		int qx = x;
-		int qy = y;
-		int qz = z;
-
-		if (way == 1) // UP
-			qy = qy + 1;
-		if (way == 2) // DOWN
-			qy = qy - 1;
-		if (way == 3) // EST
-			qx = qx + 1;
-		if (way == 4) // OUEST
-			qx = qx - 1;
-		if (way == 5) // NORD
-			qz = qz + 1;
-		if (way == 6) // SUD
-			qz = qz - 1;
-
-		if (value = getWorld(qx, qy, qz) > 1)
-			retour = true;
-
-		std::cout << "Interne  x:"<< x <<" y:" << y << " z:" << z << "way" << way << "value:" << value << std::endl;
-		this->map->getBlockInfoReallyMore(qx, qy, qz);
 	}
 	return (retour);
-}
-
-
-int		Chunk::getWorld(int x, int y, int z)
-{
-	return (this->world[x][y][z]);
-}
-
-void	Chunk::setWorld(int x, int y, int z, int val)
-{
-	this->world[x][y][z] = val;
 }
 
 void	Chunk::buildFace(int n, int x, int y, int z, int val)
@@ -313,6 +316,13 @@ void 	Chunk::build(void)
 	for (int x = sx; x < CHUNK_SIZE + sx; x++) {
 		for (int z = sz; z < CHUNK_SIZE + sz; z++) {
 			for (int y = this->minheight; y <= this->maxheight; y++) {
+				//printf("build()\n");
+				if (y > 256 || y < 0)
+				{
+					printf("%d %d %d", x, y, z);
+					printf("COLLIDE ECRIT ICI !\n");
+					exit(0);
+				}
 				if (this->getWorld(x, y, z) > 1) {
 					int val = this->getWorld(x, y, z);
 

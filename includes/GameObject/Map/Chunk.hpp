@@ -39,8 +39,10 @@ class Chunk
 
 		std::map<int,std::map<int,std::map<int,int> > > world;
 
-		int 											minheight = 256;
-		int 											maxheight = 0;
+		unsigned char	worldChar[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE+1];
+
+		long  											minheight = 256;
+		long 											maxheight = 0;
 
 
 					Chunk(void);
@@ -59,6 +61,7 @@ class Chunk
 		bool		collide(int x, int y, int z, int way);
 		bool		collideDebug(int x, int y, int z, int way);
 		int			getWorld(int x, int y, int z);
+		int			getWorldDebug(int x, int y, int z);
 		void		setWorld(int x, int y, int z, int val);
 
 		float		*getVertices(void);

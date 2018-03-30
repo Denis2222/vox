@@ -55,11 +55,6 @@
 
 # include <stb_image.h>
 
-# define WIDTH 2500
-# define HEIGHT 2000
-# define TITLE "Voxel"
-# define BASE_FOV 45.0f
-
 #include <iostream>
 //#define GLM_FORCE_SWIZZLE
 #define GLM_ENABLE_EXPERIMENTAL
@@ -68,18 +63,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "glm/gtx/string_cast.hpp"
 
-#include "static.h"
+# define WIDTH 2500
+# define HEIGHT 2000
+# define TITLE "Voxel"
+# define BASE_FOV 45.0f
 
-#include <Camera.hpp>
-#include <GameObject/Map/Map.hpp>
-#include <GameObject/Map/Chunk.hpp>
-#include <GameObject/Shader.hpp>
-#include <GameObject/Skybox.hpp>
-#include <Voxel.hpp>
-
-
-#define CHUNK_SIZE 16
-#define CHUNK_VIEW 16
+#define CHUNK_SIZE 4
+#define CHUNK_VIEW 4
 
 #define FAR 500.0f
 
@@ -92,6 +82,20 @@
 //NVIDIA VRAM
 #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+
+
+
+#include "static.h"
+
+#include <Camera.hpp>
+#include <GameObject/Map/Map.hpp>
+#include <GameObject/Map/Chunk.hpp>
+#include <GameObject/Shader.hpp>
+#include <GameObject/Skybox.hpp>
+#include <Voxel.hpp>
+
+
+
 
 int					getNoise(int x, int y);
 int					parseLine(char* line);

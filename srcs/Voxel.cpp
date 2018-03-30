@@ -25,7 +25,7 @@
 				currentTime = glfwGetTime();
 				if (currentTime - lastTime >= 0.10)
 				{
-					printf("%f ms/frame  fps:%d chunks:%lu\n", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
+					//printf("%f ms/frame  fps:%d chunks:%lu\n", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
 					nbFrames = 0;
 					lastTime += 0.10;
 					this->map->updatePosition(this->camera->position);

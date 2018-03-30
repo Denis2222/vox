@@ -24,7 +24,6 @@ int getNoise(int x, int z)
 
 	if (x==0 && z == 1)
 		noise = 35;
-	//noise = 40;
 
 	return (noise);
 }

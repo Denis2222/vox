@@ -6,6 +6,7 @@
 			this->camera = new Camera(0, WIDTH, HEIGHT, this->window);
 			this->map = new Map();
 			this->map->updatePosition(this->camera->position);
+			//this->map->updateChunkToLoad();
 			this->skybox = new Skybox();
 			//this->initSkybox();
 			this->loop();

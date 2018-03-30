@@ -28,7 +28,7 @@ void 		Camera::ProcessInput(Map *map)
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=40;
+		deltaSpeed*=10;
 
 	float posY = position.y;
 	float posX = position.x;
@@ -63,24 +63,46 @@ void 		Camera::ProcessInput(Map *map)
 	//m = m / glm::vec3(CHUNK_SIZE, 1,CHUNK_SIZE);
 
 	Chunk *c;
-	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (1)
 	{
-		c = map->getChunkWorld((int)round(m.x), (int)round(m.y), (int)round(m.z));
+		int x = (int)round(m.x);
+		int y = (int)round(m.y);
+		int z = (int)round(m.z);
+		//system("clear");
+		//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
+		c = map->getChunkWorld(x, y, z);
 		if (c != NULL)
 		{
 			if (c->state == Chunk::STATE::RENDER)
 			{
-				//usleep(50000);
-				system("clear");
-				printf("X:%d Y:%d Z:%d\n",(int)round(m.x), (int)round(m.y), (int)round(m.z));
-				printf("X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
-				printf("debug x+1 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 3));
-				printf("debug x-1 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 4));
-				printf("debug z+1 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 5));
-				printf("debug z11 :%d\n", c->collideDebug((int)round(m.x), (int)round(m.y), (int)round(m.z), 6));
+
+
+				x = x - c->worldCoord.x;
+				y = y;
+				z = z - c->worldCoord.z;
+/*
+				printf("Chunk localCoord X:%f Y:%f Z:%f\n",c->localCoord.x, c->localCoord.y, c->localCoord.z);
+				printf("GetWorld: X:%d Y:%d Z:%d va: %d \n", x, y, z, c->getWorld(x, y, z));
+
+				printf("OUEST x+1 :%d\n", c->collideDebug(x, y, z, 3));
+				printf("EST   x-1 :%d\n", c->collideDebug(x, y, z, 4));
+				printf("NORD  z+1 :%d\n", c->collideDebug(x, y, z, 5));
+				printf("SUD   z-1 :%d\n", c->collideDebug(x, y, z, 6));
 				printf("===============================\n");
 				//c->interact( floor(m.x+0.5f), floor(m.y), floor(m.z), 0);
+*/
+				if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+				{
+					c->interact( x, y, z, 0);
+				}
+				if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+				{
+					c->interact( x, y, z, 4);
+				}
+
 			}
+
+
 		}
 	}
 

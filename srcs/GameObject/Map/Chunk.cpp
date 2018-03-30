@@ -6,18 +6,7 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
-			//printf("JE SAIS PLUS FAIRE UN PUTAIN DE MALLOC !!!\n");
-			//this->worldChar = (unsigned char ***)malloc(CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * (sizeof(unsigned char) + 1));
-			/*if (!this->worldChar){
-				printf("Malloc Fail");
-				exit(0);
-			}*/
-			//printf("Malloc Work\n");
 			bzero(&this->worldChar, CHUNK_SIZE * CHUNK_SIZE * (CHUNK_HEIGHT + 1));
-
-			//this->worldChar[0][0][0] = 255;
-			//sleep(12);
-			//exit(0);
 		}
 
 		Chunk::~Chunk()
@@ -27,15 +16,13 @@
 			world.clear();
 		}
 
-
-
 int		Chunk::getWorld(int x, int y, int z)
 {
 	unsigned int X, Y, Z;
 
-	X = x - this->worldCoord.x;
+	X = x;
 	Y = y;
-	Z = z - this->worldCoord.z;
+	Z = z;
 	if (Y == -1)
 		return (0);
 	if (Y >= CHUNK_HEIGHT)
@@ -56,9 +43,9 @@ int		Chunk::getWorld(int x, int y, int z)
 void	Chunk::setWorld(int x, int y, int z, int val)
 {
 	unsigned int X, Y, Z;
-	X = x - this->worldCoord.x;
+	X = x;
 	Y = y;
-	Z = z - this->worldCoord.z;
+	Z = z;
 
 	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
 	{
@@ -74,6 +61,7 @@ void	Chunk::setWorld(int x, int y, int z, int val)
 int		Chunk::getBlockType(int x, int y, int z, int height)
 {
 	int type = 0;
+
 	if (y < 41)
 		type = 2; // Water
 	else if (y < 42)
@@ -85,29 +73,39 @@ int		Chunk::getBlockType(int x, int y, int z, int height)
 
 	if (y > 80)
 		type = 5; // Snow
+
+	if (y%16 == 0)
+		type=4;
+
 	return (type);
 }
 
-void	Chunk::generate(void)
-{
+void	Chunk::generate(void) {
 	int sx, sy, sz;
 	sx = this->worldCoord.x;
 	sy = this->worldCoord.y;
 	sz = this->worldCoord.z;
 
-	for (int x = sx; x < CHUNK_SIZE + sx; x++)
+	this->minheight = 256;
+	this->maxheight = 0;
+	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
-		for (int z = sz; z < CHUNK_SIZE + sz; z++)
+		for (int z = 0; z < CHUNK_SIZE; z++)
 		{
-			int height = getNoise(x, z);
+			int height = getNoise(x + sx, z + sz);
 			for (int y = 0; y < CHUNK_HEIGHT; y++)
 			{
 				if (y <= height)
 				{
-					setWorld(x, y, z, getBlockType(x, y, z, height));
+					//if (z == 0 || z == CHUNK_SIZE - 1)
+						setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
+					//else if (x == 0 || x == CHUNK_SIZE - 1)
+					//	setWorld(x, y, z, 2); //getBlockType(x + sx, y, z + sz, height)
+					//else
+						//setWorld(x, y, z, 3); //getBlockType(x + sx, y, z + sz, height)
 
 					if (y >= this->maxheight)
-						this->maxheight = y+1;
+						this->maxheight = y;
 					if (y <= this->minheight)
 						this->minheight = y;
 				}
@@ -118,8 +116,7 @@ void	Chunk::generate(void)
 	this->state = STATE::GENERATE;
 }
 
-void Chunk::interact(int x, int y, int z, int val)
-{
+void Chunk::interact(int x, int y, int z, int val) {
 	this->setWorld(x, y, z, val);
 	this->state = STATE::TOUPDATE;
 	if ((x == this->worldCoord.x || z == this->worldCoord.z ||
@@ -136,13 +133,9 @@ void Chunk::interact(int x, int y, int z, int val)
 	}
 }
 
-bool	Chunk::collide(int x, int y, int z, int way)
-{
-	/*
-	printf("collide(%d, %d, %d) \n", x, y, z);
-	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
+bool	Chunk::collide(int x, int y, int z, int way) {
 	bool retour = false;
-	int info = -1;
+	int type = -1;
 
 
 	//printf("extern\n");
@@ -165,15 +158,12 @@ bool	Chunk::collide(int x, int y, int z, int way)
 
 
 	//Haut ou bas, facile
-	if (way != 1 && way != 2)
+	if (way == 1 || way == 2)
 	{
 		if (getWorld(qx, qy , qz) > 1)
 			retour = true;
 	}
-	else if (qx >= this->worldCoord.x &&
-		qx < this->worldCoord.x + CHUNK_SIZE &&
-		qz >= this->worldCoord.z &&
-		qz < this->worldCoord.z + CHUNK_SIZE)
+	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE)
 	{
 		//On est dans le chunk
 		if (getWorld(qx, qy , qz) > 1)
@@ -181,15 +171,25 @@ bool	Chunk::collide(int x, int y, int z, int way)
 	}
 	else {
 		//On est hors du chunk on demande a la map
-		info = this->map->getBlockInfo(qx, qy, qz);
-		if (info > 1)
+
+		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
+		//printf("Askmap : x:%d y:%d z:%d info: %d \n", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
+		if (type > 1)
 			retour = true;
-		else if (info < 1)
+		else if (type < 0)
 		{
 			//La map le connais pas
-			info = getBlockType(qx, qy, qz, getNoise(qx, qz));
-			if (info > 1)
-				retour = true;
+			int noise = getNoise(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
+			if (qy <= noise)
+			{
+				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
+				if (type > 1)
+					retour = true;
+				else
+					retour = false;
+			} else {
+				retour = false;
+			}
 		} else {
 			retour = false;
 		}
@@ -197,18 +197,19 @@ bool	Chunk::collide(int x, int y, int z, int way)
 	return (retour);
 }
 
-bool	Chunk::collideDebug(int x, int y, int z, int way)
-{
+bool	Chunk::collideDebug(int x, int y, int z, int way) {
 	/*
 	printf("collide(%d, %d, %d) \n", x, y, z);
 	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
 	bool retour = false;
-	int info = -1;
+	int type = -1;
+
 
 	//printf("extern\n");
 	int qx = x;
 	int qy = y;
 	int qz = z;
+
 	if (way == 1) // UP
 		qy = qy + 1;
 	if (way == 2) // DOWN
@@ -222,32 +223,40 @@ bool	Chunk::collideDebug(int x, int y, int z, int way)
 	if (way == 6) // SUD
 		qz = qz - 1;
 
+
 	//Haut ou bas, facile
-	if (way == 1 && way == 2)
+	if (way == 1 || way == 2)
 	{
 		if (getWorld(qx, qy , qz) > 1)
 			retour = true;
 	}
-	else if (qx >= this->worldCoord.x &&
-		qx < this->worldCoord.x + CHUNK_SIZE &&
-		qz >= this->worldCoord.z &&
-		qz < this->worldCoord.z + CHUNK_SIZE)
+	/*else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE)
 	{
 		//On est dans le chunk
 		if (getWorld(qx, qy , qz) > 1)
 			retour = true;
-	}
+	}*/
 	else {
 		//On est hors du chunk on demande a la map
-		info = this->map->getBlockInfo(qx, qy, qz);
-		if (info > 1)
+
+		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
+		printf("Askmap : x:%d y:%d z:%d info: %d \n", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
+		if (type > 1)
 			retour = true;
-		else if (info < 1)
+		else if (type < 0)
 		{
 			//La map le connais pas
-			info = getBlockType(qx, qy, qz, getNoise(qx, qz));
-			if (info > 1)
-				retour = true;
+			int noise = getNoise(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
+			if (qy <= noise)
+			{
+				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
+				if (type > 1)
+					retour = true;
+				else
+					retour = false;
+			} else {
+				retour = false;
+			}
 		} else {
 			retour = false;
 		}
@@ -255,8 +264,7 @@ bool	Chunk::collideDebug(int x, int y, int z, int way)
 	return (retour);
 }
 
-void	Chunk::buildFace(int n, int x, int y, int z, int val)
-{
+void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 	static int oneFace = ((sizeof(VCUBE) / 4)/6/2);
 	static int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6/2);
 	int u = n + 1;
@@ -304,8 +312,7 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val)
 	}
 }
 
-void 	Chunk::build(void)
-{
+void 	Chunk::build(void) {
 	int sx, sy, sz;
 	int oneFace = ((sizeof(VCUBE) / 4)/6);
 	int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6);
@@ -313,8 +320,8 @@ void 	Chunk::build(void)
 	sx = this->worldCoord.x;
 	sy = this->worldCoord.y;
 	sz = this->worldCoord.z;
-	for (int x = sx; x < CHUNK_SIZE + sx; x++) {
-		for (int z = sz; z < CHUNK_SIZE + sz; z++) {
+	for (int x = 0; x < CHUNK_SIZE; x++) {
+		for (int z = 0; z < CHUNK_SIZE; z++) {
 			for (int y = this->minheight; y <= this->maxheight; y++) {
 				//printf("build()\n");
 				if (y > 256 || y < 0)
@@ -325,7 +332,6 @@ void 	Chunk::build(void)
 				}
 				if (this->getWorld(x, y, z) > 1) {
 					int val = this->getWorld(x, y, z);
-
 					if (!this->collide(x, y, z, 1)) {	// UP
 						this->buildFace(1, x , y, z , val);
 					}

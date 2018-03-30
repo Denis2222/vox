@@ -41,8 +41,8 @@ class Chunk
 
 		unsigned char	worldChar[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE+1];
 
-		long  											minheight = 256;
-		long 											maxheight = 0;
+		int  											minheight;
+		int 											maxheight;
 
 
 					Chunk(void);

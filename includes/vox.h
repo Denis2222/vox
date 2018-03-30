@@ -63,19 +63,19 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "glm/gtx/string_cast.hpp"
 
-# define WIDTH 2500
-# define HEIGHT 2000
+# define WIDTH 1024*3
+# define HEIGHT 768*2
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
-#define CHUNK_SIZE 4
-#define CHUNK_VIEW 4
+#define CHUNK_SIZE 32
+#define CHUNK_VIEW 16
 
-#define FAR 500.0f
+#define FAR 1000.0f
 
 #define CHUNK_HEIGHT 256
 
-#define FAR_MAP 256.0f
+#define FAR_MAP 1000.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 
 

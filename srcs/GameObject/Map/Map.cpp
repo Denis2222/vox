@@ -3,7 +3,7 @@
 #include "stb_image.h"
 
 	Map::Map(void) {
-		this->nbWorker = 8;
+		this->nbWorker = 6;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
@@ -62,10 +62,11 @@ Chunk		*Map::getChunkWorld(int x, int y, int z) {
 	int cz = floor(z) / CHUNK_SIZE;
 
 	if (x < 0)
-		cx = (floor(x)-CHUNK_SIZE) / CHUNK_SIZE;
+		cx = (x-CHUNK_SIZE) / CHUNK_SIZE;
 	if (z < 0)
-		cz = (floor(z)-CHUNK_SIZE) / CHUNK_SIZE;
+		cz = (z-CHUNK_SIZE) / CHUNK_SIZE;
 
+	//printf("getChunkWorld %d %d %d \n", cx, cy, cz);
 	Chunk *c = getChunk(cx, cy, cz);
 	return (c);
 }
@@ -75,7 +76,7 @@ int			Map::getBlockInfo(int x, int y, int z) {
 	//printf("getBlockInfo()\n");
 	if (c)
 		if (c->state > Chunk::STATE::BUILD)
-			return (c->getWorld(x, y, z));
+			return (c->getWorld(x - (int)c->worldCoord.x, y, z - (int)c->worldCoord.z));
 
 	return (-1);
 }
@@ -203,9 +204,11 @@ void 		Map::threadPoolJob(void) {
 			}
 			u++;
 		}
-		this->updateChunkToLoad();
 		if (!del)
-			usleep(10000);
+		{
+			this->updateChunkToLoad();
+			usleep(3000);
+		}
 	}
 }
 
@@ -334,6 +337,8 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection) {
 
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE)
 		{
+			glm::mat4 myMatrix = glm::translate(model, c->worldCoord);
+			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
 			//nbtriangle+=c->getTriangle();

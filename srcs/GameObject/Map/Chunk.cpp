@@ -39,6 +39,7 @@ int		Chunk::getWorld(int x, int y, int z)
 void	Chunk::setWorld(int x, int y, int z, int val)
 {
 	unsigned int X, Y, Z;
+
 	X = x;
 	Y = y;
 	Z = z;
@@ -47,7 +48,10 @@ void	Chunk::setWorld(int x, int y, int z, int val)
 	{
 		return ;
 	}
-
+	if (y > this->maxheight)
+		this->maxheight = y;
+	if (y < this->minheight)
+		this->minheight = y;
 	this->worldChar[X][Y][Z] = val;
 }
 
@@ -96,11 +100,6 @@ void	Chunk::generate(void) {
 					//	setWorld(x, y, z, 2); //getBlockType(x + sx, y, z + sz, height)
 					//else
 						//setWorld(x, y, z, 3); //getBlockType(x + sx, y, z + sz, height)
-
-					if (y >= this->maxheight)
-						this->maxheight = y;
-					if (y <= this->minheight)
-						this->minheight = y;
 				}
 			}
 		}

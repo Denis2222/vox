@@ -3,7 +3,7 @@
 #include "stb_image.h"
 
 	Map::Map(void) {
-		this->nbWorker = 6;
+		this->nbWorker = 8;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");

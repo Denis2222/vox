@@ -1,6 +1,7 @@
 #include <GameObject/Map/Map.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <inttypes.h>
 
 	Map::Map(void) {
 		this->nbWorker = 6;
@@ -148,6 +149,7 @@ void 		generateAndBuildChunk(Chunk *c, int i) {
 	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
 	//uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
+	//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
 }
 
 void 		Map::threadPoolJob(void) {
@@ -158,9 +160,9 @@ void 		Map::threadPoolJob(void) {
 
 	while (this->thread)
 	{
-		int del = 0;
+		int full = 0;
 		iter = this->chunkList.begin();
-		while(iter != this->chunkList.end() && !del) {
+		while(iter != this->chunkList.end() && !full) {
 			c = (*iter);
 			if (c->state == Chunk::STATE::TOUPDATE) {
 				//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
@@ -168,6 +170,7 @@ void 		Map::threadPoolJob(void) {
 				c->uvs.clear();
 				c->build();
 				c->state = Chunk::STATE::UPDATE;
+				full = 1;
 			}
 			if (c->state == Chunk::STATE::INIT) { //One Task !
 				if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
@@ -180,6 +183,7 @@ void 		Map::threadPoolJob(void) {
 					workersTask.push_back(c);
 					workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
 					w++;
+					full = 1;
 				}
 			}
 			if (c->state == Chunk::STATE::DELETE) {
@@ -187,7 +191,7 @@ void 		Map::threadPoolJob(void) {
 				this->chunkList.remove(c);
 				this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
 				delete c;
-				del = 1;
+				full = 1;
 				break;
 			}
 			if (c->state == Chunk::STATE::RENDER) {
@@ -211,7 +215,7 @@ void 		Map::threadPoolJob(void) {
 			}
 			u++;
 		}
-		if (!del) {
+		if (!full) {
 			this->updateChunkToLoad();
 			usleep(5000);
 		}
@@ -301,9 +305,9 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	this->program->setMat4("view", view);
 
 
-	glm::vec4 lightpos(this->position.x-500.0f, 500.0f,  this->position.y, 1);
+	glm::vec4 lightpos(this->position.x, 5000.0f,  this->position.z, 0);
 
-	glm::vec4 toto = -view * lightpos;
+	glm::vec4 toto = projection * view * lightpos;
 
 	this->program->setVec3("lightPos", toto);
 
@@ -331,8 +335,7 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	//std::cout << "Print triangle:" << nbtriangle << "Average:" << (nbtriangle / (nbchunks + 1) ) << " nbchunk:" <<nbchunks<< std::endl;
 }
 
-unsigned int Map::loadTexture(const char *path)
-{
+unsigned int Map::loadTexture(const char *path) {
 	stbi_set_flip_vertically_on_load(true);
 	/* TEXTURE  0*/
 	unsigned int texture;

@@ -1,7 +1,6 @@
 #include <GameObject/Map/Chunk.hpp>
 
-		Chunk::Chunk(int x, int y, int z, Map *map)
-		{
+		Chunk::Chunk(int x, int y, int z, Map *map) {
 			this->localCoord = glm::vec3(x, y, z);
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
@@ -17,21 +16,18 @@
 			//exit(0);
 		}
 
-		Chunk::~Chunk()
-		{
+		Chunk::~Chunk() {
 			points.clear();
 			uvs.clear();
 			free(this->blocks);
 			//memset(&this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 		}
 
-int getIndex(int x, int y, int z)
-{
+static int 	getIndex(int x, int y, int z) {
 	return (x + (y * CHUNK_SIZE) + (z * (CHUNK_SIZE * CHUNK_HEIGHT)));
 }
 
-int		Chunk::getWorld(int x, int y, int z)
-{
+int		Chunk::getWorld(int x, int y, int z) {
 	if (y < 0)
 		return (0);
 	if (y >= CHUNK_HEIGHT)
@@ -41,27 +37,22 @@ int		Chunk::getWorld(int x, int y, int z)
 	return (this->blocks[getIndex(x, y, z)]);
 }
 
-void	Chunk::setWorld(int x, int y, int z, int val)
-{
+void	Chunk::setWorld(int x, int y, int z, int val) {
 	if (y > 256 || y < 0 || x > CHUNK_SIZE - 1 || x < 0 || z > CHUNK_SIZE - 1 || z < 0)
 		return ;
-	if (val > 1 && y > this->maxheight)
-		this->maxheight = y;
-	if (val > 1 && y < this->minheight)
-		this->minheight = y;
+       if (val > 1 && y > this->maxheight)
+               this->maxheight = y;
+       if (val > 1 && y < this->minheight)
+               this->minheight = y;
 	this->blocks[getIndex(x, y, z)] = val;
 }
 
-int		Chunk::getBlockType(int x, int y, int z, int height)
-{
-
-	//int height = getHeight(x, z);
-
-	int type = 0;
+int		Chunk::getBlockType(int x, int y, int z, int height) {
+	int type = 1;
 
 	if (y == 20)
-		return (2);
-	else if (y < 22)
+		return (2); //Water
+	else if (y < 21)
 		type =  4; // Rock
 	else if (y <= height && y > (height - 3))
 	{
@@ -82,38 +73,7 @@ int		Chunk::getBlockType(int x, int y, int z, int height)
 	return (type);
 }
 
-void	Chunk::generate(void) {
-	int sx, sy, sz;
-	sx = this->worldCoord.x;
-	sy = this->worldCoord.y;
-	sz = this->worldCoord.z;
-
-	this->minheight = 256;
-	this->maxheight = 0;
-	for (int x = 0; x < CHUNK_SIZE; x++)
-	{
-		for (int z = 0; z < CHUNK_SIZE; z++)
-		{
-			int height = getHeight(x + sx, z + sz);
-			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++)
-			{
-				if (y <= height)
-				{
-					setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
-				}
-			}
-
-			if (height <= 20)
-			{
-					setWorld(x, 20, z, getBlockType(x + sx, 20, z + sz, 20));
-			}
-		}
-	}
-	//printf("Generate : %d %d\n", this->minheight, this->maxheight);
-	this->state = STATE::GENERATE;
-}
-
-void Chunk::interact(int x, int y, int z, int val) {
+void 	Chunk::interact(int x, int y, int z, int val) {
 	this->setWorld(x, y, z, val);
 	this->state = STATE::TOUPDATE;
 	if (x % CHUNK_SIZE == 0 || z % CHUNK_SIZE == 0) { // Si on est en bord de chunk on refresh les 4 autour ( ou 1 si c le meme...)
@@ -133,75 +93,9 @@ void Chunk::interact(int x, int y, int z, int val) {
 	}
 }
 
-bool	Chunk::collide(int x, int y, int z, int way) {
-	bool retour = false;
-	int type = -1;
-
-
-	//printf("extern\n");
-	int qx = x;
-	int qy = y;
-	int qz = z;
-
-	if (way == 1) // UP
-		qy = qy + 1;
-	if (way == 2) // DOWN
-		qy = qy - 1;
-	if (way == 3) // EST
-		qx = qx + 1;
-	if (way == 4) // OUEST
-		qx = qx - 1;
-	if (way == 5) // NORD
-		qz = qz + 1;
-	if (way == 6) // SUD
-		qz = qz - 1;
-
-
-	//Haut ou bas, facile
-	if (way == 1 || way == 2)
-	{
-		if (getWorld(qx, qy , qz) > 1)
-			retour = true;
-		else if (qy == -1)
-			retour = true;
-	}
-	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE)
-	{
-		//On est dans le chunk
-		if (getWorld(qx, qy , qz) > 1)
-			retour = true;
-	}
-	else {
-		//On est hors du chunk on demande a la map
-
-		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
-		//printf("Askmap : x:%d y:%d z:%d info: %d \n", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
-		if (type > 1)
-			retour = true;
-		else if (type < 0)
-		{
-			//La map le connais pas
-			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
-			if (qy <= noise)
-			{
-				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
-				if (type > 1)
-					retour = true;
-				else
-					retour = false;
-			} else {
-				retour = false;
-			}
-		} else {
-			retour = false;
-		}
-	}
-	return (retour);
-}
-
 bool	Chunk::collideDebug(int x, int y, int z, int way) {
-	/*
-	printf("collide(%d, %d, %d) \n", x, y, z);
+
+/*
 	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
 	bool retour = false;
 	int type = -1;
@@ -225,29 +119,34 @@ bool	Chunk::collideDebug(int x, int y, int z, int way) {
 	if (way == 6) // SUD
 		qz = qz - 1;
 
-
 	//Haut ou bas, facile
 	if (way == 1 || way == 2)
 	{
 		if (getWorld(qx, qy , qz) > 1)
 			retour = true;
-	}
-	/*else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE)
-	{
-		//On est dans le chunk
-		if (getWorld(qx, qy , qz) > 1)
+		if (getWorld(qx, qy , qz) == 0)
 			retour = true;
-	}*/
-	else {
-		//On est hors du chunk on demande a la map
-
+		else if (qy == -1)
+			retour = true;
+	}
+	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE) {
+		//On est dans le chunk
+		int val = getWorld(qx, qy , qz);
+		if (val > 1) // Know type, dont need face
+			retour = true;
+		else if (val == 1) // Empty bloc, put face
+			retour = false;
+		else if (val == 0) //Unknow val probably useless; say collide
+			retour = true;
+		printf("Inchunk : info: %d retour :\n", val, (int)retour);
+	}
+	else { //Out of chunk ! Ask to map
 		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
-		printf("Askmap : x:%d y:%d z:%d info: %d \n", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
+
 		if (type > 1)
 			retour = true;
-		else if (type < 0)
+		else if (type <= 0) //Unknow chunk, or unknow block Ask to noise
 		{
-			//La map le connais pas
 			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
 			if (qy <= noise)
 			{
@@ -259,9 +158,15 @@ bool	Chunk::collideDebug(int x, int y, int z, int way) {
 			} else {
 				retour = false;
 			}
-		} else {
+		} else if (type == 1) {
 			retour = false;
 		}
+		printf("Askmap : x:%d y:%d z:%d type: %d ", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
+		if (retour)
+			printf(" !MUR \n");
+		else
+			printf(" MUR \n");
+
 	}
 	return (retour);
 }
@@ -318,6 +223,29 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 	}
 }
 
+void	Chunk::generate(void) {
+	int sx, sy, sz;
+	sx = this->worldCoord.x;
+	sy = this->worldCoord.y;
+	sz = this->worldCoord.z;
+
+	this->minheight = 256;
+	this->maxheight = 0;
+	for (int x = 0; x < CHUNK_SIZE; x++) {
+		for (int z = 0; z < CHUNK_SIZE; z++) {
+
+			int height = getHeight(x + sx, z + sz);
+
+			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++) {
+				if (y <= height)
+					setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
+			}
+
+		}
+	}
+	this->state = STATE::GENERATE;
+}
+
 void 	Chunk::build(void) {
 	int sx, sy, sz;
 
@@ -364,6 +292,70 @@ void 	Chunk::build(void) {
 	this->state = STATE::BUILD;
 }
 
+bool	Chunk::collide(int x, int y, int z, int way) {
+	bool retour = false;
+	int type = -1;
+
+	int qx = x;
+	int qy = y;
+	int qz = z;
+
+	if (way == 1) // UP
+		qy = qy + 1;
+	if (way == 2) // DOWN
+		qy = qy - 1;
+	if (way == 3) // EST
+		qx = qx + 1;
+	if (way == 4) // OUEST
+		qx = qx - 1;
+	if (way == 5) // NORD
+		qz = qz + 1;
+	if (way == 6) // SUD
+		qz = qz - 1;
+
+
+	//Haut ou bas
+	if (way == 1 || way == 2)
+	{
+		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+		else if (qy == -1)
+			retour = true;
+	}
+	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE)
+	{
+		//On est dans le chunk
+		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+	}
+	else {
+		//On est hors du chunk on demande a la map
+
+		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
+		//printf("Askmap : x:%d y:%d z:%d info: %d \n", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
+		if (type > 1)
+			retour = true;
+		else if (type < 0)
+		{
+			//La map le connais pas
+			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
+			if (qy <= noise)
+			{
+				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
+				if (type > 1)
+					retour = true;
+				else
+					retour = false;
+			} else {
+				retour = false;
+			}
+		} else {
+			retour = false;
+		}
+	}
+	return (retour);
+}
+
 unsigned int Chunk::buildVAO(void) {
 	glGenVertexArrays(1, &this->VAO);
 	glBindVertexArray(this->VAO);
@@ -403,6 +395,7 @@ void	Chunk::cleanVAO(void) {
 float	*Chunk::getVertices(void) {
 	return (&this->points[0][0]);
 }
+
 size_t	Chunk::getSizeVertices(void) {
 	return (sizevert);
 }
@@ -410,6 +403,7 @@ size_t	Chunk::getSizeVertices(void) {
 float	*Chunk::getUVs(void) {
 	return (&this->uvs[0][0]);
 }
+
 size_t	Chunk::getSizeUVs(void) {
 	return (sizeuv);
 }

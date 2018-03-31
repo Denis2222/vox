@@ -12,9 +12,9 @@
 
 #include <Voxel.hpp>
 
-int		main()
+int		main(int argc, char **argv)
 {
-	Voxel start;
+	Voxel start(argc, argv);
 	return (0);
 }
 /*

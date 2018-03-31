@@ -1,8 +1,13 @@
 #include <Voxel.hpp>
 
-		Voxel::Voxel(void) {
+		Voxel::Voxel(int argc, char **argv) {
 			std::cout << "Lets GO " << std::endl;
-			this->glfwStart();
+
+			if (argc == 2)
+				this->glfwStart(true);
+			else
+				this->glfwStart(false);
+
 			this->camera = new Camera(0, this->width, this->height, this->window);
 
 			this->map = new Map();
@@ -13,7 +18,7 @@
 			this->loop();
 		}
 
-		Voxel::~Voxel(void){
+		Voxel::~Voxel(void) {
 			std::cout << "Delete" << std::endl;
 			delete this->skybox;
 			delete this->map;
@@ -30,8 +35,8 @@
 				currentTime = glfwGetTime();
 				if (currentTime - lastTime >= 0.10)
 				{
-					printf("%f ms/frame  fps:%d chunks:%lu", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
-					std::cout << glm::to_string(this->camera->position) << std::endl;
+					//printf("%f ms/frame  fps:%d chunks:%lu", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
+					//std::cout << glm::to_string(this->camera->position) << std::endl;
 					nbFrames = 0;
 					lastTime += 0.10;
 					//this->map->updatePosition(this->camera->position);
@@ -47,7 +52,7 @@
 			}
 		}
 
-		void Voxel::glfwStart (void) {
+		void Voxel::glfwStart (bool fullscreen) {
 			if (!glfwInit())
 			{
 				std::cout << "Failed to initialize GLFW\n" << std::endl;
@@ -61,25 +66,28 @@
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
-			const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-			//this->width = mode->width;
-			//this->height = mode->height;
-
 			this->width = 2048;
 			this->height = 1536;
-			/*glfwGetPrimaryMonitor()*/
-			this->window = glfwCreateWindow(this->width, this->height, TITLE, NULL, NULL);
-			if (this->window == NULL)
+			if (fullscreen)
 			{
+				const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+				this->width = mode->width;
+				this->height = mode->height;
+				this->window = glfwCreateWindow(this->width, this->height, TITLE, glfwGetPrimaryMonitor(), NULL);
+			} else {
+				this->width = 2048;
+				this->height = 1536;
+				this->window = glfwCreateWindow(this->width, this->height, TITLE, NULL, NULL);
+			}
+
+			if (this->window == NULL) {
 				std::cout << "Failed to open GLFW window.\n" << std::endl;
 				getchar();
 				glfwTerminate();
 				exit(0);
 			}
 			glfwMakeContextCurrent(this->window);
-			if (glewInit() != GLEW_OK)
-			{
+			if (glewInit() != GLEW_OK) {
 				std::cout << "Failed to initialize GLEW\n" << std::endl;
 				getchar();
 				glfwTerminate();

@@ -11,8 +11,7 @@
 			delete this->shader;
 		}
 
-		void Skybox::Load(void)
-		{
+		void Skybox::Load(void) {
 			float skyboxVertices[] = {
 				// positions
 				-1.0f,  1.0f, -1.0f,
@@ -75,8 +74,7 @@
 			this->cubemapTexture = loadCubemap(faces);
 		}
 
-		unsigned int Skybox::loadCubemap(std::vector<std::string> faces)
-		{
+		unsigned int Skybox::loadCubemap(std::vector<std::string> faces) {
 		    glGenTextures(1, &this->textureID);
 		    glBindTexture(GL_TEXTURE_CUBE_MAP, this->textureID);
 
@@ -107,8 +105,7 @@
 		    return textureID;
 		}
 
-		void Skybox::render(Camera *camera)
-		{
+		void Skybox::render(Camera *camera) {
 			// draw skybox as last
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 			this->shader->use();

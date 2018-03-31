@@ -11,8 +11,6 @@
 		this->tg = this->threadUpdate();
 		this->tp = this->threadPool();
 		this->chunkInit = 0;
-
-
 	}
 
 	Map::~Map(void) {
@@ -28,13 +26,15 @@
 
 		std::list<Chunk*>::iterator	iter;
 		Chunk						*c;
-		iter = this->chunkList.begin();
-
-		while(iter != this->chunkList.end())
+		if (this->chunkList.size() > 0)
 		{
-			c = (*iter);
-			delete c;
-			iter++;
+			iter = this->chunkList.begin();
+			while(iter != this->chunkList.end())
+			{
+				c = (*iter);
+				delete c;
+				iter++;
+			}
 		}
 		std::cout << "Chunk List delete" << std::endl;
 
@@ -150,7 +150,6 @@ void 		generateAndBuildChunk(Chunk *c, int i) {
 	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 }
 
-
 void 		Map::threadPoolJob(void) {
 	int nbWorker = this->nbWorker;
 	int w = 0;
@@ -161,61 +160,49 @@ void 		Map::threadPoolJob(void) {
 	while (this->thread)
 	{
 		int del = 0;
-		if (w < 4)
-		{
-			iter = this->chunkList.begin();
-			del = 0;
-			while(iter != this->chunkList.end() && !del)
-			{
-				//std::cout << "HERE" << std::endl;
-				c = (*iter);
-				if (c->state == Chunk::STATE::TOUPDATE)
-				{
-					//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
-					c->points.clear();
-					c->uvs.clear();
-					c->build();
-					c->state = Chunk::STATE::UPDATE;
-				}
-				if (c->state == Chunk::STATE::INIT) { //One Task !
-					if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
-					{
-						c->state = Chunk::STATE::DELETE;
-						this->chunkInit--;
-						//std::cout << "Direct delete ! " << std::endl;
-					} else if (w < nbWorker) {
-						c->state = Chunk::STATE::THREAD;
-						workersTask.push_back(c);
-						workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
-						w++;
-					}
-				}
-				if (c->state == Chunk::STATE::DELETE)
-				{
-
-					this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
-					this->chunkList.remove(c);
-					this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
-					delete c;
-					del = 1;
-					break;
-				}
-				if (c->state == Chunk::STATE::RENDER)
-				{
-					if (this->distanceToChunk(c) > FAR_CHUNK)
-					{
-						c->state = Chunk::STATE::DISABLE;
-					}
-				}
-				iter++;
+		iter = this->chunkList.begin();
+		while(iter != this->chunkList.end() && !del) {
+			c = (*iter);
+			if (c->state == Chunk::STATE::TOUPDATE) {
+				//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
+				c->points.clear();
+				c->uvs.clear();
+				c->build();
+				c->state = Chunk::STATE::UPDATE;
 			}
+			if (c->state == Chunk::STATE::INIT) { //One Task !
+				if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
+				{
+					c->state = Chunk::STATE::DELETE;
+					this->chunkInit--;
+					//std::cout << "Direct delete ! " << std::endl;
+				} else if (w < nbWorker) {
+					c->state = Chunk::STATE::THREAD;
+					workersTask.push_back(c);
+					workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
+					w++;
+				}
+			}
+			if (c->state == Chunk::STATE::DELETE) {
+				this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
+				this->chunkList.remove(c);
+				this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
+				delete c;
+				del = 1;
+				break;
+			}
+			if (c->state == Chunk::STATE::RENDER) {
+				if (this->distanceToChunk(c) > FAR_CHUNK)
+					c->state = Chunk::STATE::DISABLE;
+			}
+			iter++;
 		}
+
 		int u = 0;
 		for (auto &i : workers) {
 			if (i.joinable()) {
 				c = workersTask.at(u);
-				if (c->state != Chunk::STATE::THREAD)
-				{
+				if (c->state != Chunk::STATE::THREAD) {
 					i.join();
 					this->chunkInit--;
 					workers.erase(workers.begin() + u);
@@ -225,10 +212,9 @@ void 		Map::threadPoolJob(void) {
 			}
 			u++;
 		}
-		if (!del)
-		{
+		if (!del) {
 			this->updateChunkToLoad();
-			usleep(3000);
+			usleep(5000);
 		}
 	}
 }
@@ -333,10 +319,11 @@ void 		Map::SlowRender(void) {
 	}
 }
 
-void 		Map::Render(glm::mat4 view, glm::mat4 projection) {
+void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	std::list<Chunk*>::iterator	iter;
 	Chunk *c;
 
+	this->position = position;
 	glm::mat4 modelidentity(1.0f);
 	glm::mat4 model(1.0f);
 	this->program->use();
@@ -357,7 +344,7 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection) {
 
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE)
 		{
-			glm::mat4 myMatrix = glm::translate(model, c->worldCoord);
+			glm::mat4 myMatrix = glm::translate(model, c->worldCoord - this->position);
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());

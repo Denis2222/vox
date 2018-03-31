@@ -12,10 +12,8 @@
 
 #include <Voxel.hpp>
 
-int		main(int argc, char **argv)
+int		main()
 {
-	(void)argc;
-	(void)argv;
 	Voxel start;
 	return (0);
 }

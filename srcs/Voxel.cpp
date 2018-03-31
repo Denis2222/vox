@@ -4,13 +4,14 @@
 			std::cout << "Lets GO " << std::endl;
 			this->glfwStart();
 			this->camera = new Camera(0, this->width, this->height, this->window);
+
 			this->map = new Map();
 			this->map->updatePosition(this->camera->position);
-			//this->map->updateChunkToLoad();
+			this->map->updateChunkToLoad();
 			this->skybox = new Skybox();
-			//this->initSkybox();
+			this->skybox->Load();
 			this->loop();
-
+			glfwTerminate();
 		}
 
 		Voxel::~Voxel(void){
@@ -26,15 +27,16 @@
 				currentTime = glfwGetTime();
 				if (currentTime - lastTime >= 0.10)
 				{
-					//printf("%f ms/frame  fps:%d chunks:%lu\n", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
+					printf("%f ms/frame  fps:%d chunks:%lu", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
+					std::cout << glm::to_string(this->camera->position) << std::endl;
 					nbFrames = 0;
 					lastTime += 0.10;
-					this->map->updatePosition(this->camera->position);
+					//this->map->updatePosition(this->camera->position);
 					this->map->SlowRender();
 				}
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				this->camera->ProcessInput(map);
-				this->map->Render(this->camera->getView(), this->camera->getProjection());
+				this->map->Render(this->camera->getView(), this->camera->getProjection(), this->camera->position);
 				this->skybox->render(this->camera);
 
 				glfwSwapBuffers(this->window);
@@ -52,6 +54,7 @@
 				std::cout << "Failed to initialize GLFW\n" << std::endl;
 				exit(0);
 			}
+
 			glfwWindowHint(GLFW_SAMPLES, 0);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -61,10 +64,13 @@
 
 			const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-			this->width = mode->width;
-			this->height = mode->height;
+			//this->width = mode->width;
+			//this->height = mode->height;
 
-			this->window = glfwCreateWindow(this->width, this->height, TITLE, glfwGetPrimaryMonitor(), NULL);
+			this->width = 2048;
+			this->height = 1536;
+			/*glfwGetPrimaryMonitor()*/
+			this->window = glfwCreateWindow(this->width, this->height, TITLE, NULL, NULL);
 			if (this->window == NULL)
 			{
 				std::cout << "Failed to open GLFW window.\n" << std::endl;

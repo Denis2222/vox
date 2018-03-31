@@ -6,10 +6,12 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
-			bzero(this->worldChar, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
+			//bzero(this->worldChar, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
 			//memset(this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 
-
+			this->blocks = (unsigned char*)malloc(sizeof(unsigned char) *  CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
+			bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
+			//bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
 			//memset(&this->worldChar, 3, sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 			//printf("%d", this->worldChar[(CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT) - 10]);
 			//exit(0);
@@ -19,55 +21,44 @@
 		{
 			points.clear();
 			uvs.clear();
+			free(this->blocks);
 			//memset(&this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 		}
 
+int getIndex(int x, int y, int z)
+{
+	return (x + (y * CHUNK_SIZE) + (z * (CHUNK_SIZE * CHUNK_HEIGHT)));
+}
+
 int		Chunk::getWorld(int x, int y, int z)
 {
-	int X, Y, Z;
-
-	X = x;
-	Y = y;
-	Z = z;
-	if (Y == -1)
+	if (y < 0)
 		return (0);
-	if (Y >= CHUNK_HEIGHT)
+	if (y >= CHUNK_HEIGHT)
 		return (0);
-
-	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
-	{
+	if (x > CHUNK_SIZE - 1 || x < 0 || z > CHUNK_SIZE - 1 || z < 0)
 		return (0);
-	}
-
-	return (this->worldChar[X][Y][Z]);
+	return (this->blocks[getIndex(x, y, z)]);
 }
 
 void	Chunk::setWorld(int x, int y, int z, int val)
 {
-	int X, Y, Z;
-
-	X = x;
-	Y = y;
-	Z = z;
-
-	if (Y > 256 || Y < 0 || X > CHUNK_SIZE - 1 || X < 0 || Z > CHUNK_SIZE - 1 || Z < 0)
-	{
+	if (y > 256 || y < 0 || x > CHUNK_SIZE - 1 || x < 0 || z > CHUNK_SIZE - 1 || z < 0)
 		return ;
-	}
 	if (val > 1 && y > this->maxheight)
 		this->maxheight = y;
 	if (val > 1 && y < this->minheight)
 		this->minheight = y;
-	this->worldChar[X][Y][Z] = val;
+	this->blocks[getIndex(x, y, z)] = val;
 }
 
 int		Chunk::getBlockType(int x, int y, int z, int height)
 {
 	int type = 0;
 
-	if (y < 41)
-		type = 2; // Water
-	else if (y < 42)
+	if (y < 3)
+		return (2);
+	else if (y < 4)
 		type =  4; // Rock
 	else if (y <= height && y > (height - 3))
 		type = 3; //  Grass
@@ -77,7 +68,7 @@ int		Chunk::getBlockType(int x, int y, int z, int height)
 	if (y > 80)
 		type = 5; // Snow
 
-	if (y%16 == 0)
+	if (y%CHUNK_SIZE == 0)
 		type=4;
 
 	return (type);
@@ -112,17 +103,20 @@ void	Chunk::generate(void) {
 void Chunk::interact(int x, int y, int z, int val) {
 	this->setWorld(x, y, z, val);
 	this->state = STATE::TOUPDATE;
-	if ((x == this->worldCoord.x || z == this->worldCoord.z ||
-		x == this->worldCoord.x + CHUNK_SIZE-1 || z == this->worldCoord.z + CHUNK_SIZE-1))
-	{
-		Chunk *c = this->map->getChunk(floor((x + 1) / CHUNK_SIZE), 0, floor((z + 1) / CHUNK_SIZE));
-		c->state = STATE::TOUPDATE;
-		c = this->map->getChunk(floor((x - 1) / CHUNK_SIZE), 0, floor((z + 1) / CHUNK_SIZE));
-		c->state = STATE::TOUPDATE;
-		c = this->map->getChunk(floor((x + 1) / CHUNK_SIZE), 0, floor((z - 1) / CHUNK_SIZE));
-		c->state = STATE::TOUPDATE;
-		c = this->map->getChunk(floor((x - 1) / CHUNK_SIZE), 0, floor((z - 1) / CHUNK_SIZE));
-		c->state = STATE::TOUPDATE;
+	if (x % CHUNK_SIZE == 0 || z % CHUNK_SIZE == 0) { // Si on est en bord de chunk on refresh les 4 autour ( ou 1 si c le meme...)
+		std::cout << "UPDATE SPECIAL * 4" << std::endl;
+		Chunk  *c = this->map->getChunk(x + 1, 0, z + 1);
+					if (c)
+						c->state = STATE::TOUPDATE;
+				c = this->map->getChunk(x - 1, 0, z + 1);
+					if (c)
+						c->state = STATE::TOUPDATE;
+				c = this->map->getChunk(x + 1, 0, z - 1);
+					if (c)
+						c->state = STATE::TOUPDATE;
+				c = this->map->getChunk(x - 1, 0, z - 1);
+					if (c)
+						c->state = STATE::TOUPDATE;
 	}
 }
 
@@ -154,6 +148,8 @@ bool	Chunk::collide(int x, int y, int z, int way) {
 	if (way == 1 || way == 2)
 	{
 		if (getWorld(qx, qy , qz) > 1)
+			retour = true;
+		else if (qy == -1)
 			retour = true;
 	}
 	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE)

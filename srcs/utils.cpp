@@ -10,19 +10,13 @@ int getNoise(int x, int z)
 	float what = 300.0f;
 	float that = 10;
 
-	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 50);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 10);
 
-	if (noise < 40)
-		noise = 40;
+	if (noise < 2)
+		noise = 2;
 
 	if (x==0 && z == 0)
-		noise = 50;
-
-	if (x==0 && z == 10)
-		noise = 45;
-
-	if (x==0 && z == 1)
-		noise = 35;
+		noise = CHUNK_HEIGHT;
 
 	return (noise);
 }

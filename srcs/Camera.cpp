@@ -30,7 +30,7 @@ void 		Camera::ProcessInput(Map *map)
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=20;
+		deltaSpeed*=10;
 
 	float posY = position.y;
 	float posX = position.x;
@@ -81,17 +81,7 @@ void 		Camera::ProcessInput(Map *map)
 			{
 				x = x - c->worldCoord.x;
 				z = z - c->worldCoord.z;
-/*
-				printf("Chunk localCoord X:%f Y:%f Z:%f\n",c->localCoord.x, c->localCoord.y, c->localCoord.z);
-				printf("GetWorld: X:%d Y:%d Z:%d va: %d \n", x, y, z, c->getWorld(x, y, z));
 
-				printf("OUEST x+1 :%d\n", c->collideDebug(x, y, z, 3));
-				printf("EST   x-1 :%d\n", c->collideDebug(x, y, z, 4));
-				printf("NORD  z+1 :%d\n", c->collideDebug(x, y, z, 5));
-				printf("SUD   z-1 :%d\n", c->collideDebug(x, y, z, 6));
-				printf("===============================\n");
-				//c->interact( floor(m.x+0.5f), floor(m.y), floor(m.z), 0);
-*/
 				if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 				{
 					c->interact( x, y, z, 0);
@@ -102,42 +92,22 @@ void 		Camera::ProcessInput(Map *map)
 				}
 
 			}
-
-
+		}
+		else
+		{
+			std::cout << "Chunk Introuvable !" << std::endl;
 		}
 	}
-
-/*
-	if (map->getBlockInfo(p.x, floor(p.y-1.5f), p.z) > 1)
-		position.y = posY;
-
-	std::cout << "X+1" << map->getBlockInfo(p.x + 0.2f, floor(p.y-0.5f), p.z);
-	std::cout << " X-1" << map->getBlockInfo(p.x - 0.2f, floor(p.y-0.5f), p.z);
-
-	std::cout << " Z+1" << map->getBlockInfo(p.x, floor(p.y-0.5f), p.z + 0.2f);
-	std::cout << " Z-1" << map->getBlockInfo(p.x, floor(p.y-0.5f), p.z - 0.2f);
-
-	std::cout << std::endl;
-	if (map->getBlockInfo(p.x + 0.2f, floor(p.y-0.5f), p.z) >1)
-		position.x = posX-0.1f;
-	if (map->getBlockInfo(p.x + -0.2f, floor(p.y-0.5f), p.z) >1)
-		position.x = posX+0.01f;
-
-	if (map->getBlockInfo(p.x, floor(p.y-0.5f), p.z + 0.2f) >1)
-		position.z = posZ-0.01f;
-	if (map->getBlockInfo(p.x, floor(p.y-0.5f), p.z - 0.2f) >1)
-		position.z = posZ+0.01f;
-	//Get block arroud;
-*/
-
-
 
 	//position.y = posY;
 }
 
 glm::mat4	Camera::getView(void)
 {
-	return (glm::lookAt(position, position + front, up));
+	//glm::vec3 t(0.0f,position.y, 0.0f);
+	glm::vec3	realPosition = glm::vec3(0.0f, 0.0f,  0.0f);
+
+	return (glm::lookAt(realPosition, realPosition + front, up));
 }
 glm::mat4	Camera::getProjection(void)
 {

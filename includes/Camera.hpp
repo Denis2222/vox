@@ -19,16 +19,13 @@ class Camera
 		unsigned int height;
 		GLFWwindow	*window;
 
-		glm::vec3	position = glm::vec3(10000.0f, 50.0f,  10000.0f);
+		glm::vec3	position = glm::vec3(200000.0f, 50.0f,  200000.0f);
 		//glm::vec3	position = glm::vec3(0.0f, 0.0f,  -3.0f);
 		//glm::vec3	front = glm::vec3(0.0f, 0.0f,  1.0f);
 		glm::vec3	front = glm::vec3(-1.6f, -0.0f,  0.0f);
 		glm::vec3	up = glm::vec3(0.0f, 1.0f,  0.0f);
 
-
-
-
-		float		speed = 6.0f;
+		float		speed = 10.0f;
 		float 		deltaTime = 0.0f;
 		float 		lastFrame = 0.0f;
 		float 		lastX = 400;

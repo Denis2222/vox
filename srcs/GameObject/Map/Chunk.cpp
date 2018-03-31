@@ -5,22 +5,14 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
-			//bzero(this->worldChar, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
-			//memset(this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
-
 			this->blocks = (unsigned char*)malloc(sizeof(unsigned char) *  CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 			bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
-			//bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
-			//memset(&this->worldChar, 3, sizeof(char) * CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
-			//printf("%d", this->worldChar[(CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT) - 10]);
-			//exit(0);
 		}
 
 		Chunk::~Chunk() {
 			points.clear();
 			uvs.clear();
 			free(this->blocks);
-			//memset(&this->worldChar, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 		}
 
 static int 	getIndex(int x, int y, int z) {

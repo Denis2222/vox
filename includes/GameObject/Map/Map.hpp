@@ -51,16 +51,11 @@ class Map
 		std::vector<std::thread>								workers;
 		std::vector<Chunk*>										workersTask;
 
-		std::thread 											tg;
 		std::thread 											tp;
 
 		Shader 													*program;
 		GLuint													texture;
 		glm::vec3 												position;
-
-		std::thread threadUpdate() {
-			return std::thread(&Map::threadUpdateJob, this);
-		}
 
 		std::thread threadPool() {
 			return std::thread(&Map::threadPoolJob, this);
@@ -72,7 +67,6 @@ class Map
 		float			distanceToChunk(Chunk *c);
 		float			distanceToChunk(int x, int y, int z);
 
-		void 			threadUpdateJob(void);
 		void 			threadPoolJob(void);
 
 		unsigned int	loadTexture(const char *path);

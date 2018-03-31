@@ -11,11 +11,14 @@
 			this->skybox = new Skybox();
 			this->skybox->Load();
 			this->loop();
-			glfwTerminate();
 		}
 
 		Voxel::~Voxel(void){
 			std::cout << "Delete" << std::endl;
+			delete this->skybox;
+			delete this->map;
+			delete this->camera;
+			glfwTerminate();
 		}
 
 		void Voxel::loop(void) {
@@ -42,10 +45,6 @@
 				glfwSwapBuffers(this->window);
 				glfwPollEvents();
 			}
-		}
-
-		void 	Voxel::processInput(void) {
-
 		}
 
 		void Voxel::glfwStart (void) {
@@ -90,12 +89,15 @@
 			glfwSetInputMode(this->window, GLFW_STICKY_KEYS, GL_TRUE);
 			glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			glEnable(GL_DEPTH_TEST);
-			//glEnable(GL_MULTISAMPLE);
+			glEnable(GL_MULTISAMPLE);
 			//glfwSwapInterval(0);//delete fps limit
 			glfwSetInputMode(this->window, GLFW_STICKY_MOUSE_BUTTONS, 1);
 			glEnable(GL_CULL_FACE);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //WIREFRAME MODE
-			//glDepthFunc(GL_LESS);
+			glDepthFunc(GL_LESS);
+
+			//glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			//glfwSetCursorPosCallback(this->window, this->mouse_callback);
 			glClearColor(0.527f, 0.804f, 0.918f, 1.0f);

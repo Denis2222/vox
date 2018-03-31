@@ -2,16 +2,17 @@
 
 		Skybox::Skybox(void) {
 			this->Load();
+			this->shader = new Shader();
+			this->shader->Load("skybox");
+			this->shader->setInt("skybox", 0);
+		}
 
-
+		Skybox::~Skybox(void) {
+			delete this->shader;
 		}
 
 		void Skybox::Load(void)
 		{
-			this->shader = new Shader();
-			this->shader->Load("skybox");
-			this->shader->setInt("skybox", 0);
-
 			float skyboxVertices[] = {
 				// positions
 				-1.0f,  1.0f, -1.0f,

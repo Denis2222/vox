@@ -19,6 +19,7 @@ class Skybox
 		Shader 			*shader;
 
 						Skybox(void);
+						~Skybox(void);
 		void 			Load(void);
 		unsigned int	loadCubemap(std::vector<std::string> faces);
 		void 			render(Camera *camera);

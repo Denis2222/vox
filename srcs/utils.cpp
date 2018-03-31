@@ -5,19 +5,30 @@ noise::module::Perlin noiseModule;
 
 
 
-int getNoise(int x, int z)
+int getHeight(int x, int z)
 {
 	float what = 300.0f;
 	float that = 10;
 
-	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 10);
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 100,  (double)((double)(z+that)/what)) * 100) + 30);
 
-	if (noise < 2)
-		noise = 2;
+
+
+
+	if (noise < 1)
+		noise = 1;
 
 	if (x==0 && z == 0)
 		noise = CHUNK_HEIGHT;
 
+	return (noise);
+}
+
+int getMoisture(int x, int z)
+{
+	float what = 100.0f;
+	float that = 10;
+	int noise = ((int)(noiseModule.GetValue ((double)((double)(x+that)/what), 50,  (double)((double)(z+that)/what)) * 50) + 0);
 	return (noise);
 }
 

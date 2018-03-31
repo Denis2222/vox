@@ -54,18 +54,26 @@ void	Chunk::setWorld(int x, int y, int z, int val)
 
 int		Chunk::getBlockType(int x, int y, int z, int height)
 {
+
+	//int height = getHeight(x, z);
+
 	int type = 0;
 
-	if (y < 3)
+	if (y == 20)
 		return (2);
-	else if (y < 4)
+	else if (y < 22)
 		type =  4; // Rock
 	else if (y <= height && y > (height - 3))
-		type = 3; //  Grass
+	{
+		if (getMoisture(x, z) * 2 > height)
+			type = 6; //  Grass
+		else
+			type = 3;
+	}
 	else
 		type = 4; // Rock
 
-	if (y > 80)
+	if (y > 80 - getMoisture(x, z))
 		type = 5; // Snow
 
 	if (y%CHUNK_SIZE == 0)
@@ -86,13 +94,18 @@ void	Chunk::generate(void) {
 	{
 		for (int z = 0; z < CHUNK_SIZE; z++)
 		{
-			int height = getNoise(x + sx, z + sz);
+			int height = getHeight(x + sx, z + sz);
 			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++)
 			{
 				if (y <= height)
 				{
 					setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
 				}
+			}
+
+			if (height <= 20)
+			{
+					setWorld(x, 20, z, getBlockType(x + sx, 20, z + sz, 20));
 			}
 		}
 	}
@@ -168,7 +181,7 @@ bool	Chunk::collide(int x, int y, int z, int way) {
 		else if (type < 0)
 		{
 			//La map le connais pas
-			int noise = getNoise(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
+			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
 			if (qy <= noise)
 			{
 				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
@@ -235,7 +248,7 @@ bool	Chunk::collideDebug(int x, int y, int z, int way) {
 		else if (type < 0)
 		{
 			//La map le connais pas
-			int noise = getNoise(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
+			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
 			if (qy <= noise)
 			{
 				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
@@ -285,6 +298,8 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
 		else if (val == 5)
 			vec = glm::make_vec2(&VCUBEUVSNOW[i]);
+		else if (val == 6)
+			vec = glm::make_vec2(&VCUBEUVGRASS[i]);
 		uvs.push_back(vec);
 	}
 
@@ -297,6 +312,8 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
 		else if (val == 5)
 			vec = glm::make_vec2(&VCUBEUVSNOW[i]);
+		else if (val == 6)
+			vec = glm::make_vec2(&VCUBEUVGRASS[i]);
 		uvs.push_back(vec);
 	}
 }

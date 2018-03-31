@@ -8,7 +8,6 @@
 		this->program = new Shader();
 		this->program->Load("chunk");
 		this->texture = this->loadTexture("./assets/tileset.png");
-		this->tg = this->threadUpdate();
 		this->tp = this->threadPool();
 		this->chunkInit = 0;
 	}
@@ -16,11 +15,11 @@
 	Map::~Map(void) {
 		std::cout << "Delete map ask :" << std::endl;
 		this->nbWorker = 0;
+
 		while (workers.size()>0)
 			usleep(5000);
 		this->thread = 0;
 		std::cout << "Worker stoped" << std::endl;
-		tg.join();
 		tp.join();
 		std::cout << "Thread Join" << std::endl;
 
@@ -37,6 +36,7 @@
 			}
 		}
 		std::cout << "Chunk List delete" << std::endl;
+		delete this->program;
 
 		sleep(1);
 	}
@@ -151,7 +151,6 @@ void 		generateAndBuildChunk(Chunk *c, int i) {
 }
 
 void 		Map::threadPoolJob(void) {
-	int nbWorker = this->nbWorker;
 	int w = 0;
 
 	std::list<Chunk*>::iterator	iter;
@@ -176,7 +175,7 @@ void 		Map::threadPoolJob(void) {
 					c->state = Chunk::STATE::DELETE;
 					this->chunkInit--;
 					//std::cout << "Direct delete ! " << std::endl;
-				} else if (w < nbWorker) {
+				} else if (w < this->nbWorker) {
 					c->state = Chunk::STATE::THREAD;
 					workersTask.push_back(c);
 					workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
@@ -217,37 +216,6 @@ void 		Map::threadPoolJob(void) {
 			usleep(5000);
 		}
 	}
-}
-
-void 		Map::threadUpdateJob(void) {
-	/*
-	std::list<Chunk*>::iterator	iter;
-	Chunk						*c;
-
-
-	while (this->thread)
-	{
-		int init = 0;
-		int render = 0;
-		int disable = 0;
-		int del = 0;
-		iter = this->chunkList.begin();
-		while(iter != this->chunkList.end())
-		{
-			c = (*iter);
-			if (c->state == Chunk::STATE::INIT)
-				init++;
-			if (c->state == Chunk::STATE::RENDER)
-				render++;
-			if (c->state == Chunk::STATE::DISABLE)
-				disable++;
-			if (c->state == Chunk::STATE::DELETE)
-				del++;
-			iter++;
-		}
-
-		usleep(20000);
-	}*/
 }
 
 void 		Map::updateChunkToLoad(void) {
@@ -331,6 +299,13 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	this->program->setMat4("projection", projection);
 	this->program->setMat4("model", model);
 	this->program->setMat4("view", view);
+
+
+	glm::vec4 lightpos(this->position.x-500.0f, 500.0f,  this->position.y, 1);
+
+	glm::vec4 toto = -view * lightpos;
+
+	this->program->setVec3("lightPos", toto);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture);

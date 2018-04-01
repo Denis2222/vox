@@ -5,6 +5,7 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
+
 			this->blocks = (unsigned char*)malloc(sizeof(unsigned char) *  CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 			bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
 		}
@@ -37,32 +38,6 @@ void	Chunk::setWorld(int x, int y, int z, int val) {
        if (val > 1 && y < this->minheight)
                this->minheight = y;
 	this->blocks[getIndex(x, y, z)] = val;
-}
-
-int		Chunk::getBlockType(int x, int y, int z, int height) {
-	int type = 1;
-
-	if (y == 20)
-		return (2); //Water
-	else if (y < 21)
-		type =  4; // Rock
-	else if (y <= height && y > (height - 3))
-	{
-		if (getMoisture(x, z) * 2 > height)
-			type = 6; //  Grass
-		else
-			type = 3;
-	}
-	else
-		type = 4; // Rock
-
-	if (y > 80 - getMoisture(x, z))
-		type = 5; // Snow
-
-	if (y%CHUNK_SIZE == 0)
-		type=4;
-
-	return (type);
 }
 
 void 	Chunk::interact(int x, int y, int z, int val) {
@@ -188,29 +163,13 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 
 	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=2)
 	{
-		glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
-		if (val == 2)
-			vec = glm::make_vec2(&VCUBEUVWATER[i]);
-		else if (val == 4)
-			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
-		else if (val == 5)
-			vec = glm::make_vec2(&VCUBEUVSNOW[i]);
-		else if (val == 6)
-			vec = glm::make_vec2(&VCUBEUVGRASS[i]);
+		glm::vec2 vec = getUVBlock(val, i);
 		uvs.push_back(vec);
 	}
 
 	for (int i = oneFaceUV * n + 36; i < oneFaceUV * u + 36; i+=2)
 	{
-		glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
-		if (val == 2)
-			vec = glm::make_vec2(&VCUBEUVWATER[i]);
-		else if (val == 4)
-			vec = glm::make_vec2(&VCUBEUVEARTH[i]);
-		else if (val == 5)
-			vec = glm::make_vec2(&VCUBEUVSNOW[i]);
-		else if (val == 6)
-			vec = glm::make_vec2(&VCUBEUVGRASS[i]);
+		glm::vec2 vec = getUVBlock(val, i);
 		uvs.push_back(vec);
 	}
 }
@@ -223,6 +182,11 @@ void	Chunk::generate(void) {
 
 	this->minheight = 256;
 	this->maxheight = 0;
+
+
+
+
+
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 

@@ -3,7 +3,13 @@
 		Voxel::Voxel(int argc, char **argv) {
 			std::cout << "Lets GO " << std::endl;
 
-			if (argc == 2)
+			int seed = 0;
+			if (argc > 1)
+				seed = atoi(argv[1]);
+
+			noiseParam(seed);
+
+			if (argc == 3)
 				this->glfwStart(true);
 			else
 				this->glfwStart(false);
@@ -12,7 +18,9 @@
 
 			this->map = new Map();
 			this->map->updatePosition(this->camera->position);
-			this->map->updateChunkToLoad();
+			//this->map->updateChunkToLoad();
+
+			//this->terrain = new Terrain();
 			this->skybox = new Skybox();
 			this->skybox->Load();
 			this->loop();
@@ -45,6 +53,10 @@
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				this->camera->ProcessInput(map);
 				this->map->Render(this->camera->getView(), this->camera->getProjection(), this->camera->position);
+
+
+				//this->terrain->render(this->camera);
+
 				this->skybox->render(this->camera);
 
 				glfwSwapBuffers(this->window);
@@ -105,7 +117,7 @@
 			glDepthFunc(GL_LESS);
 
 			//glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			//glfwSetCursorPosCallback(this->window, this->mouse_callback);
 			glClearColor(0.527f, 0.804f, 0.918f, 1.0f);

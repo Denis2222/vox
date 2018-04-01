@@ -16,6 +16,7 @@ class Voxel
 		Map 			*map;
 		Camera			*camera;
 		Skybox			*skybox;
+		Terrain			*terrain;
 
 						Voxel(int argc, char **argv);
 						~Voxel(void);

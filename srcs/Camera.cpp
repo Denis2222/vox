@@ -27,7 +27,7 @@ void 		Camera::ProcessInput(Map *map) {
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=10;
+		deltaSpeed*=40;
 
 	float posY = position.y;
 	float posX = position.x;

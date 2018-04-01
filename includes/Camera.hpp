@@ -19,7 +19,7 @@ class Camera
 		unsigned int height;
 		GLFWwindow	*window;
 
-		glm::vec3	position = glm::vec3(200000.0f, 50.0f,  200000.0f);
+		glm::vec3	position = glm::vec3(0.0f, 100.0f,  0.0f);
 		//glm::vec3	position = glm::vec3(0.0f, 0.0f,  -3.0f);
 		//glm::vec3	front = glm::vec3(0.0f, 0.0f,  1.0f);
 		glm::vec3	front = glm::vec3(-1.6f, -0.0f,  0.0f);

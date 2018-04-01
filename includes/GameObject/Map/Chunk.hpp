@@ -54,9 +54,7 @@ class Chunk
 
 
 		void 		build(void);
-		int 		getBlockType(int x, int y, int z, int height);
 		void		buildFace(int n, int x, int y, int z, int val);
-
 		bool		collide(int x, int y, int z, int way);
 		bool		collideDebug(int x, int y, int z, int way);
 		int			getWorld(int x, int y, int z);

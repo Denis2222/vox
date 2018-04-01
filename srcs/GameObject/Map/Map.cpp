@@ -94,7 +94,6 @@ Chunk		*Map::getChunkWorld(int x, int y, int z) {
 
 int			Map::getBlockInfo(int x, int y, int z) {
 	Chunk *c = getChunkWorld(x, y, z);
-	//printf("getBlockInfo()\n");
 	if (c)
 		if (c->state > Chunk::STATE::BUILD)
 			return (c->getWorld(x - (int)c->worldCoord.x, y, z - (int)c->worldCoord.z));
@@ -139,17 +138,30 @@ void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
 }
 
 void 		generateAndBuildChunk(Chunk *c, int i) {
-	//std::cout << "START:" << i << std::endl;
-	//struct timespec start, end, middle;
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+	static long long timegenerate = 0;
+	static int nbgenerate = 0;
+
+	static long long timebuild = 0;
+	static int nbbuild = 0;
+
+	struct timespec start, end, middle;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 	c->generate();
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
 	c->build();
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	//uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+
+	timegenerate+=delta_middle/1000;
+	timebuild+= delta_us/1000;
+	nbbuild++;
+	nbgenerate++;
 	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 	//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
+
+
+	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
 }
 
 void 		Map::threadPoolJob(void) {
@@ -307,7 +319,7 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 
 	glm::vec4 lightpos(this->position.x, 5000.0f,  this->position.z, 0);
 
-	glm::vec4 toto = projection * view * lightpos;
+	glm::vec4 toto = lightpos;
 
 	this->program->setVec3("lightPos", toto);
 

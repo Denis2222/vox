@@ -31,6 +31,7 @@
 #  define OPENGL_VERSION_MINOR 0
 # endif
 
+
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
@@ -69,7 +70,7 @@
 # define BASE_FOV 45.0f
 
 #define CHUNK_SIZE 32
-#define CHUNK_VIEW 32
+#define CHUNK_VIEW 16
 
 #define FAR 1000.0f
 
@@ -92,13 +93,16 @@
 #include <GameObject/Map/Chunk.hpp>
 #include <GameObject/Shader.hpp>
 #include <GameObject/Skybox.hpp>
+#include <GameObject/Terrain.hpp>
 #include <Voxel.hpp>
-
-
-
 
 int					getHeight(int x, int y);
 int 				getMoisture(int x, int y);
+int					getBlockType(int x, int y, int z, int height);
+glm::vec2 			getUVBlock(int val, int i);
+
+void 				noiseParam(int seed);
+
 int					parseLine(char* line);
 int					getValue();
 

@@ -74,8 +74,8 @@ int		getBlockType(int x, int y, int z, int height) {
 	if (y <= 5)
 		return (WATER); //Water
 
-	if (y < 6)
-		return(ROCK); // Rock
+	if (y < 8)
+		return(SAND); // Rock
 
 	if (y > 80 && getMoisture(x, z) > 10)
 		return (ICE);
@@ -107,6 +107,8 @@ glm::vec2 getUVBlock(int val, int i)
 		vec = glm::make_vec2(&VCUBEUVSNOW[i]);
 	else if (val == GRASS)
 		vec = glm::make_vec2(&VCUBEUVGRASS[i]);
+	else if (val == SAND)
+		vec = glm::make_vec2(&VCUBEUVSAND[i]);
 	return (vec);
 }
 

@@ -27,11 +27,13 @@ void 		Camera::ProcessInput(Map *map) {
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=40;
+		deltaSpeed*=20;
 
 	float posY = position.y;
 	float posX = position.x;
 	float posZ = position.z;
+
+	glm::vec3 oldPos = position;
 
 	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
         position += deltaSpeed * front;
@@ -42,8 +44,7 @@ void 		Camera::ProcessInput(Map *map) {
     if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
         position += glm::normalize(glm::cross(front, up)) * deltaSpeed;
 
-	if (0)//NO GOD MODE
-		position.y-= 0.1f;
+	position.y = posY;
 
 	if (glfwGetKey(this->window, GLFW_KEY_F) == GLFW_PRESS)
 		std::cout << "Block:" << glm::to_string(this->position) << std::endl;
@@ -57,50 +58,55 @@ void 		Camera::ProcessInput(Map *map) {
 	(void)posZ;
 	//Get where i am !
 	glm::vec3 m = glm::floor(this->position + 0.5f);
-
-
-
-	//m = m / glm::vec3(CHUNK_SIZE, 1,CHUNK_SIZE);
-
 	Chunk *c;
 	if (1) {
 		int x = (int)round(m.x);
 		int y = (int)round(m.y);
 		int z = (int)round(m.z);
-		//system("clear");
 		//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
 		c = map->getChunkWorld(x, y, z);
 		if (c != NULL) {
 			if (c->state == Chunk::STATE::RENDER) {
-
 				x = x - c->worldCoord.x;
 				y = y;
 				z = z - c->worldCoord.z;
-
-				//system("clear");
-				//printf("X:%d Y:%d Z:%d\n",x,y,z);
-				//printf(" x+1 :%d\n", c->collideDebug(x,y,z, 3));
-				//printf(" x-1 :%d\n", c->collideDebug(x,y,z, 4));
-				//printf(" z+1 :%d\n", c->collideDebug(x,y,z, 5));
-				//printf(" z-1 :%d\n", c->collideDebug(x,y,z, 6));
-				//printf("===============================\n");
-				/*
-				x = x - c->worldCoord.x;
-				z = z - c->worldCoord.z;
-
 				if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 					c->interact( x, y, z, 0);
 				}
 				if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 					c->interact( x, y, z, 4);
 				}
-*/
 			}
-		}
-		else {
+		} else {
 			std::cout << "Chunk Introuvable !" << std::endl;
 		}
 	}
+
+/*
+	float s = 0.1f;
+	system("clear");
+
+	if (map->getBlockInfo(m.x, m.y-1, m.z) < 2)
+		position.y-= 0.3f;
+	if (map->getBlockInfo(m.x + s, m.y, m.z + s) > 1 && map->getBlockInfo(m.x + s, m.y, m.z - s) > 1)
+	{
+		std::cout << "X+1" << std::endl;
+		position.x = posX;
+	} else if (map->getBlockInfo(m.x - s, m.y, m.z + s) > 1 && map->getBlockInfo(m.x - s, m.y, m.z - s) > 1)
+	{
+		std::cout << "X-1" << std::endl;
+		position.x = posX;
+	}
+	if (map->getBlockInfo(m.x + s, m.y, m.z + s) > 1 && map->getBlockInfo(m.x - s, m.y, m.z + s) > 1)
+	{
+		std::cout << "Z+1" << std::endl;
+		position.z = posZ;
+	} else if (map->getBlockInfo(m.x - s, m.y, m.z - s) > 1 && map->getBlockInfo(m.x + s, m.y, m.z - s) > 1)
+	{
+		std::cout << "Z-1" << std::endl;
+		position.z = posZ;
+	}
+*/
 
 	//position.y = posY;
 }

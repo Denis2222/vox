@@ -23,6 +23,7 @@ SRC =  	main.cpp \
 		Voxel.cpp \
 		Camera.cpp \
 		GameObject/Skybox.cpp \
+		GameObject/Terrain.cpp \
 		GameObject/Model.cpp \
 		GameObject/Mesh.cpp \
 		GameObject/Shader.cpp \

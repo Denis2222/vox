@@ -26,11 +26,9 @@
 
 		std::list<Chunk*>::iterator	iter;
 		Chunk						*c;
-		if (this->chunkList.size() > 0)
-		{
+		if (this->chunkList.size() > 0) {
 			iter = this->chunkList.begin();
-			while(iter != this->chunkList.end())
-			{
+			while(iter != this->chunkList.end()) {
 				c = (*iter);
 				delete c;
 				iter++;
@@ -130,38 +128,37 @@ void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
 
 	Chunk *c = getChunk(cx, cy, cz);
 	//std::cout << "ChunkCoord:" << cx << " " << cy << " " << cz << " " << std::endl;
-	if (c)
-	{
+	if (c) {
 		//std::cout << "VALUE:  x:" << x<< " y:" << y<< " z:" << z << " !! : " <<  c->world[x][y][z] << std::endl;
 		//std::cout << "LocalCoord:" << c->localCoord.x << " " << c->localCoord.y << " " << c->localCoord.z << " " << std::endl;
 	}
 }
 
 void 		generateAndBuildChunk(Chunk *c, int i) {
-	static long long timegenerate = 0;
-	static int nbgenerate = 0;
+//	static long long timegenerate = 0;
+//	static int nbgenerate = 0;
 
-	static long long timebuild = 0;
-	static int nbbuild = 0;
+//	static long long timebuild = 0;
+//	static int nbbuild = 0;
 
-	struct timespec start, end, middle;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+//	struct timespec start, end, middle;
+//	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 	c->generate();
-	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+//	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
 	c->build();
-	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+//	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+//	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+//	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 
-	timegenerate+=delta_middle/1000;
-	timebuild+= delta_us/1000;
-	nbbuild++;
-	nbgenerate++;
+//	timegenerate+=delta_middle/1000;
+//	timebuild+= delta_us/1000;
+//	nbbuild++;
+//	nbgenerate++;
 	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 	//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
 
 
-	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
+//	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
 }
 
 void 		Map::threadPoolJob(void) {
@@ -170,8 +167,7 @@ void 		Map::threadPoolJob(void) {
 	std::list<Chunk*>::iterator	iter;
 	Chunk						*c;
 
-	while (this->thread)
-	{
+	while (this->thread) {
 		int full = 0;
 		iter = this->chunkList.begin();
 		while(iter != this->chunkList.end() && !full) {
@@ -242,21 +238,12 @@ void 		Map::updateChunkToLoad(void) {
 	int priority = CHUNK_VIEW;
 
 	int chunkAddPerPassage = 0;
-
-	for (priority = 0; priority <= CHUNK_VIEW && chunkAddPerPassage<MAX_CHUNK_INIT && this->chunkInit < MAX_CHUNK_INIT; priority++)
-	{
-
-		for (int X = -priority; X <= priority && this->chunkInit < MAX_CHUNK_INIT; X++)
-		{
-
-			int Y=0;
-			for (int Z = -priority; Z <= priority && this->chunkInit < MAX_CHUNK_INIT; Z++)
-			{
-
-				if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK)
-				{
-					if (this->getInfos((X+x),0,(Z+z)) < INFO::INIT)
-					{
+	int Y=0;
+	for (priority = 0; priority <= CHUNK_VIEW && chunkAddPerPassage<MAX_CHUNK_INIT && this->chunkInit < MAX_CHUNK_INIT; priority++) {
+		for (int X = -priority; X <= priority && this->chunkInit < MAX_CHUNK_INIT; X++) {
+			for (int Z = -priority; Z <= priority && this->chunkInit < MAX_CHUNK_INIT; Z++) {
+				if (this->distanceToChunk(X+x, 0, Z+z) < FAR_CHUNK) {
+					if (this->getInfos((X+x),0,(Z+z)) < INFO::INIT) {
 						chunkAddPerPassage++;
 						int lx, ly, lz;
 						lx = X+x;
@@ -279,22 +266,18 @@ void 		Map::SlowRender(void) {
 	Chunk *c;
 
 	iter = this->chunkList.begin();
-	while(iter != this->chunkList.end())
-	{
+	while(iter != this->chunkList.end()) {
 		c = (*iter);
-		if (c->state == Chunk::STATE::UPDATE)
-		{
+		if (c->state == Chunk::STATE::UPDATE) {
 			c->updateVAO();
 			c->state = Chunk::STATE::RENDER;
 		}
-		if (c->state == Chunk::STATE::BUILD)
-		{
+		if (c->state == Chunk::STATE::BUILD) {
 			c->buildVAO();
 			c->state = Chunk::STATE::RENDER;
 			this->renderList.push_back(c);
 		}
-		if (c->state == Chunk::STATE::DISABLE)
-		{
+		if (c->state == Chunk::STATE::DISABLE) {
 			c->cleanVAO();
 			this->renderList.remove(c);
 			c->state = Chunk::STATE::DELETE;
@@ -329,12 +312,10 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	iter = this->renderList.begin();
 	//long nbtriangle = 0;
 	//int nbchunks = 0;
-	while(iter != this->renderList.end())
-	{
+	while(iter != this->renderList.end()) {
 		c = (*iter);
 
-		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE)
-		{
+		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE) {
 			glm::mat4 myMatrix = glm::translate(model, c->worldCoord - this->position);
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);
@@ -361,13 +342,10 @@ unsigned int Map::loadTexture(const char *path) {
 
 	int width, height, nrChannels;
 	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, STBI_rgb_alpha);
-	if (data)
-	{
+	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
+	} else {
 		std::cout << "Failed to load texture : " << std::endl;
 	}
 	stbi_image_free(data);

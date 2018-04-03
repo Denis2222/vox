@@ -76,9 +76,9 @@ Chunk 		*Map::getChunk(int x, int y, int z) {
 }
 
 Chunk		*Map::getChunkWorld(float x, float y, float z) {
-	int cx = round(x / CHUNK_SIZE);
+	int cx = round((int)x / CHUNK_SIZE);
 	int cy = 0;
-	int cz = round(z / CHUNK_SIZE);
+	int cz = round((int)z / CHUNK_SIZE);
 
 	if (x < 0)
 		cx = (x-CHUNK_SIZE) / CHUNK_SIZE;
@@ -106,13 +106,23 @@ Chunk		*Map::getChunkWorld(int x, int y, int z) {
 }
 
 int			Map::getBlockInfo(glm::vec3 v) {
-	Chunk *c = getChunkWorld(v.x, v.y, v.z);
-
+	//std::cout << "BEFORE Wth : V: " << glm::to_string(v) << std::endl;
+	int x = ((int)round(v.x));
+	int y = round(v.y);
+	int z = ((int)round(v.z));
+	Chunk *c = getChunkWorld(x, y, z);
+	//std::cout << "AFTER Wth : V: " << glm::to_string(v) << std::endl;
 
 	printf("chunk:%f %f %f \n", c->localCoord.x, c->localCoord.y, c->localCoord.z);
 	if (c)
 		if (c->state > Chunk::STATE::BUILD)
-			return (c->getWorld(round(v.x) - (int)c->worldCoord.x, round(v.y), round(v.z) - (int)c->worldCoord.z));
+		{
+			x = (x - (int)c->worldCoord.x)%CHUNK_SIZE;
+			y = y;
+			z = (z - (int)c->worldCoord.z)%CHUNK_SIZE;
+			printf("block: x:%d y:%d z:%d \n", x, y, z);
+			return (c->getWorld(			   x, y, z));
+		}
 
 	return (-1);
 }

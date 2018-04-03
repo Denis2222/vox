@@ -41,8 +41,12 @@ int getHeight(int x, int z)
 	if (noise < 1)
 		noise = 1;
 
-	if (x==0 && z == 0)
-		noise = CHUNK_HEIGHT;
+	if (x==500 && z == 500)
+		noise = 4;
+	if (x==502 && z == 500)
+		noise = 5;
+	if (x==501 && z == 501)
+		noise = 6;
 
 	return (noise);
 }

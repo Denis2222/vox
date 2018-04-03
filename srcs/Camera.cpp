@@ -57,7 +57,7 @@ void 		Camera::ProcessInput(Map *map) {
 	(void)posY;
 	(void)posZ;
 	//Get where i am !
-	glm::vec3 m = glm::floor(this->position + 0.5f);
+	glm::vec3 m = glm::round(this->position);
 	Chunk *c;
 	if (1) {
 		int x = (int)round(m.x);
@@ -82,30 +82,131 @@ void 		Camera::ProcessInput(Map *map) {
 		}
 	}
 
-/*
-	float s = 0.1f;
+
+
+
+	float pHeight = 0.5f;
 	system("clear");
 
-	if (map->getBlockInfo(m.x, m.y-1, m.z) < 2)
+	printf("x:%.2f y:%.2f z:%.2f \n", m.x, m.y, m.z);
+
+	if (map->getBlockInfo(m.x, m.y-pHeight, m.z) < 2)
+	{
+		printf("ground x:%.2f y:%.2f z:%.2f \n", m.x, m.y-pHeight, m.z);
 		position.y-= 0.3f;
-	if (map->getBlockInfo(m.x + s, m.y, m.z + s) > 1 && map->getBlockInfo(m.x + s, m.y, m.z - s) > 1)
+	}
+
+	float dN = 99.0f;
+	float dS = 99.0f;
+	float dE = 99.0f;
+	float dW = 99.0f;
+
+
+
+	float dSE = 99.0f;
+	float dSW = 99.0f;
+
+	float dNE = 99.0f;
+	float dNW = 99.0f;
+
+	float s = 1.0f;
+
+	m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
+
+	if (map->getBlockInfo(m+glm::vec3(s, 0.0f, 0.0f)) > 1)
 	{
-		std::cout << "X+1" << std::endl;
+		dW = glm::distance(m+glm::vec3(s, 0.0f, 0.0f), m);
+		std::cout << "X+1 " << dW << std::endl;
 		position.x = posX;
-	} else if (map->getBlockInfo(m.x - s, m.y, m.z + s) > 1 && map->getBlockInfo(m.x - s, m.y, m.z - s) > 1)
+		//position.x = posX;
+	}
+	if (map->getBlockInfo(m+glm::vec3(-s, 0.0f, 0.0f)) > 1)
 	{
-		std::cout << "X-1" << std::endl;
+		dE = glm::distance(m+glm::vec3(-s, 0.0f, 0.0f), m);
+		std::cout << "X-1 " << dE << std::endl;
+		position.x = posX;
+		//position.x = posX+0.1f;
+	}
+	if (map->getBlockInfo(m+glm::vec3(0.0f, 0.0f, s)) > 1)
+	{
+		dN = glm::distance(m+glm::vec3(0.0f, 0.0f, s), m);
+		std::cout << "Z+1 dN:" << dN << std::endl;
+		position.z = posZ;
+	}
+	if (map->getBlockInfo(m+glm::vec3(0.0f, 0.0f, -s)) > 1)
+	{
+		dS = glm::distance(m+glm::vec3(0.0f, 0.0f, -s), m);
+		std::cout << "Z-1 dS:" << dS << std::endl;
+		position.z = posZ;
+	}
+/*
+	if (map->getBlockInfo(round(m.x + s), m.y-pHeight, round(m.z + s)) > 1)
+	{
+		dNW = glm::distance(glm::vec3(round(m.x + s), m.y-pHeight, round(m.z + s)), m);
+		std::cout << "X+1 Z+1 " << dNW << std::endl;
+		//position.x = posX;
+	}
+	if (map->getBlockInfo(round(m.x - s), m.y-pHeight, round(m.z + s)) > 1)
+	{
+		dNE = glm::distance(glm::vec3(round(m.x - s), m.y-pHeight, round(m.z + s)), m);
+		std::cout << "X-1 Z+1 " << dNE << std::endl;
+		//position.x = posX;
+	}
+	if (map->getBlockInfo(round(m.x + s), m.y-pHeight, round(m.z - s)) > 1)
+	{
+		dSW = glm::distance(glm::vec3(round(m.x + s), m.y-pHeight, round(m.z - s)), m);
+		std::cout << "X+1 Z-1 " << dSW << std::endl;
+		//position.z = posZ;
+	}
+	if (map->getBlockInfo(round(m.x - s), m.y-pHeight, round(m.z - s)) > 1)
+	{
+		dSE = glm::distance(glm::vec3(round(m.x - s), m.y-pHeight, round(m.z - s)), m);
+		std::cout << "X-1 Z-1 " << dSE << std::endl;
+		//position.z = posZ;
+	}
+*/
+/*
+	if (dW < 2.0f && dW > 0.0f)
+	{
+
+	}
+
+	if (dE < 2.0f && dE > 0.0f)
+	{
 		position.x = posX;
 	}
-	if (map->getBlockInfo(m.x + s, m.y, m.z + s) > 1 && map->getBlockInfo(m.x - s, m.y, m.z + s) > 1)
+
+	if (dN < 3.0f && dN > 0.0f)
 	{
-		std::cout << "Z+1" << std::endl;
-		position.z = posZ;
-	} else if (map->getBlockInfo(m.x - s, m.y, m.z - s) > 1 && map->getBlockInfo(m.x + s, m.y, m.z - s) > 1)
-	{
-		std::cout << "Z-1" << std::endl;
 		position.z = posZ;
 	}
+
+	if (dS < 3.0f && dS > 0.0f)
+	{
+		position.z = posZ;
+	}
+*/
+
+/*
+if (map->getBlockInfo(m.x + s, m.y-pHeight, m.z + (s/4)) > 1 || map->getBlockInfo(m.x + s, m.y-pHeight, m.z - (s/4)) > 1)
+{
+	std::cout << "X+1" << std::endl;
+	position.x = posX;
+} else if (map->getBlockInfo(m.x - s, m.y-pHeight, m.z + (s/4)) > 1 || map->getBlockInfo(m.x - s, m.y-pHeight, m.z - (s/4)) > 1)
+{
+	std::cout << "X-1" << std::endl;
+	position.x = posX;
+}
+if (map->getBlockInfo(m.x + (s/4), m.y-pHeight, m.z + s) > 1 || map->getBlockInfo(m.x - (s/4), m.y-pHeight, m.z + s) > 1)
+{
+	std::cout << "Z+1" << std::endl;
+	position.z = posZ;
+} else if (map->getBlockInfo(m.x - (s/4), m.y-pHeight, m.z - s) > 1 || map->getBlockInfo(m.x + (s/4), m.y-pHeight, m.z - s) > 1)
+{
+	std::cout << "Z-1" << std::endl;
+	position.z = posZ;
+}
+
 */
 
 	//position.y = posY;

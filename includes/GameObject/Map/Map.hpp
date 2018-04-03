@@ -34,7 +34,11 @@ class Map
 		Chunk 		*getChunk(int x, int y, int z);
 		Map::INFO	getInfos(int x, int y, int z);
 		Chunk		*getChunkWorld(int x, int y, int z);
+		Chunk		*getChunkWorld(float x, float y, float z);
+
+
 		int			getBlockInfo(int x, int y, int z);
+		int			getBlockInfo(glm::vec3 v) ;
 		void 		getBlockInfoReallyMore(int qx,int qy,int  qz);
 
 		void		updatePosition(glm::vec3 position);
@@ -56,10 +60,10 @@ class Map
 		Shader 													*program;
 		GLuint													texture;
 		glm::vec3 												position;
-
+/*
 		std::thread threadPool() {
-			return std::thread(&Map::threadPoolJob, this);
-		}
+			return ;
+		}*/
 
 		void			setChunkPtr(int x, int y, int z, Chunk *chunk);
 		void			setInfos(int x, int y, int z, Map::INFO info);

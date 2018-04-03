@@ -4,12 +4,12 @@
 #include <inttypes.h>
 
 	Map::Map(void) {
-		this->nbWorker = 6;
+		this->nbWorker = 4;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
 		this->texture = this->loadTexture("./assets/tileset.png");
-		this->tp = this->threadPool();
+		this->tp = std::thread(&Map::threadPoolJob, this);
 		this->chunkInit = 0;
 	}
 
@@ -75,10 +75,10 @@ Chunk 		*Map::getChunk(int x, int y, int z) {
 	return (c);
 }
 
-Chunk		*Map::getChunkWorld(int x, int y, int z) {
-	int cx = floor(x) / CHUNK_SIZE;
+Chunk		*Map::getChunkWorld(float x, float y, float z) {
+	int cx = round(x / CHUNK_SIZE);
 	int cy = 0;
-	int cz = floor(z) / CHUNK_SIZE;
+	int cz = round(z / CHUNK_SIZE);
 
 	if (x < 0)
 		cx = (x-CHUNK_SIZE) / CHUNK_SIZE;
@@ -88,6 +88,33 @@ Chunk		*Map::getChunkWorld(int x, int y, int z) {
 	//printf("getChunkWorld %d %d %d \n", cx, cy, cz);
 	Chunk *c = getChunk(cx, cy, cz);
 	return (c);
+}
+
+Chunk		*Map::getChunkWorld(int x, int y, int z) {
+	int cx = round(x / CHUNK_SIZE);
+	int cy = 0;
+	int cz = round(z / CHUNK_SIZE);
+
+	if (x < 0)
+		cx = (x-CHUNK_SIZE) / CHUNK_SIZE;
+	if (z < 0)
+		cz = (z-CHUNK_SIZE) / CHUNK_SIZE;
+
+	//printf("getChunkWorld %d %d %d \n", cx, cy, cz);
+	Chunk *c = getChunk(cx, cy, cz);
+	return (c);
+}
+
+int			Map::getBlockInfo(glm::vec3 v) {
+	Chunk *c = getChunkWorld(v.x, v.y, v.z);
+
+
+	printf("chunk:%f %f %f \n", c->localCoord.x, c->localCoord.y, c->localCoord.z);
+	if (c)
+		if (c->state > Chunk::STATE::BUILD)
+			return (c->getWorld(round(v.x) - (int)c->worldCoord.x, round(v.y), round(v.z) - (int)c->worldCoord.z));
+
+	return (-1);
 }
 
 int			Map::getBlockInfo(int x, int y, int z) {
@@ -169,63 +196,75 @@ void 		Map::threadPoolJob(void) {
 
 	while (this->thread) {
 		int full = 0;
-		iter = this->chunkList.begin();
-		while(iter != this->chunkList.end() && !full) {
-			c = (*iter);
-			if (c->state == Chunk::STATE::TOUPDATE) {
-				//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
-				c->points.clear();
-				c->uvs.clear();
-				c->build();
-				c->state = Chunk::STATE::UPDATE;
-				full = 1;
-			}
-			if (c->state == Chunk::STATE::INIT) { //One Task !
-				if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
-				{
-					c->state = Chunk::STATE::DELETE;
-					this->chunkInit--;
-					//std::cout << "Direct delete ! " << std::endl;
-				} else if (w < this->nbWorker) {
-					c->state = Chunk::STATE::THREAD;
-					workersTask.push_back(c);
-					workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
-					w++;
+
+		if (this->chunkList.size() > 0)
+		{
+			iter = this->chunkList.begin();
+			while(iter != this->chunkList.end() && !full) {
+				c = (*iter);
+				if (c->state == Chunk::STATE::TOUPDATE) {
+					//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
+					c->points.clear();
+					c->uvs.clear();
+					c->build();
+					c->state = Chunk::STATE::UPDATE;
 					full = 1;
 				}
+				if (c->state == Chunk::STATE::INIT) { //One Task !
+					if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
+					{
+						c->state = Chunk::STATE::DELETE;
+						this->chunkInit--;
+						//std::cout << "Direct delete ! " << std::endl;
+					} else if (w < this->nbWorker) {
+						c->state = Chunk::STATE::THREAD;
+						workersTask.push_back(c);
+						workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
+						w++;
+						full = 1;
+					}
+				}
+				if (c->state == Chunk::STATE::DELETE) {
+					this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
+					this->chunkList.remove(c);
+					this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
+					delete c;
+					full = 1;
+					break;
+				}
+				if (c->state == Chunk::STATE::RENDER) {
+					if (this->distanceToChunk(c) > FAR_CHUNK)
+						c->state = Chunk::STATE::DISABLE;
+				}
+				iter++;
 			}
-			if (c->state == Chunk::STATE::DELETE) {
-				this->setInfos(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, INFO::FREE);
-				this->chunkList.remove(c);
-				this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
-				delete c;
-				full = 1;
-				break;
-			}
-			if (c->state == Chunk::STATE::RENDER) {
-				if (this->distanceToChunk(c) > FAR_CHUNK)
-					c->state = Chunk::STATE::DISABLE;
-			}
-			iter++;
 		}
 
 		int u = 0;
-		for (auto &i : workers) {
-			if (i.joinable()) {
-				c = workersTask.at(u);
-				if (c->state != Chunk::STATE::THREAD) {
-					i.join();
-					this->chunkInit--;
-					workers.erase(workers.begin() + u);
-					workersTask.erase(workersTask.begin() + u);
-					w--;
+		if (workers.size() > 0)
+		{
+			for (auto &i : workers) {
+
+				if (i.joinable()) {
+					c = workersTask.at(u);
+					if (c->state != Chunk::STATE::THREAD) {
+						i.join();
+						this->chunkInit--;
+						//if (workers.size() >= u)
+							workers.erase(workers.begin() + u);
+						workersTask.erase(workersTask.begin() + u);
+						w--;
+					}
 				}
+				u++;
+
 			}
-			u++;
 		}
+
+
 		if (!full) {
 			this->updateChunkToLoad();
-			usleep(5000);
+			usleep(3000);
 		}
 	}
 }

@@ -18,6 +18,7 @@ class Camera
 		unsigned int 	width;
 		unsigned int 	height;
 		bool			grounded;
+		unsigned int	jump;
 		bool			god;
 		GLFWwindow		*window;
 

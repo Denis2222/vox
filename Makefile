@@ -1,12 +1,12 @@
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
-	GCC_FLAG = -g -std=c++14 -fsanitize=leak
+	GCC_FLAG = -g -std=c++14 -fsanitize=address
 	DL_INC = -I./includes -I./glmc -I./libft
 	DL_FLAG_DIR =
 	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lnoise -lassimp
 endif
 ifeq ($(UNAME), Darwin)
-	GCC_FLAG = -std=c++14 -g3 
+	GCC_FLAG = -std=c++14 -g3
 	DL_INC = -I./includes -I $(HOME)/.brew/include
 	DL_FLAG_DIR = -L./glmc -L./libft
 	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread -lnoise -lassimp

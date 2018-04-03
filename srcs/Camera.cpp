@@ -5,6 +5,7 @@ Camera::Camera(unsigned int id, unsigned int w, unsigned int h, GLFWwindow *win)
 
 	this->window = win;
 	this->grounded = false;
+	this->jump = 0;
 	this->god = false;
 
 	this->height = h;
@@ -28,7 +29,7 @@ void 		Camera::ProcessInput(Map *map) {
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=20;
+		deltaSpeed*=4;
 
 	float posY = position.y;
 	float posX = position.x;
@@ -60,10 +61,35 @@ void 		Camera::ProcessInput(Map *map) {
 		glfwSetWindowShouldClose(this->window, true);
 	}
 
-	(void)posX;
-	(void)posY;
-	(void)posZ;
 	//Get where i am !
+
+
+	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+		glm::vec3 detector(0.0f,0.0f,0.0f);
+		for (float d = 0; d < 5.0f; d+=0.2f)
+		{
+			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
+			if (map->getBlockInfo(detector) > 1) {
+				//std::cout << "Quelque chose" << std::endl;
+				int x = (int)round(detector.x);
+				int y = (int)round(detector.y);
+				int z = (int)round(detector.z);
+				//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
+				Chunk *c;
+				c = map->getChunkWorld(x, y, z);
+				if (c != NULL) {
+					if (c->state == Chunk::STATE::RENDER) {
+						x = x - c->worldCoord.x;
+						y = y;
+						z = z - c->worldCoord.z;
+						c->interact( x, y, z, 0);
+					}
+				}
+				break;
+			}
+		}
+	}
+
 	glm::vec3 m = glm::round(this->position);
 	Chunk *c;
 	if (1) {
@@ -77,10 +103,8 @@ void 		Camera::ProcessInput(Map *map) {
 				x = x - c->worldCoord.x;
 				y = y;
 				z = z - c->worldCoord.z;
-				if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-					c->interact( x, y, z, 0);
-				}
-				if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+
+				if (glfwGetKey(this->window, GLFW_KEY_R) == GLFW_PRESS) {
 					c->interact( x, y, z, 4);
 				}
 			}
@@ -90,16 +114,34 @@ void 		Camera::ProcessInput(Map *map) {
 	}
 
 
-		float pHeight = 1.0f; // Hauteur joueur
-		system("clear");
+		float pHeight = 2.0f; // Hauteur joueur
+		//system("clear");
 
-		printf("Current case positionx:%.2f y:%.2f z:%.2f \n", m.x, m.y, m.z);
+		//printf("Current case positionx:%.2f y:%.2f z:%.2f \n", m.x, m.y, m.z);
 		m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
-		if (map->getBlockInfo(m+glm::vec3(0.0f, -1.0f, 0.0f)) < 2)
-		{
-			printf("ground x:%.2f y:%.2f z:%.2f \n", m.x, m.y-pHeight, m.z);
-			if (!this->god)
+		if (map->getBlockInfo(m+glm::vec3(0.0f, -1.0f, 0.0f)) < 2) {
+			//printf("ground x:%.2f y:%.2f z:%.2f \n", m.x, m.y-pHeight, m.z);
+			if (!this->god) {
+				this->grounded = false;
+				//if (this->jump == 0) {
 				position.y-= 0.3f;
+				//}
+			}
+		} else {
+			this->grounded = true;
+			this->jump = 0;
+		}
+
+		if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+			if (this->grounded)
+				this->jump = 45;
+		}
+
+
+		if (this->jump > 0)
+		{
+			position.y+=(0.01f * this->jump);
+			this->jump--;
 		}
 
 		float dN = 99.0f;
@@ -126,15 +168,15 @@ void 		Camera::ProcessInput(Map *map) {
 		{
 			dW = glm::distance(m+glm::vec3(s, 0.0f, 0.0f), m);
 			//std::cout << "X+1 " << dW << std::endl;
-			position.x = posX;//-0.05f;
+			position.x = posX-0.05f;
 			//position.x = posX;
 		}
-		std::cout << "X-1";
+		//std::cout << "X-1";
 		if (map->getBlockInfo(m+glm::vec3(-s, 0.0f, 0.0f)) > 1)
 		{
 			dE = glm::distance(m+glm::vec3(-s, 0.0f, 0.0f), m);
-			std::cout << "X-1 " << dE << std::endl;
-			position.x = posX;//+0.05f;
+			//std::cout << "X-1 " << dE << std::endl;
+			position.x = posX+0.05f;
 			//position.x = posX+0.1f;
 		}
 		//std::cout << "Z+1 ";

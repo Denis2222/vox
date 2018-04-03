@@ -69,8 +69,8 @@
 # define TITLE "Voxel"
 # define BASE_FOV 45.0f
 
-#define CHUNK_SIZE 16
-#define CHUNK_VIEW 8
+#define CHUNK_SIZE 32
+#define CHUNK_VIEW 16
 
 #define FAR 1000.0f
 

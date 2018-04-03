@@ -113,14 +113,14 @@ int			Map::getBlockInfo(glm::vec3 v) {
 	Chunk *c = getChunkWorld(x, y, z);
 	//std::cout << "AFTER Wth : V: " << glm::to_string(v) << std::endl;
 
-	printf("chunk:%f %f %f \n", c->localCoord.x, c->localCoord.y, c->localCoord.z);
+	//printf("chunk:%f %f %f \n", c->localCoord.x, c->localCoord.y, c->localCoord.z);
 	if (c)
 		if (c->state > Chunk::STATE::BUILD)
 		{
 			x = (x - (int)c->worldCoord.x)%CHUNK_SIZE;
 			y = y;
 			z = (z - (int)c->worldCoord.z)%CHUNK_SIZE;
-			printf("block: x:%d y:%d z:%d \n", x, y, z);
+			//printf("block: x:%d y:%d z:%d \n", x, y, z);
 			return (c->getWorld(			   x, y, z));
 		}
 

@@ -6,6 +6,9 @@ out vec2 TexCoord;
 out vec3 pos;
 out vec3 FragPos;
 
+out vec4 VertPos;
+
+
 out vec3 ec_pos;
 
 uniform mat4 model;
@@ -19,4 +22,6 @@ void main()
 	pos = aPos;
 	FragPos = vec3(model * vec4(aPos, 1.0));
 	ec_pos = (projection * view * model *  vec4(aPos, 1.0)).xyz;
+
+	VertPos = gl_Position;
 }

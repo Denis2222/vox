@@ -28,6 +28,7 @@ class Map
 		};
 
 				Map(void);
+				Map(bool nographics);
 				~Map(void);
 		void 	generate(int sx, int sy, int sz);
 
@@ -60,10 +61,6 @@ class Map
 		Shader 													*program;
 		GLuint													texture;
 		glm::vec3 												position;
-/*
-		std::thread threadPool() {
-			return ;
-		}*/
 
 		void			setChunkPtr(int x, int y, int z, Chunk *chunk);
 		void			setInfos(int x, int y, int z, Map::INFO info);

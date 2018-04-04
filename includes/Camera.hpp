@@ -22,11 +22,11 @@ class Camera
 		bool			god;
 		GLFWwindow		*window;
 
-		glm::vec3		position = glm::vec3(500.0f, 30.0f,  500.0f);
-		glm::vec3		front = glm::vec3(-1.6f, -0.0f,  0.0f);
+		glm::vec3		position = glm::vec3(10000.0f, 30.0f,  10000.0f);
+		glm::vec3		front = glm::vec3(1.6f, -0.0f,  0.0f);
 		glm::vec3		up = glm::vec3(0.0f, 1.0f,  0.0f);
 
-		float			speed = 2.0f;
+		float			speed = 5.0f;
 		float 			deltaTime = 0.0f;
 		float 			lastFrame = 0.0f;
 		float 			lastX = 400;

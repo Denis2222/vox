@@ -29,7 +29,12 @@ void 		Camera::ProcessInput(Map *map) {
 	this->mouse_callback(xPos, yPos);
 
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		deltaSpeed*=4;
+	{
+		if (this->god)
+			deltaSpeed*=40;
+		else
+			deltaSpeed*=4;
+	}
 
 	float posY = position.y;
 	float posX = position.x;
@@ -90,6 +95,33 @@ void 		Camera::ProcessInput(Map *map) {
 		}
 	}
 
+	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		glm::vec3 detector(0.0f,0.0f,0.0f);
+		for (float d = 1.1; d < 5.0f; d+=0.2f)
+		{
+			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
+			if (map->getBlockInfo(detector) < 2) {
+				//std::cout << "Quelque chose" << std::endl;
+				int x = (int)round(detector.x);
+				int y = (int)round(detector.y);
+				int z = (int)round(detector.z);
+				//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
+				Chunk *c;
+				c = map->getChunkWorld(x, y, z);
+				if (c != NULL) {
+					if (c->state == Chunk::STATE::RENDER) {
+						x = x - c->worldCoord.x;
+						y = y;
+						z = z - c->worldCoord.z;
+						c->interact( x, y, z, 6);
+					}
+				}
+				break;
+			}
+		}
+	}
+
+
 	glm::vec3 m = glm::round(this->position);
 	Chunk *c;
 	if (1) {
@@ -114,12 +146,12 @@ void 		Camera::ProcessInput(Map *map) {
 	}
 
 
-		float pHeight = 2.0f; // Hauteur joueur
+		float pHeight = 4.0f; // Hauteur joueur
 		//system("clear");
 
 		//printf("Current case positionx:%.2f y:%.2f z:%.2f \n", m.x, m.y, m.z);
 		m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
-		if (map->getBlockInfo(m+glm::vec3(0.0f, -1.0f, 0.0f)) < 2) {
+		if (map->getBlockInfo(m+glm::vec3(0.0f, -pHeight, 0.0f)) < 2) {
 			//printf("ground x:%.2f y:%.2f z:%.2f \n", m.x, m.y-pHeight, m.z);
 			if (!this->god) {
 				this->grounded = false;

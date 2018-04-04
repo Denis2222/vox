@@ -4,13 +4,33 @@
 #include <inttypes.h>
 
 	Map::Map(void) {
-		this->nbWorker = 4;
+		/*this->nbWorker = 4;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
 		this->texture = this->loadTexture("./assets/tileset.png");
 		this->tp = std::thread(&Map::threadPoolJob, this);
-		this->chunkInit = 0;
+		this->chunkInit = 0;*/
+	}
+
+	Map::Map(bool nographics) {
+		if (nographics)
+		{
+			std::cout << "ICI" << std::endl;
+			this->nbWorker = 4;
+			this->thread = 1;
+			threadPoolJob();
+			exit(0);
+		} else {
+			std::cout << "LA" << std::endl;
+			this->nbWorker = 4;
+			this->thread = 1;
+			this->program = new Shader();
+			this->program->Load("chunk");
+			this->texture = this->loadTexture("./assets/tileset.png");
+			this->tp = std::thread(&Map::threadPoolJob, this);
+			this->chunkInit = 0;
+		}
 	}
 
 	Map::~Map(void) {
@@ -36,7 +56,6 @@
 		}
 		std::cout << "Chunk List delete" << std::endl;
 		delete this->program;
-
 		sleep(1);
 	}
 
@@ -172,30 +191,30 @@ void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
 }
 
 void 		generateAndBuildChunk(Chunk *c, int i) {
-//	static long long timegenerate = 0;
-//	static int nbgenerate = 0;
+	static long long timegenerate = 0;
+	static int nbgenerate = 0;
 
-//	static long long timebuild = 0;
-//	static int nbbuild = 0;
+	static long long timebuild = 0;
+	static int nbbuild = 0;
 
-//	struct timespec start, end, middle;
-//	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+	struct timespec start, end, middle;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 	c->generate();
-//	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
 	c->build();
-//	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-//	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-//	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 
-//	timegenerate+=delta_middle/1000;
-//	timebuild+= delta_us/1000;
-//	nbbuild++;
-//	nbgenerate++;
-	//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
+	timegenerate+=delta_middle/1000;
+	timebuild+= delta_us/1000;
+	nbbuild++;
+	nbgenerate++;
+//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 	//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
 
 
-//	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
+	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
 }
 
 void 		Map::threadPoolJob(void) {
@@ -229,6 +248,8 @@ void 		Map::threadPoolJob(void) {
 					} else if (w < this->nbWorker) {
 						c->state = Chunk::STATE::THREAD;
 						workersTask.push_back(c);
+						/*generateAndBuildChunk(c, 0);
+						exit(0);*/
 						workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
 						w++;
 						full = 1;
@@ -347,7 +368,7 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	this->program->setMat4("projection", projection);
 	this->program->setMat4("model", model);
 	this->program->setMat4("view", view);
-
+	//this->program->setMat4("camera", camera);
 
 	glm::vec4 lightpos(this->position.x, 5000.0f,  this->position.z, 0);
 
@@ -365,6 +386,20 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 		c = (*iter);
 
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE) {
+/*
+			if (yaw > 130 && yaw < 230
+					&& obj.transform.position.z < (this.camera.transform.position.z - 50f))
+				continue ;
+			if ((this.camera.transform.rotation.y > 300 || this.camera.transform.rotation.y < 50)
+					&& obj.transform.position.z > (this.camera.transform.position.z + 50f))
+				continue ;
+			if ((this.camera.transform.rotation.y > 220 && this.camera.transform.rotation.y < 320)
+					&& obj.transform.position.x > (this.camera.transform.position.x + 50f))
+				continue ;
+			if ((this.camera.transform.rotation.y > 40 && this.camera.transform.rotation.y < 130)
+					&& obj.transform.position.x < (this.camera.transform.position.x - 50f))
+				continue ;
+*/
 			glm::mat4 myMatrix = glm::translate(model, c->worldCoord - this->position);
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);

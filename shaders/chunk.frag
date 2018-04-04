@@ -8,6 +8,9 @@ uniform sampler2D texture2;
 
 uniform vec3 lightPos;
 
+in vec3 VertPos;
+
+
 in vec3 pos;
 
 in vec3 FragPos;
@@ -17,7 +20,6 @@ void main()
 {
 
 	vec3 Normal = normalize(cross(dFdx(ec_pos), dFdy(ec_pos)));
-
 
 	//vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(lightPos - FragPos);

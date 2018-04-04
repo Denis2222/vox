@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/04/03 00:06:48 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/04/04 04:35:46 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #  define GL3_PROTOTYPES 1
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
-# include  <libnoise/noise.h>
+//# include  <libnoise/noise.h>
 #  define OPENGL_VERSION_MAJOR 4
 #  define OPENGL_VERSION_MINOR 4
 # endif
@@ -26,7 +26,7 @@
 # ifdef __APPLE__
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
-# include  <noise/noise.h>
+//# include  <noise/noise.h>
 #  define OPENGL_VERSION_MAJOR 4
 #  define OPENGL_VERSION_MINOR 0
 # endif
@@ -85,7 +85,7 @@
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
 
-
+#include "PerlinNoise.hpp"
 #include "static.h"
 
 #include <Camera.hpp>
@@ -97,6 +97,7 @@
 #include <Voxel.hpp>
 
 int					getHeight(int x, int y);
+int					getHeight(int x, int y, int z);
 int 				getMoisture(int x, int y);
 int					getBlockType(int x, int y, int z, int height);
 glm::vec2 			getUVBlock(int val, int i);

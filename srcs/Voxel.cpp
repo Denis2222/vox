@@ -1,37 +1,66 @@
 #include <Voxel.hpp>
-
-		Voxel::Voxel(int argc, char **argv) {
+#include <getopt.h>
+		Voxel::Voxel(int argc, char **argv) : nographics(false) {
 			std::cout << "Lets GO " << std::endl;
 
 			int seed = 0;
-			if (argc > 1)
-				seed = atoi(argv[1]);
+			int ch, fd;
+
+	        /* options descriptor */
+	        static struct option longopts[] = {
+	                { "seed",       no_argument,            NULL,           's' },
+	                { "nographics",   required_argument,    NULL,           'n' },
+					{ "fullscreen",   required_argument,    NULL,           'f' },
+	                { NULL,         0,                      NULL,           0 }
+	        };
+
+	        while ((ch = getopt_long(argc, argv, "s:n:f", longopts, NULL)) != -1) {
+	                switch (ch) {
+	                case 's':
+	                        seed = std::atoi(optarg);
+	                        break;
+	                case 'n':
+							nographics = true;
+							std::cout << "BATARD" << std::endl;
+	                        break;
+					case 'f':
+							fullscreen = true;
+	                        break;
+	                }
+	        }
+	        argc -= optind;
+	        argv += optind;
 
 			noiseParam(seed);
 
-			if (argc == 3)
-				this->glfwStart(true);
-			else
-				this->glfwStart(false);
+			if (!nographics) {
+				std::cout << "Start GLFW" << std::endl;
+				this->glfwStart(fullscreen);
+			}
 
 			this->camera = new Camera(0, this->width, this->height, this->window);
-
-			this->map = new Map();
+			this->map = new Map(nographics);
 			this->map->updatePosition(this->camera->position);
-			//this->map->updateChunkToLoad();
-
-			//this->terrain = new Terrain();
-			this->skybox = new Skybox();
-			this->skybox->Load();
-			this->loop();
+			this->map->updateChunkToLoad();
+			if (!nographics)
+			{
+				//this->terrain = new Terrain();
+				this->skybox = new Skybox();
+				this->skybox->Load();
+				this->loop();
+			}
+			sleep(3);
 		}
 
 		Voxel::~Voxel(void) {
 			std::cout << "Delete" << std::endl;
-			delete this->skybox;
+			if (!nographics)
+			{
+				delete this->skybox;
+				glfwTerminate();
+			}
 			delete this->map;
 			delete this->camera;
-			glfwTerminate();
 		}
 
 		void Voxel::loop(void) {
@@ -65,15 +94,14 @@
 		}
 
 		void Voxel::glfwStart (bool fullscreen) {
-			if (!glfwInit())
-			{
+			if (!glfwInit()) {
 				std::cout << "Failed to initialize GLFW\n" << std::endl;
 				exit(0);
 			}
 
 			glfwWindowHint(GLFW_SAMPLES, 0);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 

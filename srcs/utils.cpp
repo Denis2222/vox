@@ -1,25 +1,24 @@
 #include <vox.h>
 
 
-noise::module::Perlin noiseModule;
+//noise::module::Perlin noiseModule;
+
+
+siv::PerlinNoise customNoise;
+
 
 void noiseParam(int seed) {
+	/*
 	noiseModule.SetOctaveCount (6);
 	noiseModule.SetFrequency (1.0);
-	noiseModule.SetSeed(seed);
-}
-
-double ridgenoise(int x, int z) {
-	float what = 200.0f;
-  return 2 * (0.5 - abs(0.5 - noiseModule.GetValue ((double)(x/what), 0,  (double)(z/what))));
+	noiseModule.SetSeed(seed);*/
 }
 
 int getHeight(int x, int z)
 {
 	int noise;
-	float what;
+	float scale = 20;
 	//Montagneux
-	what = 300.0f; // Lissage
 	//int noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 100) + 70);
 
 	//Plaines
@@ -30,8 +29,13 @@ int getHeight(int x, int z)
 	//int noise = getMoisture(x, z);
 	//if (noise > 20)
 	//{
-		what = 400.0f; // Lissage
-		noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 70) + 20);
+		float sampleX = x / scale;
+		float sampleZ = z / scale;
+		float f = customNoise.noise(sampleX, sampleZ);
+	//	std::cout << f << std::endl;
+		noise = f * 20 + 20;
+
+		//noise = (customNoise.octaveNoise((double)(x/what), 100, (double)(z/what), 4) * 70 ) + 20;
 	//}
 	//else
 	//{
@@ -40,14 +44,14 @@ int getHeight(int x, int z)
 	//}
 	if (noise < 1)
 		noise = 1;
-
+/*
 	if (x==500 && z == 500)
 		noise = 4;
 	if (x==502 && z == 500)
 		noise = 5;
 	if (x==501 && z == 501)
 		noise = 6;
-
+*/
 	return (noise);
 }
 
@@ -55,7 +59,7 @@ int getMoisture(int x, int z)
 {
 	float what = 300.0f;
 	float that = 10;
-	int noise = (int)(noiseModule.GetValue ((double)(x/what), 0,  (double)(z/what))* 100);
+	int noise = (int)(customNoise.noise ((double)(x/what), (double)(z/what)) * 100);
 	return (noise);
 }
 
@@ -65,7 +69,7 @@ int		getBlockType(int x, int y, int z, int height) {
 	if (y <= height && y >= 10)
 		{
 			float what = 50.0f;
-			int noise = (int)(noiseModule.GetValue ((double)(x/what),(double)(y/what),  (double)(z/what))* 20);
+			int noise = (int)(customNoise.noise ((double)(x/what),(double)(z/what))* 20);
 			if (noise > 20)
 				return (0);
 			/*else

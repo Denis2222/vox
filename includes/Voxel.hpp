@@ -17,6 +17,9 @@ class Voxel
 		Camera			*camera;
 		Skybox			*skybox;
 		Terrain			*terrain;
+		bool			nographics = false;
+		bool			fullscreen = false;
+
 
 						Voxel(int argc, char **argv);
 						~Voxel(void);

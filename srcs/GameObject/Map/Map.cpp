@@ -191,30 +191,30 @@ void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
 }
 
 void 		generateAndBuildChunk(Chunk *c, int i) {
-	static long long timegenerate = 0;
-	static int nbgenerate = 0;
+	//static long long timegenerate = 0;
+	//static int nbgenerate = 0;
 
-	static long long timebuild = 0;
-	static int nbbuild = 0;
+	//static long long timebuild = 0;
+	//static int nbbuild = 0;
 
-	struct timespec start, end, middle;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+	//struct timespec start, end, middle;
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 	c->generate();
-	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
 	c->build();
-	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+	//clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	//uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 
-	timegenerate+=delta_middle/1000;
-	timebuild+= delta_us/1000;
-	nbbuild++;
-	nbgenerate++;
+	//timegenerate+=delta_middle/1000;
+	//timebuild+= delta_us/1000;
+	//nbbuild++;
+	//nbgenerate++;
 //std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
 	//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
 
 
-	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
+//printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
 }
 
 void 		Map::threadPoolJob(void) {

@@ -161,15 +161,15 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 		points.push_back(vec);
 	}
 
-	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=2)
+	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=3)
 	{
-		glm::vec2 vec = getUVBlock(val, i);
+		glm::vec3 vec = getUVBlock(val, i);
 		uvs.push_back(vec);
 	}
 
-	for (int i = oneFaceUV * n + 36; i < oneFaceUV * u + 36; i+=2)
+	for (int i = oneFaceUV * n + 54; i < oneFaceUV * u + 54; i+=3)
 	{
-		glm::vec2 vec = getUVBlock(val, i);
+		glm::vec3 vec = getUVBlock(val, i);
 		uvs.push_back(vec);
 	}
 }
@@ -183,10 +183,6 @@ void	Chunk::generate(void) {
 	this->minheight = 256;
 	this->maxheight = 0;
 
-
-
-
-
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
 
@@ -194,9 +190,31 @@ void	Chunk::generate(void) {
 
 			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++) {
 				if (y <= height)
-					setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
-			}
+				{
+					int type = getBlockType(x + sx, y, z + sz, height);
+					setWorld(x, y, z, type);
+					if (type > 1)
+					{
+						if (y == height && y > 0 && y < CHUNK_SIZE - 1 && z > 0 && z < CHUNK_SIZE - 1 )
+						{
+							if (getTree(x + sx, y, z + sz))
+							{
+								setWorld(x, height+1, z, BLOCK::FOREST);
+								setWorld(x, height+2, z, BLOCK::FOREST);
+								setWorld(x, height+3, z, BLOCK::FOREST);
+								setWorld(x, height+4, z, BLOCK::FOREST);
+								setWorld(x, height+5, z, BLOCK::FOREST);
+								setWorld(x+1, height+5, z, BLOCK::FOREST);
+								setWorld(x-1, height+5, z, BLOCK::FOREST);
+								setWorld(x, height+5, z+1, BLOCK::FOREST);
+								setWorld(x, height+5, z-1, BLOCK::FOREST);
+								setWorld(x, height+6, z, BLOCK::FOREST);
+							}
+						}
+					}
+				}
 
+			}
 		}
 	}
 	this->state = STATE::GENERATE;
@@ -242,7 +260,7 @@ void 	Chunk::build(void) {
 			}
 		}
 	}
-	sizeuv = this->uvs.size() * sizeof(glm::vec2);
+	sizeuv = this->uvs.size() * sizeof(glm::vec3);
 	sizevert = this->points.size() * sizeof(glm::vec3);
 	nb = (this->points.size());
 	this->state = STATE::BUILD;
@@ -327,7 +345,7 @@ unsigned int Chunk::buildVAO(void) {
 	glGenBuffers(1, &this->VBO_UV);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_UV);
 	glBufferData(GL_ARRAY_BUFFER, this->getSizeUVs(), this->getUVs(), GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(0));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(0));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

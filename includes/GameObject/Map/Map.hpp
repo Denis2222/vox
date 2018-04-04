@@ -28,7 +28,6 @@ class Map
 		};
 
 				Map(void);
-				Map(bool nographics);
 				~Map(void);
 		void 	generate(int sx, int sy, int sz);
 
@@ -51,6 +50,8 @@ class Map
 		int 		chunkInit = 0;
 		std::map<int,std::map<int,Map::INFO> >	infos;
 
+		std::map<int, unsigned int> textures;
+
 		unsigned int											nbWorker;
 		unsigned int 											thread;
 		std::vector<std::thread>								workers;
@@ -61,6 +62,10 @@ class Map
 		Shader 													*program;
 		GLuint													texture;
 		glm::vec3 												position;
+/*
+		std::thread threadPool() {
+			return ;
+		}*/
 
 		void			setChunkPtr(int x, int y, int z, Chunk *chunk);
 		void			setInfos(int x, int y, int z, Map::INFO info);

@@ -4,33 +4,19 @@
 #include <inttypes.h>
 
 	Map::Map(void) {
-		/*this->nbWorker = 4;
+		this->nbWorker = 4;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
-		this->texture = this->loadTexture("./assets/tileset.png");
-		this->tp = std::thread(&Map::threadPoolJob, this);
-		this->chunkInit = 0;*/
-	}
 
-	Map::Map(bool nographics) {
-		if (nographics)
-		{
-			std::cout << "ICI" << std::endl;
-			this->nbWorker = 4;
-			this->thread = 1;
-			threadPoolJob();
-			exit(0);
-		} else {
-			std::cout << "LA" << std::endl;
-			this->nbWorker = 4;
-			this->thread = 1;
-			this->program = new Shader();
-			this->program->Load("chunk");
-			this->texture = this->loadTexture("./assets/tileset.png");
-			this->tp = std::thread(&Map::threadPoolJob, this);
-			this->chunkInit = 0;
+		for (const auto& tex : blocks_texture) {
+			//std::cout << texture.first << " has value " << texture.second << std::endl;
+			this->textures[tex.first] = this->loadTexture(tex.second.c_str());
+			std::cout << this->textures[tex.first] << std::endl;
 		}
+		this->texture = this->textures[0];
+		this->tp = std::thread(&Map::threadPoolJob, this);
+		this->chunkInit = 0;
 	}
 
 	Map::~Map(void) {
@@ -56,6 +42,7 @@
 		}
 		std::cout << "Chunk List delete" << std::endl;
 		delete this->program;
+
 		sleep(1);
 	}
 
@@ -191,30 +178,30 @@ void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
 }
 
 void 		generateAndBuildChunk(Chunk *c, int i) {
-	//static long long timegenerate = 0;
-	//static int nbgenerate = 0;
+	//	static long long timegenerate = 0;
+	//	static int nbgenerate = 0;
 
-	//static long long timebuild = 0;
-	//static int nbbuild = 0;
+	//	static long long timebuild = 0;
+	//	static int nbbuild = 0;
 
-	//struct timespec start, end, middle;
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-	c->generate();
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
-	c->build();
-	//clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-	//uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
-	//uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
+	//	struct timespec start, end, middle;
+	//	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+		c->generate();
+	//	clock_gettime(CLOCK_MONOTONIC_RAW, &middle);
+		c->build();
+	//	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+	//	uint64_t delta_middle = (middle.tv_sec - start.tv_sec) * 1000000 + (middle.tv_nsec - start.tv_nsec) / 1000;
+	//	uint64_t delta_us = (end.tv_sec - middle.tv_sec) * 1000000 + (end.tv_nsec - middle.tv_nsec) / 1000;
 
-	//timegenerate+=delta_middle/1000;
-	//timebuild+= delta_us/1000;
-	//nbbuild++;
-	//nbgenerate++;
-//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
-	//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
+	//	timegenerate+=delta_middle/1000;
+	//	timebuild+= delta_us/1000;
+	//	nbbuild++;
+	//	nbgenerate++;
+		//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
+		//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
 
 
-//printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
+	//	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
 }
 
 void 		Map::threadPoolJob(void) {
@@ -248,8 +235,6 @@ void 		Map::threadPoolJob(void) {
 					} else if (w < this->nbWorker) {
 						c->state = Chunk::STATE::THREAD;
 						workersTask.push_back(c);
-						/*generateAndBuildChunk(c, 0);
-						exit(0);*/
 						workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
 						w++;
 						full = 1;
@@ -364,20 +349,31 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	glm::mat4 modelidentity(1.0f);
 	glm::mat4 model(1.0f);
 	this->program->use();
-	this->program->setInt("texture1", 0);
 	this->program->setMat4("projection", projection);
 	this->program->setMat4("model", model);
 	this->program->setMat4("view", view);
-	//this->program->setMat4("camera", camera);
+
 
 	glm::vec4 lightpos(this->position.x, 5000.0f,  this->position.z, 0);
 
 	glm::vec4 toto = lightpos;
 
 	this->program->setVec3("lightPos", toto);
-
+/*
+	this->program->setInt("texturelol[0]", 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->texture);
+	glBindTexture(GL_TEXTURE_2D, this->texture);*/
+
+	for (const auto& tex : blocks_texture) {
+		//std::cout << this->textures[tex.first] << std::endl;
+		std::string idTextureShader = "texturelol[";
+		idTextureShader+= std::to_string(tex.first);
+		idTextureShader+= "]";
+		//std::cout << idTextureShader << std::endl;
+		this->program->setInt(idTextureShader.c_str(), tex.first);
+		glActiveTexture(GL_TEXTURE0 + tex.first);
+		glBindTexture(GL_TEXTURE_2D, this->textures[tex.first]);
+	}
 
 	iter = this->renderList.begin();
 	//long nbtriangle = 0;
@@ -386,20 +382,6 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 		c = (*iter);
 
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE) {
-/*
-			if (yaw > 130 && yaw < 230
-					&& obj.transform.position.z < (this.camera.transform.position.z - 50f))
-				continue ;
-			if ((this.camera.transform.rotation.y > 300 || this.camera.transform.rotation.y < 50)
-					&& obj.transform.position.z > (this.camera.transform.position.z + 50f))
-				continue ;
-			if ((this.camera.transform.rotation.y > 220 && this.camera.transform.rotation.y < 320)
-					&& obj.transform.position.x > (this.camera.transform.position.x + 50f))
-				continue ;
-			if ((this.camera.transform.rotation.y > 40 && this.camera.transform.rotation.y < 130)
-					&& obj.transform.position.x < (this.camera.transform.position.x - 50f))
-				continue ;
-*/
 			glm::mat4 myMatrix = glm::translate(model, c->worldCoord - this->position);
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);
@@ -416,7 +398,7 @@ unsigned int Map::loadTexture(const char *path) {
 	stbi_set_flip_vertically_on_load(true);
 	/* TEXTURE  0*/
 	unsigned int texture;
-	glGenTextures(1, &texture);
+	glGenTextures(1 , &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -425,6 +407,8 @@ unsigned int Map::loadTexture(const char *path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
+
+
 	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -432,6 +416,7 @@ unsigned int Map::loadTexture(const char *path) {
 	} else {
 		std::cout << "Failed to load texture : " << std::endl;
 	}
+
 	stbi_image_free(data);
 	return (texture);
 }

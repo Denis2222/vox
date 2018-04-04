@@ -3,13 +3,13 @@ ifeq ($(UNAME), Linux)
 	GCC_FLAG = -g -std=c++14 -fsanitize=address
 	DL_INC = -I./includes -I./glmc -I./libft
 	DL_FLAG_DIR =
-	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lassimp
+	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lassimp -lnoise
 endif
 ifeq ($(UNAME), Darwin)
 	GCC_FLAG = -std=c++14 -g3
 	DL_INC = -I./includes -I $(HOME)/.brew/include
 	DL_FLAG_DIR = -L./glmc -L./libft
-	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread -lassimp
+	DL_FLAG = -L $(HOME)/.brew/lib -framework OpenGL -lglfw -lGLEW -lpthread -lassimp  -lnoise
 endif
 
 CC = g++ $(GCC_FLAG) $(DL_INC)

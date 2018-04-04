@@ -1,7 +1,7 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-out vec2 TexCoord;
+layout (location = 1) in vec3 aTexCoord;
+out vec3 TexCoord;
 out vec3 pos;
 out vec3 FragPos;
 out vec3 ec_pos;

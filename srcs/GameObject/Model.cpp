@@ -3,14 +3,29 @@
 // constructor, expects a filepath to a 3D model.
 Model::Model(std::string const &path, bool gamma)
 {
+	this->shader = new Shader();
+	this->shader->Load("model");
 	loadModel(path);
 }
 
 // draws the model, and thus all its meshes
-void Model::Draw(Shader shader)
+void Model::Draw(Camera *camera)
 {
+
+	glm::mat4 modelObj(1.0f);
+
+	//glm::vec3	realPosition = glm::vec3(0.0f, 0.0f,  0.0f);
+	modelObj = glm::translate(modelObj, glm::vec3(5.0f, 0.0f, 5.0f)); // translate it down so it's at the center of the scene
+	//modelObj = glm::scale(modelObj, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	glm::vec3		up = glm::vec3(0.0f, 1.0f,  0.0f);
+
+	this->shader->use();
+	this->shader->setMat4("projection", camera->getProjection());
+	this->shader->setMat4("view", glm::lookAt(camera->position, camera->position - glm::vec3(5.0f, 0.0f, 5.0f), up));
+	this->shader->setMat4("model", modelObj);
+
 	for(unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].Draw(shader);
+		meshes[i].Draw(this->shader);
 }
 
 void Model::loadModel(std::string const &path)

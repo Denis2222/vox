@@ -20,6 +20,9 @@
 			this->map->updatePosition(this->camera->position);
 			//this->map->updateChunkToLoad();
 
+			this->model = new Model("assets/42/42_texture.obj");
+
+
 			//this->terrain = new Terrain();
 			this->skybox = new Skybox();
 			this->skybox->Load();
@@ -56,6 +59,7 @@
 
 
 				//this->terrain->render(this->camera);
+				this->model->Draw(this->camera);
 
 				this->skybox->render(this->camera);
 

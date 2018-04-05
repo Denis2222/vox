@@ -5,6 +5,7 @@
 class Skybox;
 class Map;
 class Camera;
+class Model;
 
 class Voxel
 {
@@ -17,6 +18,9 @@ class Voxel
 		Camera			*camera;
 		Skybox			*skybox;
 		Terrain			*terrain;
+
+		Model			*model;
+
 		bool			nographics = false;
 		bool			fullscreen = false;
 

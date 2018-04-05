@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/04/05 04:49:03 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/04/05 10:04:15 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@
 #include <GameObject/Shader.hpp>
 #include <GameObject/Skybox.hpp>
 #include <GameObject/Terrain.hpp>
+#include <GameObject/Model.hpp>
 #include <Voxel.hpp>
 
 int					getHeight(int x, int y);

@@ -22,7 +22,7 @@ class Camera
 		bool			god;
 		GLFWwindow		*window;
 
-		glm::vec3		position = glm::vec3(10000.0f, 90.0f,  10000.0f);
+		glm::vec3		position = glm::vec3(0.0f, 90.0f,  0.0f);
 		glm::vec3		front = glm::vec3(1.6f, -0.0f,  0.0f);
 		glm::vec3		up = glm::vec3(0.0f, 1.0f,  0.0f);
 

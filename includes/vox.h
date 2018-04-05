@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/04/04 10:18:00 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/04/05 04:49:03 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ int					getHeight(int x, int y);
 int 				getMoisture(int x, int y);
 int 				getTree(int x, int y, int z);
 int					getBlockType(int x, int y, int z, int height);
-glm::vec3 			getUVBlock(int val, int i);
+glm::vec3 			getUVBlock(int val, int i, int face);
 
 void 				noiseParam(int seed);
 

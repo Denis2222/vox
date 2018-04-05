@@ -4,7 +4,7 @@
 #include <inttypes.h>
 
 	Map::Map(void) {
-		this->nbWorker = 4;
+		this->nbWorker = 8;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
@@ -407,7 +407,6 @@ unsigned int Map::loadTexture(const char *path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
-
 
 	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data) {

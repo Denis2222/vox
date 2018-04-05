@@ -14,8 +14,7 @@ double ridgenoise(int x, int z) {
   return 2 * (0.5 - abs(0.5 - noiseModule.GetValue ((double)(x/what), 0,  (double)(z/what))));
 }
 
-int getHeight(int x, int z)
-{
+int getHeight(int x, int z) {
 	int noise;
 	float what;
 	//Montagneux
@@ -31,7 +30,7 @@ int getHeight(int x, int z)
 	//if (noise > 20)
 	//{
 		what = 400.0f; // Lissage
-		noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 70) + 80);
+		noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 70) + 40);
 	//}
 	//else
 	//{
@@ -51,8 +50,7 @@ int getHeight(int x, int z)
 	return (noise);
 }
 
-int getTree(int x, int y, int z)
-{
+int getTree(int x, int y, int z) {
 	int noise;
 	float what;
 	//Montagneux
@@ -77,14 +75,13 @@ int getTree(int x, int y, int z)
 	//}
 
 	if (noise > 100 && y > 6)
-		return (1);
+		return (noise);
 	else
 		return (0);
 }
 
 
-int getMoisture(int x, int z)
-{
+int getMoisture(int x, int z) {
 	float what = 300.0f;
 	float that = 10;
 	int noise = (int)(noiseModule.GetValue ((double)(x/what), 0,  (double)(z/what))* 100);
@@ -178,9 +175,57 @@ float *uvArray(int val, int i)
 }
 */
 
-glm::vec3 getUVBlock(int val, int i)
+/*
+glm::vec3 getUVBlockV2(int type, int nb, int face)
 {
-	glm::vec3 vec = glm::make_vec3(&VCUBEUV[i]);
+	if (nb == 0)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 1)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 2)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 3)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 4)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 5)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+}*/
+
+glm::vec3 getUVBlock(int val, int i, int face)
+{
+	//printf("val:%d i:%d \n", val , i);
+	glm::vec2 vec = glm::make_vec2(&CUBEUV[i]);
+
+	float type = 3.1f;
+	if (val == GRASS)
+	{
+		if (face == 0 || face == 1)
+			type = 0.1f;
+		else
+			type = 1.1;
+	} else if (val == FOREST) {
+		if (face == 0 || face == 1)
+			type = 4.1f;
+		else
+			type = 5.1;
+	} else if (val == ICE) {
+		if (face == 0 || face == 1)
+			type = 2.1f;
+		else
+			type = 3.1;
+	} else if (val == SAND) {
+		type = 7.1f;
+	} else if (val == ROCK) {
+		type = 6.1f;
+	} else if (val == WATER) {
+		type = 8.1f;
+	} else if (val ==TREE_BOT) {
+		type = 9.1f;
+	} else if (val ==TREE_LEAVE) {
+		type = 10.1f;
+	}
+	glm::vec3 f = glm::vec3(vec.x, vec.y, type);
 	/*
 	if (val == WATER)
 		vec = glm::make_vec2(&VCUBEUVWATER[i]);
@@ -192,7 +237,7 @@ glm::vec3 getUVBlock(int val, int i)
 		vec = glm::make_vec2(&VCUBEUVGRASS[i]);
 	else if (val == SAND)
 		vec = glm::make_vec2(&VCUBEUVSAND[i]);*/
-	return (vec);
+	return (f);
 }
 
 

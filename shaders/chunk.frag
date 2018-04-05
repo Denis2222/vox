@@ -26,6 +26,7 @@ void main()
     float diff = max(dot(Normal, lightDir), 0.0);
     vec3 diffuse = vec3((diff * vec3(1,1,1)));
     vec3 ambiant = vec3((vec3(0.7,0.7,0.7)));
-    FragColor = vec4(mix(fogColor, texture(texturelol[int(TexCoord.z)], TexCoord.xy).rgb, fogFactor) * (diffuse/3 + ambiant), 1);
+    //FragColor = vec4(mix(fogColor, texture(texturelol[int(TexCoord.z)], TexCoord.xy).rgb, fogFactor) * (diffuse/3 + ambiant), 1);
+	FragColor = vec4(texture(texturelol[int(TexCoord.z)], TexCoord.xy).rgb * (diffuse/3 + ambiant), 1);
     //FragColor = vec4(0.5,0.3,0.3,0.5) * (diffuse + ambiant);
 }

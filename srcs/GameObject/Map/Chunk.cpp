@@ -62,7 +62,7 @@ void 	Chunk::interact(int x, int y, int z, int val) {
 
 bool	Chunk::collideDebug(int x, int y, int z, int way) {
 
-/*
+	/*
 	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
 	bool retour = false;
 	int type = -1;
@@ -105,7 +105,7 @@ bool	Chunk::collideDebug(int x, int y, int z, int way) {
 			retour = false;
 		else if (val == 0) //Unknow val probably useless; say collide
 			retour = true;
-		printf("Inchunk : info: %d retour :\n", val, (int)retour);
+		//printf("Inchunk : info: %d retour :\n", val, (int)retour);
 	}
 	else { //Out of chunk ! Ask to map
 		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
@@ -140,7 +140,7 @@ bool	Chunk::collideDebug(int x, int y, int z, int way) {
 
 void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 	static int oneFace = ((sizeof(VCUBE) / 4)/6/2);
-	static int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6/2);
+	static int oneFaceUV = ((sizeof(CUBEUV) / 4)/6/2);
 	int u = n + 1;
 
 	for (int i = oneFace * n; i < oneFace * u; i+=3)
@@ -160,18 +160,28 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 		vec.z = vec.z*0.5f +(float)z*1;
 		points.push_back(vec);
 	}
+/*
+	ivs.push_back(getUVBlockV2(val, 0, n));
+	ivs.push_back(getUVBlockV2(val, 1, n));
+	ivs.push_back(getUVBlockV2(val, 2, n));
 
-	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=3)
+	ivs.push_back(getUVBlockV2(val, 3, n));
+	ivs.push_back(getUVBlockV2(val, 4, n));
+	ivs.push_back(getUVBlockV2(val, 5, n));
+*/
+
+	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=2)
 	{
-		glm::vec3 vec = getUVBlock(val, i);
+		glm::vec3 vec = getUVBlock(val, i, n);
 		uvs.push_back(vec);
 	}
 
-	for (int i = oneFaceUV * n + 54; i < oneFaceUV * u + 54; i+=3)
+	for (int i = oneFaceUV * n + 36; i < oneFaceUV * u + 36; i+=2)
 	{
-		glm::vec3 vec = getUVBlock(val, i);
+		glm::vec3 vec = getUVBlock(val, i, n);
 		uvs.push_back(vec);
 	}
+
 }
 
 void	Chunk::generate(void) {
@@ -185,7 +195,6 @@ void	Chunk::generate(void) {
 
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
-
 			int height = getHeight(x + sx, z + sz);
 
 			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++) {
@@ -197,18 +206,16 @@ void	Chunk::generate(void) {
 					{
 						if (y == height && y > 0 && y < CHUNK_SIZE - 1 && z > 0 && z < CHUNK_SIZE - 1 )
 						{
-							if (getTree(x + sx, y, z + sz))
+							if (int htree = getTree(x + sx, y, z + sz)/15)
 							{
-								setWorld(x, height+1, z, BLOCK::FOREST);
-								setWorld(x, height+2, z, BLOCK::FOREST);
-								setWorld(x, height+3, z, BLOCK::FOREST);
-								setWorld(x, height+4, z, BLOCK::FOREST);
-								setWorld(x, height+5, z, BLOCK::FOREST);
-								setWorld(x+1, height+5, z, BLOCK::FOREST);
-								setWorld(x-1, height+5, z, BLOCK::FOREST);
-								setWorld(x, height+5, z+1, BLOCK::FOREST);
-								setWorld(x, height+5, z-1, BLOCK::FOREST);
-								setWorld(x, height+6, z, BLOCK::FOREST);
+								for (int j = 1; j < htree; j++){
+									setWorld(x, height+j, z, BLOCK::TREE_BOT);
+								}
+								setWorld(x+1, height+htree, z, BLOCK::TREE_LEAVE);
+								setWorld(x-1, height+htree, z, BLOCK::TREE_LEAVE);
+								setWorld(x, height+htree, z+1, BLOCK::TREE_LEAVE);
+								setWorld(x, height+htree, z-1, BLOCK::TREE_LEAVE);
+								setWorld(x, height+htree+1, z, BLOCK::TREE_LEAVE);
 							}
 						}
 					}

@@ -185,6 +185,7 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 }
 
 void	Chunk::generate(void) {
+
 	int sx, sy, sz;
 	sx = this->worldCoord.x;
 	sy = this->worldCoord.y;

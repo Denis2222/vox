@@ -12,7 +12,7 @@
 		for (const auto& tex : blocks_texture) {
 			//std::cout << texture.first << " has value " << texture.second << std::endl;
 			this->textures[tex.first] = this->loadTexture(tex.second.c_str());
-			std::cout << this->textures[tex.first] << std::endl;
+			std::cout << "Chunk texture load : "<<this->textures[tex.first] << std::endl;
 		}
 		this->texture = this->textures[0];
 		this->tp = std::thread(&Map::threadPoolJob, this);
@@ -20,18 +20,18 @@
 	}
 
 	Map::~Map(void) {
-		std::cout << "Delete map ask :" << std::endl;
+		std::cout << "Clean map..." << std::endl;
+
+		//Stop thread
 		this->nbWorker = 0;
-
 		while (workers.size()>0)
-			usleep(5000);
+			usleep(1000);
 		this->thread = 0;
-		std::cout << "Worker stoped" << std::endl;
 		tp.join();
-		std::cout << "Thread Join" << std::endl;
 
+		//Clean Chunk
 		std::list<Chunk*>::iterator	iter;
-		Chunk						*c;
+		Chunk	*c;
 		if (this->chunkList.size() > 0) {
 			iter = this->chunkList.begin();
 			while(iter != this->chunkList.end()) {
@@ -40,10 +40,7 @@
 				iter++;
 			}
 		}
-		std::cout << "Chunk List delete" << std::endl;
 		delete this->program;
-
-		sleep(1);
 	}
 
 void 		Map::setInfos(int x, int y, int z, Map::INFO info) {
@@ -91,8 +88,6 @@ Chunk		*Map::getChunkWorld(float x, float y, float z) {
 		cx = (x-CHUNK_SIZE) / CHUNK_SIZE;
 	if (z < 0)
 		cz = (z-CHUNK_SIZE) / CHUNK_SIZE;
-
-	//printf("getChunkWorld %d %d %d \n", cx, cy, cz);
 	Chunk *c = getChunk(cx, cy, cz);
 	return (c);
 }
@@ -113,24 +108,18 @@ Chunk		*Map::getChunkWorld(int x, int y, int z) {
 }
 
 int			Map::getBlockInfo(glm::vec3 v) {
-	//std::cout << "BEFORE Wth : V: " << glm::to_string(v) << std::endl;
 	int x = ((int)round(v.x));
 	int y = round(v.y);
 	int z = ((int)round(v.z));
-	Chunk *c = getChunkWorld(x, y, z);
-	//std::cout << "AFTER Wth : V: " << glm::to_string(v) << std::endl;
 
-	//printf("chunk:%f %f %f \n", c->localCoord.x, c->localCoord.y, c->localCoord.z);
+	Chunk *c = getChunkWorld(x, y, z);
 	if (c)
-		if (c->state > Chunk::STATE::BUILD)
-		{
+		if (c->state > Chunk::STATE::BUILD) {
 			x = (x - (int)c->worldCoord.x)%CHUNK_SIZE;
 			y = y;
 			z = (z - (int)c->worldCoord.z)%CHUNK_SIZE;
-			//printf("block: x:%d y:%d z:%d \n", x, y, z);
 			return (c->getWorld(			   x, y, z));
 		}
-
 	return (-1);
 }
 
@@ -139,7 +128,6 @@ int			Map::getBlockInfo(int x, int y, int z) {
 	if (c)
 		if (c->state > Chunk::STATE::BUILD)
 			return (c->getWorld(x - (int)c->worldCoord.x, y, z - (int)c->worldCoord.z));
-
 	return (-1);
 }
 
@@ -156,28 +144,7 @@ float		Map::distanceToChunk(int x, int y, int z) {
 	return (d);
 }
 
-void 		Map::updatePosition(glm::vec3 position) {
-	this->position = position;
-}
-
-void 		Map::getBlockInfoReallyMore(int x,int y,int z) {
-	int cx = floor(x) / CHUNK_SIZE;
-	int cy = 0;
-	int cz = floor(z) / CHUNK_SIZE;
-
-	if (x < 0)
-	cx = (floor(x)-CHUNK_SIZE) / CHUNK_SIZE;
-	if (z < 0)
-	cz = (floor(z)-CHUNK_SIZE) / CHUNK_SIZE;
-
-	Chunk *c = getChunk(cx, cy, cz);
-	//std::cout << "ChunkCoord:" << cx << " " << cy << " " << cz << " " << std::endl;
-	if (c) {
-		//std::cout << "VALUE:  x:" << x<< " y:" << y<< " z:" << z << " !! : " <<  c->world[x][y][z] << std::endl;
-		//std::cout << "LocalCoord:" << c->localCoord.x << " " << c->localCoord.y << " " << c->localCoord.z << " " << std::endl;
-	}
-}
-
+//Thread function for generate and build new chunk
 void 		generateAndBuildChunk(Chunk *c, int i) {
 	//	static long long timegenerate = 0;
 	//	static int nbgenerate = 0;
@@ -198,13 +165,12 @@ void 		generateAndBuildChunk(Chunk *c, int i) {
 	//	timebuild+= delta_us/1000;
 	//	nbbuild++;
 	//	nbgenerate++;
-		//std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
-		//printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
-
-
+	//  std::cout << "END:" << i << " " << delta_middle << ":" << delta_us << std::endl;
+	//  printf("Timer: %" PRIu64 " %" PRIu64 "\n", delta_middle, delta_us);
 	//	printf("Average: %" PRIu64 " ms %" PRIu64 " ms\n", timegenerate/nbgenerate, timebuild/nbbuild);
 }
 
+//Thread pool generate chunk and manage chunkList
 void 		Map::threadPoolJob(void) {
 	int w = 0;
 
@@ -212,33 +178,31 @@ void 		Map::threadPoolJob(void) {
 	Chunk						*c;
 
 	while (this->thread) {
-		int full = 0;
+		bool sleep = true;
 
 		if (this->chunkList.size() > 0)
 		{
 			iter = this->chunkList.begin();
-			while(iter != this->chunkList.end() && !full) {
+			while(iter != this->chunkList.end() && sleep) {
 				c = (*iter);
 				if (c->state == Chunk::STATE::TOUPDATE) {
-					//std::cout << "Update " << glm::to_string(c->localCoord) << std::endl;
 					c->points.clear();
 					c->uvs.clear();
 					c->build();
 					c->state = Chunk::STATE::UPDATE;
-					full = 1;
+					sleep = false;
 				}
-				if (c->state == Chunk::STATE::INIT) { //One Task !
+				if (c->state == Chunk::STATE::INIT) {
 					if (this->distanceToChunk(c) > FAR_CHUNK+5 || (this->chunkInit > MAX_CHUNK_INIT && this->distanceToChunk(c) > FAR_CHUNK/3))
 					{
 						c->state = Chunk::STATE::DELETE;
 						this->chunkInit--;
-						//std::cout << "Direct delete ! " << std::endl;
 					} else if (w < this->nbWorker) {
 						c->state = Chunk::STATE::THREAD;
 						workersTask.push_back(c);
 						workers.push_back(std::thread(generateAndBuildChunk, c, workers.size()));
 						w++;
-						full = 1;
+						sleep = false;
 					}
 				}
 				if (c->state == Chunk::STATE::DELETE) {
@@ -246,7 +210,7 @@ void 		Map::threadPoolJob(void) {
 					this->chunkList.remove(c);
 					this->setChunkPtr(c->localCoord.x ,c->localCoord.y ,c->localCoord.z, NULL);
 					delete c;
-					full = 1;
+					sleep = false;
 					break;
 				}
 				if (c->state == Chunk::STATE::RENDER) {
@@ -257,44 +221,45 @@ void 		Map::threadPoolJob(void) {
 			}
 		}
 
-		int u = 0;
 		if (workers.size() > 0)
 		{
+			int u = 0;
 			for (auto &i : workers) {
-
 				if (i.joinable()) {
 					c = workersTask.at(u);
 					if (c->state != Chunk::STATE::THREAD) {
 						i.join();
 						this->chunkInit--;
-						//if (workers.size() >= u)
-							workers.erase(workers.begin() + u);
+						workers.erase(workers.begin() + u);
 						workersTask.erase(workersTask.begin() + u);
 						w--;
 					}
 				}
 				u++;
-
 			}
 		}
 
-
-		if (!full) {
+		if (sleep) {
 			this->updateChunkToLoad();
 			usleep(3000);
 		}
 	}
 }
 
+
+void 		Map::updatePosition(glm::vec3 position) {
+	this->position = position;
+}
+
+//Search for new chunk to load
 void 		Map::updateChunkToLoad(void) {
-	int x = (floor(position.x / CHUNK_SIZE));
-	int y = (floor(position.y / CHUNK_SIZE));
-	int z = (floor(position.z / CHUNK_SIZE));
-
+	int x = (floor(this->position.x / CHUNK_SIZE));
+	int y = (floor(this->position.y / CHUNK_SIZE));
+	int z = (floor(this->position.z / CHUNK_SIZE));
 	int priority = CHUNK_VIEW;
-
 	int chunkAddPerPassage = 0;
 	int Y=0;
+
 	for (priority = 0; priority <= CHUNK_VIEW && chunkAddPerPassage<MAX_CHUNK_INIT && this->chunkInit < MAX_CHUNK_INIT; priority++) {
 		for (int X = -priority; X <= priority && this->chunkInit < MAX_CHUNK_INIT; X++) {
 			for (int Z = -priority; Z <= priority && this->chunkInit < MAX_CHUNK_INIT; Z++) {
@@ -317,6 +282,7 @@ void 		Map::updateChunkToLoad(void) {
 	}
 }
 
+//Gateway between thread generator and renderlist
 void 		Map::SlowRender(void) {
 	std::list<Chunk*>::iterator	iter;
 	Chunk *c;
@@ -354,31 +320,19 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 	this->program->setMat4("model", model);
 	this->program->setMat4("view", view);
 
-
 	glm::vec4 lightpos(this->position.x, 5000.0f,  this->position.z, 0);
-
-	glm::vec4 toto = lightpos;
-
-	this->program->setVec3("lightPos", toto);
-/*
-	this->program->setInt("texturelol[0]", 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->texture);*/
+	this->program->setVec3("lightPos", lightpos);
 
 	for (const auto& tex : blocks_texture) {
-		//std::cout << this->textures[tex.first] << std::endl;
 		std::string idTextureShader = "texturelol[";
 		idTextureShader+= std::to_string(tex.first);
 		idTextureShader+= "]";
-		//std::cout << idTextureShader << std::endl;
 		this->program->setInt(idTextureShader.c_str(), tex.first);
 		glActiveTexture(GL_TEXTURE0 + tex.first);
 		glBindTexture(GL_TEXTURE_2D, this->textures[tex.first]);
 	}
 
 	iter = this->renderList.begin();
-	//long nbtriangle = 0;
-	//int nbchunks = 0;
 	while(iter != this->renderList.end()) {
 		c = (*iter);
 
@@ -387,12 +341,9 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
-			//nbtriangle+=c->getTriangle();
-			//nbchunks++;
 		}
 		iter++;
 	}
-	//std::cout << "Print triangle:" << nbtriangle << "Average:" << (nbtriangle / (nbchunks + 1) ) << " nbchunk:" <<nbchunks<< std::endl;
 }
 
 unsigned int Map::loadTexture(const char *path) {
@@ -401,14 +352,11 @@ unsigned int Map::loadTexture(const char *path) {
 	unsigned int texture;
 	glGenTextures(1 , &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 	int width, height, nrChannels;
-
 	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

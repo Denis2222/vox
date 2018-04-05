@@ -5,7 +5,6 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
-
 			this->blocks = (unsigned char*)malloc(sizeof(unsigned char) *  CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 			bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
 		}
@@ -72,84 +71,6 @@ void 	Chunk::interact(int x, int y, int z, int val) {
 	}
 }
 
-bool	Chunk::collideDebug(int x, int y, int z, int way) {
-
-	/*
-	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
-	bool retour = false;
-	int type = -1;
-
-
-	//printf("extern\n");
-	int qx = x;
-	int qy = y;
-	int qz = z;
-
-	if (way == 1) // UP
-		qy = qy + 1;
-	if (way == 2) // DOWN
-		qy = qy - 1;
-	if (way == 3) // EST
-		qx = qx + 1;
-	if (way == 4) // OUEST
-		qx = qx - 1;
-	if (way == 5) // NORD
-		qz = qz + 1;
-	if (way == 6) // SUD
-		qz = qz - 1;
-
-	//Haut ou bas, facile
-	if (way == 1 || way == 2)
-	{
-		if (getWorld(qx, qy , qz) > 1)
-			retour = true;
-		if (getWorld(qx, qy , qz) == 0)
-			retour = true;
-		else if (qy == -1)
-			retour = true;
-	}
-	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE) {
-		//On est dans le chunk
-		int val = getWorld(qx, qy , qz);
-		if (val > 1) // Know type, dont need face
-			retour = true;
-		else if (val == 1) // Empty bloc, put face
-			retour = false;
-		else if (val == 0) //Unknow val probably useless; say collide
-			retour = true;
-		//printf("Inchunk : info: %d retour :\n", val, (int)retour);
-	}
-	else { //Out of chunk ! Ask to map
-		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
-
-		if (type > 1)
-			retour = true;
-		else if (type <= 0) //Unknow chunk, or unknow block Ask to noise
-		{
-			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
-			if (qy <= noise)
-			{
-				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
-				if (type > 1)
-					retour = true;
-				else
-					retour = false;
-			} else {
-				retour = false;
-			}
-		} else if (type == 1) {
-			retour = false;
-		}
-		printf("Askmap : x:%d y:%d z:%d type: %d ", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
-		if (retour)
-			printf(" !MUR \n");
-		else
-			printf(" MUR \n");
-
-	}
-	return (retour);
-}
-
 void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 	static int oneFace = ((sizeof(VCUBE) / 4)/6/2);
 	static int oneFaceUV = ((sizeof(CUBEUV) / 4)/6/2);
@@ -207,6 +128,8 @@ void	Chunk::generate(void) {
 					setWorld(x, y, z, type);
 					if (type > 1)
 					{
+						//Make tree
+						//TODO put somewhere else
 						if (y == height && y > 0 && y < CHUNK_SIZE - 1 && z > 0 && z < CHUNK_SIZE - 1 )
 						{
 							if (int htree = getTree(x + sx, y, z + sz)/15)

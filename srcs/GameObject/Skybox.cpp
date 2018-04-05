@@ -5,6 +5,7 @@
 			this->shader = new Shader();
 			this->shader->Load("skybox");
 			this->shader->setInt("skybox", 0);
+			this->Load();
 		}
 
 		Skybox::~Skybox(void) {

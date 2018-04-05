@@ -69,16 +69,14 @@ void 		Camera::ProcessInput(Map *map) {
 	//Get where i am !
 
 	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		glm::vec3 detector(0.0f,0.0f,0.0f);
+		glm::vec3 detector;
 		for (float d = 0; d < 5.0f; d+=0.2f)
 		{
 			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
 			if (map->getBlockInfo(detector) > 1) {
-				//std::cout << "Quelque chose" << std::endl;
 				int x = (int)round(detector.x);
 				int y = (int)round(detector.y);
 				int z = (int)round(detector.z);
-				//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
 				Chunk *c;
 				c = map->getChunkWorld(x, y, z);
 				if (c != NULL) {
@@ -100,11 +98,9 @@ void 		Camera::ProcessInput(Map *map) {
 		{
 			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
 			if (map->getBlockInfo(detector) < 2) {
-				//std::cout << "Quelque chose" << std::endl;
 				int x = (int)round(detector.x);
 				int y = (int)round(detector.y);
 				int z = (int)round(detector.z);
-				//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
 				Chunk *c;
 				c = map->getChunkWorld(x, y, z);
 				if (c != NULL) {
@@ -120,40 +116,42 @@ void 		Camera::ProcessInput(Map *map) {
 		}
 	}
 
-
-	glm::vec3 m = glm::round(this->position);
-
-	float pHeight = 1.0f; // Hauteur joueur
-	m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
-	if (map->getBlockInfo(m+glm::vec3(0.0f, -pHeight, 0.0f)) < 2) {
-		if (!this->god) {
-			this->grounded = false;
-			position.y-= 0.3f;
-		}
-	} else {
-		this->grounded = true;
-		this->jump = 0;
-	}
-
-	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		if (this->grounded)
-			this->jump = 45;
-	}
-
-	if (this->jump > 0)
-	{
-		if (map->getBlockInfo(m+glm::vec3(0.0f, pHeight, 0.0f)) > 1) {
-			this->jump = 0;
-		} else {
-			position.y+=(0.01f * this->jump);
-			this->jump--;
-		}
-	}
-
-	float s = 0.3f;
-
+	//God mode disable
 	if (!this->god)
 	{
+		glm::vec3 m = glm::round(this->position);
+		float pHeight = 1.0f; // Hauteur joueur
+		float s = 0.3f; // Side detection offset
+		float gravity = 0.3f;
+		unsigned int jumpPower = 45;
+
+		//Gravity
+		m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
+		if (map->getBlockInfo(m+glm::vec3(0.0f, -pHeight, 0.0f)) < 2) {
+			if (!this->god) {
+				this->grounded = false;
+				position.y-= gravity;
+			}
+		} else {
+			this->grounded = true;
+			this->jump = 0;
+		}
+
+		//Jump
+		if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+			if (this->grounded)
+				this->jump = jumpPower;
+		}
+
+		if (this->jump > 0) {
+			if (map->getBlockInfo(m+glm::vec3(0.0f, pHeight, 0.0f)) > 1) {
+				this->jump = 0;
+			} else {
+				position.y+=(0.01f * this->jump);
+				this->jump--;
+			}
+		}
+		
 		if (map->getBlockInfo(m+glm::vec3(s, 0.0f, 0.0f)) > 1) {
 			position.x = posX-0.05f;
 		}
@@ -170,10 +168,7 @@ void 		Camera::ProcessInput(Map *map) {
 }
 
 glm::mat4	Camera::getView(void) {
-	//glm::vec3 t(0.0f,position.y, 0.0f);
-	glm::vec3	realPosition = glm::vec3(0.0f, 0.0f,  0.0f);
-
-	return (glm::lookAt(realPosition, realPosition + front, up));
+	return (glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f) + front, up));
 }
 glm::mat4	Camera::getProjection(void) {
 	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.1f, FAR));
@@ -192,15 +187,12 @@ void 		Camera::mouse_callback(double xpos, double ypos) {
 	lastY = ypos;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
-
 	yaw   += xoffset;
     pitch += yoffset;
-
 	if(pitch > 89.0f)
 	  pitch =  89.0f;
 	if(pitch < -89.0f)
 	  pitch = -89.0f;
-
 	 front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
 	 front.y = sin(glm::radians(pitch));
 	 front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));

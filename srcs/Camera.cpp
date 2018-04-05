@@ -68,7 +68,6 @@ void 		Camera::ProcessInput(Map *map) {
 
 	//Get where i am !
 
-
 	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 		glm::vec3 detector(0.0f,0.0f,0.0f);
 		for (float d = 0; d < 5.0f; d+=0.2f)
@@ -124,38 +123,34 @@ void 		Camera::ProcessInput(Map *map) {
 
 	glm::vec3 m = glm::round(this->position);
 
+	float pHeight = 1.0f; // Hauteur joueur
+	m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
+	if (map->getBlockInfo(m+glm::vec3(0.0f, -pHeight, 0.0f)) < 2) {
+		if (!this->god) {
+			this->grounded = false;
+			position.y-= 0.3f;
+		}
+	} else {
+		this->grounded = true;
+		this->jump = 0;
+	}
 
-		float pHeight = 1.0f; // Hauteur joueur
-		m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
-		if (map->getBlockInfo(m+glm::vec3(0.0f, -pHeight, 0.0f)) < 2) {
-			if (!this->god) {
-				this->grounded = false;
-				position.y-= 0.3f;
-			}
-		} else {
-			this->grounded = true;
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		if (this->grounded)
+			this->jump = 45;
+	}
+
+	if (this->jump > 0)
+	{
+		if (map->getBlockInfo(m+glm::vec3(0.0f, pHeight, 0.0f)) > 1) {
 			this->jump = 0;
+		} else {
+			position.y+=(0.01f * this->jump);
+			this->jump--;
 		}
+	}
 
-		if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-			if (this->grounded)
-				this->jump = 45;
-		}
-
-
-		if (this->jump > 0)
-		{
-			if (map->getBlockInfo(m+glm::vec3(0.0f, pHeight, 0.0f)) > 1) {
-				this->jump = 0;
-			} else {
-				position.y+=(0.01f * this->jump);
-				this->jump--;
-			}
-		}
-
-
-		float s = 0.3f;
-
+	float s = 0.3f;
 
 	if (!this->god)
 	{

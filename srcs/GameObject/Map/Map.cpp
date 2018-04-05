@@ -74,6 +74,7 @@ Chunk 		*Map::getChunk(int x, int y, int z) {
 	c = NULL;
 	if (this->getInfos(x, 0, z) > 0)
 	{
+		//printf("x:%d z:%d \n", x, z);
 		this->mutex_chunks.lock();
 		c = this->chunks[x][z];
 		this->mutex_chunks.unlock();

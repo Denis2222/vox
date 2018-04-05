@@ -41,22 +41,34 @@ void	Chunk::setWorld(int x, int y, int z, int val) {
 }
 
 void 	Chunk::interact(int x, int y, int z, int val) {
+	Chunk  *c;
 	this->setWorld(x, y, z, val);
 	this->state = STATE::TOUPDATE;
-	if (x % CHUNK_SIZE == 0 || z % CHUNK_SIZE == 0) { // Si on est en bord de chunk on refresh les 4 autour ( ou 1 si c le meme...)
-		std::cout << "UPDATE SPECIAL * 4" << std::endl;
-		Chunk  *c = this->map->getChunk(x + 1, 0, z + 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-				c = this->map->getChunk(x - 1, 0, z + 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-				c = this->map->getChunk(x + 1, 0, z - 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-				c = this->map->getChunk(x - 1, 0, z - 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
+
+	if (x == CHUNK_SIZE - 1 || x == 0) {
+		c = this->map->getChunk(this->localCoord.x - 1.0f, 0, this->localCoord.z);
+			if (c)
+			{
+				c->state = STATE::TOUPDATE;
+			}
+		c = this->map->getChunk(this->localCoord.x + 1.0f, 0, this->localCoord.z);
+			if (c)
+			{
+				c->state = STATE::TOUPDATE;
+			}
+	}
+	if (z == CHUNK_SIZE - 1 || z == 0) {
+		c = this->map->getChunk(this->localCoord.x, 0, this->localCoord.z - 1.0f);
+			if (c)
+			{
+				c->state = STATE::TOUPDATE;
+			}
+		c = this->map->getChunk(this->localCoord.x, 0, this->localCoord.z + 1.0f);
+			if (c)
+			{
+				std::cout << "One more to update" << std::endl;
+				c->state = STATE::TOUPDATE;
+			}
 	}
 }
 
@@ -160,15 +172,6 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 		vec.z = vec.z*0.5f +(float)z*1;
 		points.push_back(vec);
 	}
-/*
-	ivs.push_back(getUVBlockV2(val, 0, n));
-	ivs.push_back(getUVBlockV2(val, 1, n));
-	ivs.push_back(getUVBlockV2(val, 2, n));
-
-	ivs.push_back(getUVBlockV2(val, 3, n));
-	ivs.push_back(getUVBlockV2(val, 4, n));
-	ivs.push_back(getUVBlockV2(val, 5, n));
-*/
 
 	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=2)
 	{
@@ -181,7 +184,6 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 		glm::vec3 vec = getUVBlock(val, i, n);
 		uvs.push_back(vec);
 	}
-
 }
 
 void	Chunk::generate(void) {

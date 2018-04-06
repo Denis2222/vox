@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/04/06 23:47:54 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/04/07 01:09:37 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,13 @@
 # define BASE_FOV 45.0f
 
 #define CHUNK_SIZE 32
-#define CHUNK_VIEW 16
+#define CHUNK_VIEW 12
 
-#define FAR 1000.0f
+#define FAR 600.0f
 
 #define CHUNK_HEIGHT 256
 
-#define FAR_MAP 360.0f
+#define FAR_MAP 384.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 #define MAX_CHUNK_INIT 15
 

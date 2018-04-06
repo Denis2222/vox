@@ -65,7 +65,7 @@ void Model::loadModel(std::string const &path) {
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
-	std::cout << "Import "<< path<< " Done ! " << std::endl;
+	//std::cout << "Import "<< path<< " Done ! " << std::endl;
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene) {
@@ -149,8 +149,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
 	std::vector<Texture> textures;
-	printf("loadMaterialTextures ! \n");
-	std::cout << typeName;
+	//printf("loadMaterialTextures ! \n");
+	//std::cout << typeName;
 	for(unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 
 		aiString str;
@@ -168,7 +168,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 		if(!skip) {   // if texture hasn't been loaded already, load it
 			Texture texture;
 			texture.id = TextureFromFile(str.C_Str(), this->directory);
-			printf("texture ID: %d \n", texture.id);
+			//printf("texture ID: %d \n", texture.id);
 			texture.type = typeName;
 			texture.path = str.C_Str();
 			textures.push_back(texture);

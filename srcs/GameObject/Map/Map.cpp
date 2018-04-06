@@ -4,7 +4,7 @@
 #include <inttypes.h>
 
 	Map::Map(void) {
-		this->nbWorker = 16;
+		this->nbWorker = 5;
 		this->thread = 1;
 		this->program = new Shader();
 		this->program->Load("chunk");
@@ -12,7 +12,7 @@
 		for (const auto& tex : blocks_texture) {
 			//std::cout << texture.first << " has value " << texture.second << std::endl;
 			this->textures[tex.first] = this->loadTexture(tex.second.c_str());
-			std::cout << "Chunk texture load : "<<this->textures[tex.first] << std::endl;
+			//std::cout << "Chunk texture load : "<<this->textures[tex.first] << std::endl;
 		}
 		this->texture = this->textures[0];
 		this->tp = std::thread(&Map::threadPoolJob, this);
@@ -279,7 +279,7 @@ void 		Map::threadPoolJob(void) {
 
 		if (sleep) {
 			this->updateChunkToLoad();
-			usleep(1000);
+			usleep(5000);
 		}
 	}
 }
@@ -392,8 +392,8 @@ unsigned int Map::loadTexture(const char *path) {
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	int width, height, nrChannels;
 	unsigned char *data = stbi_load(path, &width, &height, &nrChannels, STBI_rgb_alpha);
 	if (data) {

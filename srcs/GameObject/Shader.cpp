@@ -19,10 +19,10 @@ void Shader::Load(const GLchar *name)
 	char path[1024];
 	try {
 		sprintf(path, "./shaders/%s.vert", name);
-		std::cout << "Open " << path << std::endl;
+		//std::cout << "Open " << path << std::endl;
 		vShaderFile.open(path);
 		sprintf(path, "./shaders/%s.frag", name);
-		std::cout << "Open " << path << std::endl;
+		//std::cout << "Open " << path << std::endl;
 		fShaderFile.open(path);
 
 		std::stringstream vShaderStream, fShaderStream;

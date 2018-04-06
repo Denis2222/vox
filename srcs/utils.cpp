@@ -95,7 +95,7 @@ int		getBlockType(int x, int y, int z, int height) {
 		{
 			float what = 50.0f;
 			int noise = (int)(noiseModule.GetValue ((double)(x/what),(double)(y/what),  (double)(z/what))* 20);
-			if (noise > 20)
+			if (noise > 22)
 				return (0);
 			/*else
 				if (noise >0 && noise < 10)

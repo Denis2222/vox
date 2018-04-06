@@ -19,7 +19,7 @@
 			//this->model = new Model("assets/spaceship/untitled.obj");
 
 
-		
+
 
 			this->scene = new Scene(this->camera);
 
@@ -45,7 +45,7 @@
 				nbFrames++;
 				currentTime = glfwGetTime();
 				if (currentTime - lastTime >= 0.10) {
-					//printf("%f ms/frame  fps:%d chunks:%lu", 100.0/double(nbFrames), nbFrames * 10, this->map->chunkList.size());
+					//printf("%f ms/frame  fps:%d chunks:%lu", 100.0/double(nbFrames), nbFrames, this->map->chunkList.size());
 					//std::cout << glm::to_string(this->camera->position) << std::endl;
 					nbFrames = 0;
 					lastTime += 0.10;

@@ -173,7 +173,7 @@ glm::mat4	Camera::getView(void) {
 	return (glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f) + front, up));
 }
 glm::mat4	Camera::getProjection(void) {
-	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.02f, FAR));
+	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.1f, FAR));
 }
 
 void 		Camera::mouse_callback(double xpos, double ypos) {

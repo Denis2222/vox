@@ -20,6 +20,7 @@ dir_guard=@mkdir -p $(@D)
 
 SRC =  	main.cpp \
 		utils.cpp \
+		Scene.cpp \
 		Voxel.cpp \
 		Camera.cpp \
 		GameObject/Skybox.cpp \

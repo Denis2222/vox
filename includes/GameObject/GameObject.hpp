@@ -5,6 +5,9 @@
 #include <iostream>
 #include <algorithm>
 #include <GameObject/Component.hpp>
+#include <Scene.hpp>
+
+class Scene;
 
 struct Transform {
 	glm::vec3			position = glm::vec3(0,0,0);
@@ -40,6 +43,10 @@ class GameObject
 		template <typename T> T					*GetComponent(void);
 		template <typename T> bool				RemoveComponent(void);
 
+		void									Render(void);
+		void									Update(void);
+
+		Scene									*scene;
 		Transform								transform;
 		long									id;
 		std::string								tag;
@@ -58,10 +65,8 @@ bool						GameObject::AddComponent(Component *component)
 {
 	std::string name = std::string(typeid(T).name());
 	name.erase(std::remove_if(name.begin(), name.end(), &isdigit), name.end());
-	this->mutex.lock();
 	this->components[name] = component;
 	component->gameObject = this;
-	this->mutex.unlock();
 	return true;
 }
 
@@ -71,10 +76,8 @@ bool						GameObject::AddComponent( void )
 	std::string name = std::string(typeid(T).name());
 	name.erase(std::remove_if(name.begin(), name.end(), &isdigit), name.end());
 	T *component = new T();
-	this->mutex.lock();
 	this->components[name] = component;
 	component->gameObject = this;
-	this->mutex.unlock();
 	return true;
 }
 
@@ -83,13 +86,10 @@ bool						GameObject::RemoveComponent(void)
 {
 	std::string name = std::string(typeid(T).name());
 	name.erase(std::remove_if(name.begin(), name.end(), &isdigit), name.end());
-	this->mutex.lock();
 	if (this->components.count(name) == 0) {
-		this->mutex.unlock();
 		return false;
 	}
 	this->components[name] = NULL;
-	this->mutex.unlock();
 	return true;
 }
 
@@ -99,13 +99,10 @@ T*							GameObject::GetComponent(void)
 	std::string name = std::string(typeid(T).name());
 	T			*comp = NULL;
 	name.erase(std::remove_if(name.begin(), name.end(), &isdigit), name.end());
-	this->mutex.lock();
 	if (this->components.count(name) == 0) {
-		this->mutex.unlock();
 		return NULL;
 	}
 	comp = dynamic_cast<T*>(this->components[name]);
-	this->mutex.unlock();
 	return (comp);
 }
 // #############################################################################

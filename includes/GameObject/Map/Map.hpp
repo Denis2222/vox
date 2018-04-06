@@ -36,7 +36,7 @@ class Map
 		Chunk		*getChunkWorld(int x, int y, int z);
 		Chunk		*getChunkWorld(float x, float y, float z);
 
-
+		void 		explode(int x, int y , int z);
 		int			getBlockInfo(int x, int y, int z);
 		int			getBlockInfo(glm::vec3 v) ;
 		void 		getBlockInfoReallyMore(int qx,int qy,int  qz);

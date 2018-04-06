@@ -13,11 +13,17 @@
 			this->map = new Map();
 			this->map->updatePosition(this->camera->position);
 			this->map->updateChunkToLoad();
-			
-			this->model = new Model("assets/rocket/rocketlauncher.x");
+
+			//this->model = new Model("assets/shotgun/shotgun.obj");
 
 			//this->model = new Model("assets/spaceship/untitled.obj");
 
+
+		
+
+			this->scene = new Scene(this->camera);
+
+			//this->scene->Add(obj);
 
 			this->skybox = new Skybox();
 			this->loop();
@@ -46,11 +52,14 @@
 					this->map->SlowRender();
 				}
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				
+
 				this->camera->ProcessInput(map);
 				this->map->Render(this->camera->getView(), this->camera->getProjection(), this->camera->position);
 				this->skybox->render(this->camera);
-				this->model->Draw(this->camera);
+				//this->model->Draw(this->camera);
+
+				this->scene->Render();
+
 				glfwSwapBuffers(this->window);
 				glfwPollEvents();
 			}

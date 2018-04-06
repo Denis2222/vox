@@ -1,11 +1,32 @@
 #include <GameObject/Model.hpp>
 
+std::map<const std::string, Model*>	Model::model = std::map<const std::string, Model*>();
+
 // constructor, expects a filepath to a 3D model.
-Model::Model(std::string const &path, bool gamma)
+Model::Model (void)
 {
-	this->shader = new Shader();
-	this->shader->Load("model");
-	loadModel(path);
+	return ;
+}
+
+Model::Model ( Model const & src )
+{
+	*this = src;
+	return ;
+}
+Model::~Model ( void )
+{
+	return ;
+}
+
+bool Model::PreLoad(const std::string& key, std::string const &path, std::string const &shaderfile)
+{
+
+	Model *m = new Model();
+	
+	m->shader = new Shader();
+	m->shader->Load(shaderfile.c_str());
+	m->loadModel(path);
+	Model::model[key] = m;
 }
 
 // draws the model, and thus all its meshes
@@ -13,9 +34,16 @@ void Model::Draw(Camera *camera)
 {
 	glm::mat4 modelObj(1.0f);
 
+	modelObj = glm::translate(modelObj, glm::vec3(.15f, -0.05f, -0.05f)); // translate it down so it's at the center of the scene
+	modelObj = glm::rotate(modelObj, 1.6f, glm::vec3(0.00f, 1.0f, 0.0f));
+	modelObj = glm::scale(modelObj, glm::vec3(0.005f,0.005f, 0.005f));
+
+	/*
+	Rocket
 	modelObj = glm::translate(modelObj, glm::vec3(.2f, -0.0f, -0.2f)); // translate it down so it's at the center of the scene
 	modelObj = glm::rotate(modelObj, 0.0f, glm::vec3(0.00f, 1.0f, 0.0f));
 	modelObj = glm::scale(modelObj, glm::vec3(0.005f,0.005f, 0.005f));
+	*/
 
 	this->shader->use();
 	this->shader->setMat4("projection", camera->getProjection());

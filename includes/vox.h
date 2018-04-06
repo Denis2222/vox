@@ -53,6 +53,7 @@
 #include <ctime>
 #include <ratio>
 #include <chrono>
+#include <unordered_map>
 
 # include <stb_image.h>
 
@@ -89,6 +90,8 @@
 #include "static.h"
 
 #include <Camera.hpp>
+#include <Scene.hpp>
+#include <GameObject/GameObject.hpp>
 #include <GameObject/Map/Map.hpp>
 #include <GameObject/Map/Chunk.hpp>
 #include <GameObject/Shader.hpp>

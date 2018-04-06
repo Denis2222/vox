@@ -1,4 +1,4 @@
-#include "Camera.hpp"
+#include <Camera.hpp>
 
 Camera::Camera(unsigned int id, unsigned int w, unsigned int h, GLFWwindow *win) {
 	this->ID = id;
@@ -70,13 +70,15 @@ void 		Camera::ProcessInput(Map *map) {
 
 	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 		glm::vec3 detector;
-		for (float d = 0; d < 5.0f; d+=0.2f)
+		for (float d = 2.0f; d < 50.0f; d+=0.5f)
 		{
 			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
 			if (map->getBlockInfo(detector) > 1) {
 				int x = (int)round(detector.x);
 				int y = (int)round(detector.y);
 				int z = (int)round(detector.z);
+				map->explode(x, y, z);
+				/*
 				Chunk *c;
 				c = map->getChunkWorld(x, y, z);
 				if (c != NULL) {
@@ -86,7 +88,7 @@ void 		Camera::ProcessInput(Map *map) {
 						z = z - c->worldCoord.z;
 						c->interact( x, y, z, 0);
 					}
-				}
+				}*/
 				break;
 			}
 		}
@@ -94,7 +96,7 @@ void 		Camera::ProcessInput(Map *map) {
 
 	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 		glm::vec3 detector(0.0f,0.0f,0.0f);
-		for (float d = 1.1; d < 5.0f; d+=0.2f)
+		for (float d = 1.1; d < 7.0f; d+=0.5f)
 		{
 			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
 			if (map->getBlockInfo(detector) < 2) {
@@ -151,7 +153,7 @@ void 		Camera::ProcessInput(Map *map) {
 				this->jump--;
 			}
 		}
-		
+
 		if (map->getBlockInfo(m+glm::vec3(s, 0.0f, 0.0f)) > 1) {
 			position.x = posX-0.05f;
 		}
@@ -171,7 +173,7 @@ glm::mat4	Camera::getView(void) {
 	return (glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f) + front, up));
 }
 glm::mat4	Camera::getProjection(void) {
-	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.1f, FAR));
+	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.02f, FAR));
 }
 
 void 		Camera::mouse_callback(double xpos, double ypos) {

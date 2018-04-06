@@ -144,6 +144,43 @@ float		Map::distanceToChunk(int x, int y, int z) {
 	return (d);
 }
 
+void 		Map::explode(int x, int y , int z)
+{
+	glm::vec3 impact((float)x, (float)y, (float)z);
+	glm::vec3 toto((float)(x-3), (float)(y-3), (float)(z-3));
+	std::cout << "impact : " << glm::to_string(impact) << std::endl;
+
+	std::cout << "prediction max: " << glm::to_string(toto) << std::endl;
+
+	printf("test distance -3 -3 -3 : %f \n", glm::distance(impact, toto));
+
+	//for (int radius = 0; radius < 5; radius++) {
+		for (int X = -5; X < 6; X++) {
+			for (int Y = -5; Y < 6; Y++) {
+				for (int Z = -5; Z < 6; Z++) {
+					glm::vec3 here((float)(x+X), (float)(y+Y), (float)(z+Z));
+					//printf("distance : %f \n", glm::distance(here, impact));
+					if (glm::distance(here, impact) < 4.0f)
+					{
+						Chunk *c;
+						c = this->getChunkWorld(x+X, y+Y, z+Z);
+						if (c != NULL) {
+							if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE) {
+								printf("INTERACT\n");
+								c->interact( x + X - c->worldCoord.x, y + Y, z + Z - c->worldCoord.z, 0);
+							} else {
+								printf("Not STATE RENDER\n");
+							}
+						} else {
+							printf("Cant get Chunk \n");
+						}
+					}
+				}
+			}
+		}
+	//}
+}
+
 //Thread function for generate and build new chunk
 void 		generateAndBuildChunk(Chunk *c, int i) {
 	//	static long long timegenerate = 0;

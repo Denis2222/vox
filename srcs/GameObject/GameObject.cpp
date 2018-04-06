@@ -68,11 +68,11 @@ void						GameObject::Translate(glm::vec3 v)
 
 void									GameObject::Render(void) {
 	Model *model = this->GetComponent<Model>();
-	printf("GameObject render");
+	//printf("GameObject render");
 	model->Draw(this->scene->GetCamera());
 }
 void									GameObject::Update(void) {
-	
+
 }
 
 // ###############################################################

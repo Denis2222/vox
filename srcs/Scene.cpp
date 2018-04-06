@@ -3,7 +3,7 @@
 
 			Scene::Scene(Camera *camera) {
 				this->SetCamera(camera);
-				Model::PreLoad("shotgun", "assets/shotgun/shotgun.obj", "model");
+				Model::PreLoad("shotgun", "assets/rocket/rocketlauncher.x", "model");
 
 					GameObject *obj = new GameObject();
 
@@ -27,7 +27,7 @@
 		return (this->camera);
 	}
 
-	Camera	*Scene::SetCamera(Camera *camera) {
+	void 	Scene::SetCamera(Camera *camera) {
 		this->camera = camera;
 	}
 
@@ -47,13 +47,13 @@
 	void Scene::view(void) {
 		for (auto const &it : this->objects) {
 			GameObject *o = it.second;
-			printf("GameObject id: %d\n", o->id);
+			//printf("GameObject id: %d\n", o->id);
 		}
 	}
 
 	void Scene::Render(void) {
 		for (auto const &it : this->objects) {
-			printf("Each object !\n");
+			//printf("Each object !\n");
 			GameObject *c = it.second;
 			c->Update();
 			c->Render();

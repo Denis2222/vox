@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/04/05 10:04:15 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/04/06 23:47:54 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@
 
 #define CHUNK_HEIGHT 256
 
-#define FAR_MAP 320.0f
+#define FAR_MAP 360.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 #define MAX_CHUNK_INIT 15
 

@@ -30,7 +30,7 @@ int getHeight(int x, int z) {
 	//if (noise > 20)
 	//{
 		what = 400.0f; // Lissage
-		noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 70) + 40);
+		noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 70));
 	//}
 	//else
 	//{

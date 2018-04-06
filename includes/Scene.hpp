@@ -20,7 +20,7 @@ class Scene {
 
 
 		Camera	*GetCamera();
-		Camera	*SetCamera(Camera *camera);
+		void 	SetCamera(Camera *camera);
 
 		void view(void);
 		void Render(void);

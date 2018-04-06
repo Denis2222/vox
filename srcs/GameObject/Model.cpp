@@ -22,28 +22,30 @@ bool Model::PreLoad(const std::string& key, std::string const &path, std::string
 {
 
 	Model *m = new Model();
-	
+
 	m->shader = new Shader();
 	m->shader->Load(shaderfile.c_str());
 	m->loadModel(path);
 	Model::model[key] = m;
+	return true;
 }
 
 // draws the model, and thus all its meshes
 void Model::Draw(Camera *camera)
 {
 	glm::mat4 modelObj(1.0f);
-
+/*
 	modelObj = glm::translate(modelObj, glm::vec3(.15f, -0.05f, -0.05f)); // translate it down so it's at the center of the scene
 	modelObj = glm::rotate(modelObj, 1.6f, glm::vec3(0.00f, 1.0f, 0.0f));
 	modelObj = glm::scale(modelObj, glm::vec3(0.005f,0.005f, 0.005f));
+*/
 
-	/*
-	Rocket
+
+//	Rocket
 	modelObj = glm::translate(modelObj, glm::vec3(.2f, -0.0f, -0.2f)); // translate it down so it's at the center of the scene
 	modelObj = glm::rotate(modelObj, 0.0f, glm::vec3(0.00f, 1.0f, 0.0f));
 	modelObj = glm::scale(modelObj, glm::vec3(0.005f,0.005f, 0.005f));
-	*/
+
 
 	this->shader->use();
 	this->shader->setMat4("projection", camera->getProjection());

@@ -6,7 +6,7 @@
 /*   By: dmoureu- <dmoureu-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/17 15:25:14 by dmoureu-          #+#    #+#             */
-/*   Updated: 2018/04/04 04:35:46 by dmoureu-         ###   ########.fr       */
+/*   Updated: 2018/04/07 04:01:30 by dmoureu-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #  define GL3_PROTOTYPES 1
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
-//# include  <libnoise/noise.h>
+# include  <libnoise/noise.h>
 #  define OPENGL_VERSION_MAJOR 4
 #  define OPENGL_VERSION_MINOR 4
 # endif
@@ -26,7 +26,7 @@
 # ifdef __APPLE__
 #  include <GL/glew.h>
 #  include <GLFW/glfw3.h>
-//# include  <noise/noise.h>
+# include  <noise/noise.h>
 #  define OPENGL_VERSION_MAJOR 4
 #  define OPENGL_VERSION_MINOR 0
 # endif
@@ -53,6 +53,7 @@
 #include <ctime>
 #include <ratio>
 #include <chrono>
+#include <unordered_map>
 
 # include <stb_image.h>
 
@@ -70,13 +71,13 @@
 # define BASE_FOV 45.0f
 
 #define CHUNK_SIZE 32
-#define CHUNK_VIEW 16
+#define CHUNK_VIEW 15
 
 #define FAR 1000.0f
 
 #define CHUNK_HEIGHT 256
 
-#define FAR_MAP 320.0f
+#define FAR_MAP 460.0f
 #define FAR_CHUNK FAR_MAP+(CHUNK_SIZE*3)
 #define MAX_CHUNK_INIT 15
 
@@ -85,22 +86,25 @@
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
 
-#include "PerlinNoise.hpp"
+
 #include "static.h"
 
 #include <Camera.hpp>
+#include <Scene.hpp>
+#include <GameObject/GameObject.hpp>
 #include <GameObject/Map/Map.hpp>
 #include <GameObject/Map/Chunk.hpp>
 #include <GameObject/Shader.hpp>
 #include <GameObject/Skybox.hpp>
 #include <GameObject/Terrain.hpp>
+#include <GameObject/Model.hpp>
 #include <Voxel.hpp>
 
 int					getHeight(int x, int y);
-int					getHeight(int x, int y, int z);
 int 				getMoisture(int x, int y);
+int 				getTree(int x, int y, int z);
 int					getBlockType(int x, int y, int z, int height);
-glm::vec2 			getUVBlock(int val, int i);
+glm::vec3 			getUVBlock(int val, int i, int face);
 
 void 				noiseParam(int seed);
 

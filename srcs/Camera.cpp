@@ -1,4 +1,4 @@
-#include "Camera.hpp"
+#include <Camera.hpp>
 
 Camera::Camera(unsigned int id, unsigned int w, unsigned int h, GLFWwindow *win) {
 	this->ID = id;
@@ -31,7 +31,7 @@ void 		Camera::ProcessInput(Map *map) {
 	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		if (this->god)
-			deltaSpeed*=40;
+			deltaSpeed*=20;
 		else
 			deltaSpeed*=4;
 	}
@@ -68,18 +68,17 @@ void 		Camera::ProcessInput(Map *map) {
 
 	//Get where i am !
 
-
 	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		glm::vec3 detector(0.0f,0.0f,0.0f);
-		for (float d = 0; d < 5.0f; d+=0.2f)
+		glm::vec3 detector;
+		for (float d = 2.0f; d < 50.0f; d+=0.5f)
 		{
 			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
 			if (map->getBlockInfo(detector) > 1) {
-				//std::cout << "Quelque chose" << std::endl;
 				int x = (int)round(detector.x);
 				int y = (int)round(detector.y);
 				int z = (int)round(detector.z);
-				//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
+				map->explode(x, y, z);
+				/*
 				Chunk *c;
 				c = map->getChunkWorld(x, y, z);
 				if (c != NULL) {
@@ -89,7 +88,7 @@ void 		Camera::ProcessInput(Map *map) {
 						z = z - c->worldCoord.z;
 						c->interact( x, y, z, 0);
 					}
-				}
+				}*/
 				break;
 			}
 		}
@@ -97,15 +96,13 @@ void 		Camera::ProcessInput(Map *map) {
 
 	if ( glfwGetMouseButton(this->window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 		glm::vec3 detector(0.0f,0.0f,0.0f);
-		for (float d = 1.1; d < 5.0f; d+=0.2f)
+		for (float d = 1.1; d < 7.0f; d+=0.5f)
 		{
 			detector = position+glm::vec3(0.0f,0.5f,0.0f)+ (front * d);
 			if (map->getBlockInfo(detector) < 2) {
-				//std::cout << "Quelque chose" << std::endl;
 				int x = (int)round(detector.x);
 				int y = (int)round(detector.y);
 				int z = (int)round(detector.z);
-				//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
 				Chunk *c;
 				c = map->getChunkWorld(x, y, z);
 				if (c != NULL) {
@@ -121,146 +118,62 @@ void 		Camera::ProcessInput(Map *map) {
 		}
 	}
 
+	//God mode disable
+	if (!this->god)
+	{
+		glm::vec3 m = glm::round(this->position);
+		float pHeight = 1.0f; // Hauteur joueur
+		float s = 0.3f; // Side detection offset
+		float gravity = 0.3f;
+		unsigned int jumpPower = 45;
 
-	glm::vec3 m = glm::round(this->position);
-	Chunk *c;
-	if (1) {
-		int x = (int)round(m.x);
-		int y = (int)round(m.y);
-		int z = (int)round(m.z);
-		//printf("Case float : X:%f Y:%f Z:%f\n",m.x, m.y, m.z);
-		c = map->getChunkWorld(x, y, z);
-		if (c != NULL) {
-			if (c->state == Chunk::STATE::RENDER) {
-				x = x - c->worldCoord.x;
-				y = y;
-				z = z - c->worldCoord.z;
-
-				if (glfwGetKey(this->window, GLFW_KEY_R) == GLFW_PRESS) {
-					c->interact( x, y, z, 4);
-				}
-			}
-		} else {
-			std::cout << "Chunk Introuvable !" << std::endl;
-		}
-	}
-
-
-		float pHeight = 4.0f; // Hauteur joueur
-		//system("clear");
-
-		//printf("Current case positionx:%.2f y:%.2f z:%.2f \n", m.x, m.y, m.z);
+		//Gravity
 		m = this->position + glm::vec3(0.0f, 0.0f, 0.0f);
 		if (map->getBlockInfo(m+glm::vec3(0.0f, -pHeight, 0.0f)) < 2) {
-			//printf("ground x:%.2f y:%.2f z:%.2f \n", m.x, m.y-pHeight, m.z);
 			if (!this->god) {
 				this->grounded = false;
-				//if (this->jump == 0) {
-				position.y-= 0.3f;
-				//}
+				position.y-= gravity;
 			}
 		} else {
 			this->grounded = true;
 			this->jump = 0;
 		}
 
+		//Jump
 		if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 			if (this->grounded)
-				this->jump = 45;
+				this->jump = jumpPower;
 		}
 
-
-		if (this->jump > 0)
-		{
-			position.y+=(0.01f * this->jump);
-			this->jump--;
+		if (this->jump > 0) {
+			if (map->getBlockInfo(m+glm::vec3(0.0f, pHeight, 0.0f)) > 1) {
+				this->jump = 0;
+			} else {
+				position.y+=(0.01f * this->jump);
+				this->jump--;
+			}
 		}
 
-		float dN = 99.0f;
-		float dS = 99.0f;
-		float dE = 99.0f;
-		float dW = 99.0f;
-
-
-
-		float dSE = 99.0f;
-		float dSW = 99.0f;
-
-		float dNE = 99.0f;
-		float dNW = 99.0f;
-
-		float s = 0.3f;
-
-
-	if (!this->god)
-	{
-
-		//std::cout << "X+1";
-		if (map->getBlockInfo(m+glm::vec3(s, 0.0f, 0.0f)) > 1)
-		{
-			dW = glm::distance(m+glm::vec3(s, 0.0f, 0.0f), m);
-			//std::cout << "X+1 " << dW << std::endl;
+		if (map->getBlockInfo(m+glm::vec3(s, 0.0f, 0.0f)) > 1) {
 			position.x = posX-0.05f;
-			//position.x = posX;
 		}
-		//std::cout << "X-1";
-		if (map->getBlockInfo(m+glm::vec3(-s, 0.0f, 0.0f)) > 1)
-		{
-			dE = glm::distance(m+glm::vec3(-s, 0.0f, 0.0f), m);
-			//std::cout << "X-1 " << dE << std::endl;
+		if (map->getBlockInfo(m+glm::vec3(-s, 0.0f, 0.0f)) > 1) {
 			position.x = posX+0.05f;
-			//position.x = posX+0.1f;
 		}
-		//std::cout << "Z+1 ";
-		if (map->getBlockInfo(m+glm::vec3(0.0f, 0.0f, s)) > 1)
-		{
-			dN = glm::distance(m+glm::vec3(0.0f, 0.0f, s), m);
-			//std::cout << "Z+1 dN:" << dN << std::endl;
+		if (map->getBlockInfo(m+glm::vec3(0.0f, 0.0f, s)) > 1) {
 			position.z = posZ-0.05f;
 		}
-		//std::cout << "Z-1 ";
-		if (map->getBlockInfo(m+glm::vec3(0.0f, 0.0f, -s)) > 1)
-		{
-			dS = glm::distance(m+glm::vec3(0.0f, 0.0f, -s), m);
-			//std::cout << "Z-1 dS:" << dS << std::endl;
+		if (map->getBlockInfo(m+glm::vec3(0.0f, 0.0f, -s)) > 1) {
 			position.z = posZ+0.05f;
 		}
-/*
-		if (map->getBlockInfo(m+glm::vec3(s, 0.0f, s)) > 1)
-		{
-			dNW = glm::distance(m+glm::vec3(s, 0.0f, s), m);
-			std::cout << "X+1 Z+1 " << dNW << std::endl;
-			//position.x = posX;
-		}
-		if (map->getBlockInfo(m+glm::vec3(-s, 0.0f, s)) > 1)
-		{
-			dNE = glm::distance(m+glm::vec3(-s, 0.0f, s), m);
-			std::cout << "X-1 Z+1 " << dNE << std::endl;
-			//position.x = posX;
-		}
-		if (map->getBlockInfo(m+glm::vec3(s, 0.0f, -s)) > 1)
-		{
-			dSW = glm::distance(m+glm::vec3(s, 0.0f, -s), m);
-			std::cout << "X+1 Z-1 " << dSW << std::endl;
-			//position.z = posZ;
-		}
-		if (map->getBlockInfo(m+glm::vec3(-s, 0.0f, -s)) > 1)
-		{
-			dSE = glm::distance(m+glm::vec3(-s, 0.0f, -s), m);
-			std::cout << "X-1 Z-1 " << dSE << std::endl;
-			//position.z = posZ;
-		}*/
 	}
 }
 
 glm::mat4	Camera::getView(void) {
-	//glm::vec3 t(0.0f,position.y, 0.0f);
-	glm::vec3	realPosition = glm::vec3(0.0f, 0.0f,  0.0f);
-
-	return (glm::lookAt(realPosition, realPosition + front, up));
+	return (glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f) + front, up));
 }
 glm::mat4	Camera::getProjection(void) {
-	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.1f, FAR));
+	return (glm::perspective(glm::radians(80.0f), ((float)this->width / (float)this->height), 0.10f, FAR));
 }
 
 void 		Camera::mouse_callback(double xpos, double ypos) {
@@ -276,15 +189,12 @@ void 		Camera::mouse_callback(double xpos, double ypos) {
 	lastY = ypos;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
-
 	yaw   += xoffset;
     pitch += yoffset;
-
 	if(pitch > 89.0f)
 	  pitch =  89.0f;
 	if(pitch < -89.0f)
 	  pitch = -89.0f;
-
 	 front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
 	 front.y = sin(glm::radians(pitch));
 	 front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));

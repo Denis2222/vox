@@ -6,12 +6,20 @@
 # include <assimp/scene.h>
 # include <assimp/postprocess.h>
 # include <GameObject/Mesh.hpp>
+# include <GameObject/Component.hpp>
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
+struct Texture;
+class Mesh;
+class Camera;
 
-class Model
+class Model : public Component
 {
 	public:
+		static std::map<const std::string, Model*>	model;
+
+		Shader 			*shader;
+
 	    /*  Model Data */
 	    std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 	    std::vector<Mesh> meshes;
@@ -20,10 +28,12 @@ class Model
 
 	    /*  Functions   */
 	    // constructor, expects a filepath to a 3D model.
-	    Model(std::string const &path, bool gamma = false);
-
+	    Model(void);
+		Model ( Model const & src );
+		virtual ~Model(void);
+		static bool PreLoad(const std::string& key, std::string const &path, std::string const &shaderfile);
 	    // draws the model, and thus all its meshes
-	    void Draw(Shader shader);
+	    void Draw(Camera *camera);
 
 	private:
 	    /*  Functions   */

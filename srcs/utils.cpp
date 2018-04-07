@@ -1,24 +1,24 @@
 #include <vox.h>
 
 
-//noise::module::Perlin noiseModule;
-
-
-siv::PerlinNoise customNoise;
-
+noise::module::Perlin noiseModule;
 
 void noiseParam(int seed) {
-	/*
 	noiseModule.SetOctaveCount (6);
 	noiseModule.SetFrequency (1.0);
-	noiseModule.SetSeed(seed);*/
+	noiseModule.SetSeed(seed);
 }
 
-int getHeight(int x, int z)
-{
+double ridgenoise(int x, int z) {
+	float what = 200.0f;
+  return 2 * (0.5 - abs(0.5 - noiseModule.GetValue ((double)(x/what), 0,  (double)(z/what))));
+}
+
+int getHeight(int x, int z) {
 	int noise;
-	float scale = 20;
+	float what;
 	//Montagneux
+	what = 300.0f; // Lissage
 	//int noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 100) + 70);
 
 	//Plaines
@@ -29,13 +29,8 @@ int getHeight(int x, int z)
 	//int noise = getMoisture(x, z);
 	//if (noise > 20)
 	//{
-		float sampleX = x / scale;
-		float sampleZ = z / scale;
-		float f = customNoise.noise(sampleX, sampleZ);
-	//	std::cout << f << std::endl;
-		noise = f * 20 + 20;
-
-		//noise = (customNoise.octaveNoise((double)(x/what), 100, (double)(z/what), 4) * 70 ) + 20;
+		what = 400.0f; // Lissage
+		noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 70));
 	//}
 	//else
 	//{
@@ -50,16 +45,46 @@ int getHeight(int x, int z)
 	if (x==502 && z == 500)
 		noise = 5;
 	if (x==501 && z == 501)
-		noise = 6;
-*/
+		noise = 6;*/
+
 	return (noise);
 }
 
-int getMoisture(int x, int z)
-{
+int getTree(int x, int y, int z) {
+	int noise;
+	float what;
+	//Montagneux
+	what = 10.0f; // Lissage
+	//int noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 100) + 70);
+
+	//Plaines
+	//what = 1000;
+	//int noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 100) + 45);
+
+
+	//int noise = getMoisture(x, z);
+	//if (noise > 20)
+	//{
+		what = 2.0f; // Lissage
+		noise = ((int)(noiseModule.GetValue ((double)(x/what), 10,  (double)(z/what)) * 70) + 40);
+	//}
+	//else
+	//{
+	//	what = 800;
+	//	noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 100) + 5);
+	//}
+
+	if (noise > 105 && y > 8 && y < 40)
+		return (noise);
+	else
+		return (0);
+}
+
+
+int getMoisture(int x, int z) {
 	float what = 300.0f;
 	float that = 10;
-	int noise = (int)(customNoise.noise ((double)(x/what), (double)(z/what)) * 100);
+	int noise = (int)(noiseModule.GetValue ((double)(x/what), 0,  (double)(z/what))* 100);
 	return (noise);
 }
 
@@ -69,8 +94,8 @@ int		getBlockType(int x, int y, int z, int height) {
 	if (y <= height && y >= 10)
 		{
 			float what = 50.0f;
-			int noise = (int)(customNoise.noise ((double)(x/what),(double)(z/what))* 20);
-			if (noise > 20)
+			int noise = (int)(noiseModule.GetValue ((double)(x/what),(double)(y/what),  (double)(z/what))* 20);
+			if (noise > 22)
 				return (0);
 			/*else
 				if (noise >0 && noise < 10)
@@ -104,9 +129,104 @@ int		getBlockType(int x, int y, int z, int height) {
 	return (ROCK); // Rock
 }
 
-glm::vec2 getUVBlock(int val, int i)
+/*
+float *uvArray(int val, int i)
 {
-	glm::vec2 vec = glm::make_vec2(&VCUBEUV[i]);
+	float uv[108] = {
+		1.000000 , 0.000000, id,
+		0.000000 , 1.000000, id,
+		0.000000 , 0.000000, id,
+		1.000000 , 0.000000, id,
+		0.000000 , 1.000000, id,
+		0.000000 , 0.000000, id,
+		1.000000 , 0.000000, id2,
+		0.000000 , 1.000000, id2,
+		0.000000 , 0.000000, id2,
+		1.000000 , 0.000000, id2,
+		0.000000 , 1.000000, id2,
+		0.000000 , 0.000000, id2,
+		0.000000 , 0.000000, id3,
+		1.000000 , 1.000000, id3,
+		0.000000 , 1.000000, id3,
+		1.000000 , 0.000000, id3,
+		0.000000 , 1.000000, id3,
+		0.000000 , 0.000000, id3,
+		1.000000 , 0.000000, id4,
+		1.000000 , 1.000000, id4,
+		0.000000 , 1.000000, id4,
+		1.000000 , 0.000000, id4,
+		1.000000 , 1.000000, id4,
+		0.000000 , 1.000000, id4,
+		1.000000 , 0.000000, id5,
+		1.000000 , 1.000000, id5,
+		0.000000 , 1.000000, id5,
+		1.000000 , 0.000000, id5,
+		1.000000 , 1.000000, id5,
+		0.000000 , 1.000000, id5,
+		0.000000 , 0.000000, id6,
+		1.000000 , 0.000000, id6,
+		1.000000 , 1.000000, id6,
+		1.000000 , 0.000000, id6,
+		1.000000 , 1.000000, id6,
+		0.000000 , 1.000000, id6
+	}
+
+	return (uv[i]);
+}
+*/
+
+/*
+glm::vec3 getUVBlockV2(int type, int nb, int face)
+{
+	if (nb == 0)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 1)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 2)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 3)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 4)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+	if (nb == 5)
+		return (glm::vec3(1.0f, 0.0f, 1.1f));
+}*/
+
+glm::vec3 getUVBlock(int val, int i, int face)
+{
+	//printf("val:%d i:%d \n", val , i);
+	glm::vec2 vec = glm::make_vec2(&CUBEUV[i]);
+
+	float type = 3.1f;
+	if (val == GRASS)
+	{
+		if (face == 0 || face == 1)
+			type = 0.1f;
+		else
+			type = 1.1;
+	} else if (val == FOREST) {
+		if (face == 0 || face == 1)
+			type = 4.1f;
+		else
+			type = 5.1;
+	} else if (val == ICE) {
+		if (face == 0 || face == 1)
+			type = 2.1f;
+		else
+			type = 3.1;
+	} else if (val == SAND) {
+		type = 7.1f;
+	} else if (val == ROCK) {
+		type = 6.1f;
+	} else if (val == WATER) {
+		type = 8.1f;
+	} else if (val ==TREE_BOT) {
+		type = 9.1f;
+	} else if (val ==TREE_LEAVE) {
+		type = 10.1f;
+	}
+	glm::vec3 f = glm::vec3(vec.x, vec.y, type);
+	/*
 	if (val == WATER)
 		vec = glm::make_vec2(&VCUBEUVWATER[i]);
 	else if (val == ROCK)
@@ -116,8 +236,8 @@ glm::vec2 getUVBlock(int val, int i)
 	else if (val == GRASS)
 		vec = glm::make_vec2(&VCUBEUVGRASS[i]);
 	else if (val == SAND)
-		vec = glm::make_vec2(&VCUBEUVSAND[i]);
-	return (vec);
+		vec = glm::make_vec2(&VCUBEUVSAND[i]);*/
+	return (f);
 }
 
 

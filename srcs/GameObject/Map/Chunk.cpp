@@ -5,7 +5,6 @@
 			this->worldCoord = glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
 			this->state = STATE::INIT;
 			this->map = map;
-
 			this->blocks = (unsigned char*)malloc(sizeof(unsigned char) *  CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT);
 			bzero(this->blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT * sizeof(unsigned char));
 		}
@@ -41,106 +40,39 @@ void	Chunk::setWorld(int x, int y, int z, int val) {
 }
 
 void 	Chunk::interact(int x, int y, int z, int val) {
+	Chunk  *c;
 	this->setWorld(x, y, z, val);
 	this->state = STATE::TOUPDATE;
-	if (x % CHUNK_SIZE == 0 || z % CHUNK_SIZE == 0) { // Si on est en bord de chunk on refresh les 4 autour ( ou 1 si c le meme...)
-		std::cout << "UPDATE SPECIAL * 4" << std::endl;
-		Chunk  *c = this->map->getChunk(x + 1, 0, z + 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-				c = this->map->getChunk(x - 1, 0, z + 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-				c = this->map->getChunk(x + 1, 0, z - 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-				c = this->map->getChunk(x - 1, 0, z - 1);
-					if (c)
-						c->state = STATE::TOUPDATE;
-	}
-}
 
-bool	Chunk::collideDebug(int x, int y, int z, int way) {
-
-/*
-	printf("worldCoord(%d, %d, %d) \n", (int)this->worldCoord.x, (int)this->worldCoord.y, (int)this->worldCoord.z);*/
-	bool retour = false;
-	int type = -1;
-
-
-	//printf("extern\n");
-	int qx = x;
-	int qy = y;
-	int qz = z;
-
-	if (way == 1) // UP
-		qy = qy + 1;
-	if (way == 2) // DOWN
-		qy = qy - 1;
-	if (way == 3) // EST
-		qx = qx + 1;
-	if (way == 4) // OUEST
-		qx = qx - 1;
-	if (way == 5) // NORD
-		qz = qz + 1;
-	if (way == 6) // SUD
-		qz = qz - 1;
-
-	//Haut ou bas, facile
-	if (way == 1 || way == 2)
-	{
-		if (getWorld(qx, qy , qz) > 1)
-			retour = true;
-		if (getWorld(qx, qy , qz) == 0)
-			retour = true;
-		else if (qy == -1)
-			retour = true;
-	}
-	else if (qx >= 0  && qx < CHUNK_SIZE && qz >= 0 && qz < CHUNK_SIZE) {
-		//On est dans le chunk
-		int val = getWorld(qx, qy , qz);
-		if (val > 1) // Know type, dont need face
-			retour = true;
-		else if (val == 1) // Empty bloc, put face
-			retour = false;
-		else if (val == 0) //Unknow val probably useless; say collide
-			retour = true;
-		printf("Inchunk : info: %d retour :\n", val, (int)retour);
-	}
-	else { //Out of chunk ! Ask to map
-		type = this->map->getBlockInfo(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z);
-
-		if (type > 1)
-			retour = true;
-		else if (type <= 0) //Unknow chunk, or unknow block Ask to noise
-		{
-			int noise = getHeight(qx + (int)this->worldCoord.x, qz + (int)this->worldCoord.z);
-			if (qy <= noise)
+	if (x == CHUNK_SIZE - 1 || x == 0) {
+		c = this->map->getChunk(this->localCoord.x - 1.0f, 0, this->localCoord.z);
+			if (c)
 			{
-				type = getBlockType(qx + (int)this->worldCoord.x, qy, qz + (int)this->worldCoord.z, noise);
-				if (type > 1)
-					retour = true;
-				else
-					retour = false;
-			} else {
-				retour = false;
+				c->state = STATE::TOUPDATE;
 			}
-		} else if (type == 1) {
-			retour = false;
-		}
-		printf("Askmap : x:%d y:%d z:%d type: %d ", qx + (int)this->worldCoord.x, qy, qz+(int)this->worldCoord.z, type);
-		if (retour)
-			printf(" !MUR \n");
-		else
-			printf(" MUR \n");
-
+		c = this->map->getChunk(this->localCoord.x + 1.0f, 0, this->localCoord.z);
+			if (c)
+			{
+				c->state = STATE::TOUPDATE;
+			}
 	}
-	return (retour);
+	if (z == CHUNK_SIZE - 1 || z == 0) {
+		c = this->map->getChunk(this->localCoord.x, 0, this->localCoord.z - 1.0f);
+			if (c)
+			{
+				c->state = STATE::TOUPDATE;
+			}
+		c = this->map->getChunk(this->localCoord.x, 0, this->localCoord.z + 1.0f);
+			if (c)
+			{
+				c->state = STATE::TOUPDATE;
+			}
+	}
 }
 
 void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 	static int oneFace = ((sizeof(VCUBE) / 4)/6/2);
-	static int oneFaceUV = ((sizeof(VCUBEUV) / 4)/6/2);
+	static int oneFaceUV = ((sizeof(CUBEUV) / 4)/6/2);
 	int u = n + 1;
 
 	for (int i = oneFace * n; i < oneFace * u; i+=3)
@@ -163,18 +95,19 @@ void	Chunk::buildFace(int n, int x, int y, int z, int val) {
 
 	for (int i = oneFaceUV * n; i < oneFaceUV * u; i+=2)
 	{
-		glm::vec2 vec = getUVBlock(val, i);
+		glm::vec3 vec = getUVBlock(val, i, n);
 		uvs.push_back(vec);
 	}
 
 	for (int i = oneFaceUV * n + 36; i < oneFaceUV * u + 36; i+=2)
 	{
-		glm::vec2 vec = getUVBlock(val, i);
+		glm::vec3 vec = getUVBlock(val, i, n);
 		uvs.push_back(vec);
 	}
 }
 
 void	Chunk::generate(void) {
+
 	int sx, sy, sz;
 	sx = this->worldCoord.x;
 	sy = this->worldCoord.y;
@@ -183,20 +116,37 @@ void	Chunk::generate(void) {
 	this->minheight = 256;
 	this->maxheight = 0;
 
-
-
-
-
 	for (int x = 0; x < CHUNK_SIZE; x++) {
 		for (int z = 0; z < CHUNK_SIZE; z++) {
-
 			int height = getHeight(x + sx, z + sz);
 
 			for (int y = 0; y < CHUNK_HEIGHT && y <= height; y++) {
 				if (y <= height)
-					setWorld(x, y, z, getBlockType(x + sx, y, z + sz, height));
-			}
+				{
+					int type = getBlockType(x + sx, y, z + sz, height);
+					setWorld(x, y, z, type);
+					if (type > 1)
+					{
+						//Make tree
+						//TODO put somewhere else
+						if (y == height && y > 0 && y < CHUNK_SIZE - 1 && z > 0 && z < CHUNK_SIZE - 1 )
+						{
+							if (int htree = getTree(x + sx, y, z + sz)/15)
+							{
+								for (int j = 1; j < htree; j++){
+									setWorld(x, height+j, z, BLOCK::TREE_BOT);
+								}
+								setWorld(x+1, height+htree, z, BLOCK::TREE_LEAVE);
+								setWorld(x-1, height+htree, z, BLOCK::TREE_LEAVE);
+								setWorld(x, height+htree, z+1, BLOCK::TREE_LEAVE);
+								setWorld(x, height+htree, z-1, BLOCK::TREE_LEAVE);
+								setWorld(x, height+htree+1, z, BLOCK::TREE_LEAVE);
+							}
+						}
+					}
+				}
 
+			}
 		}
 	}
 	this->state = STATE::GENERATE;
@@ -242,7 +192,7 @@ void 	Chunk::build(void) {
 			}
 		}
 	}
-	sizeuv = this->uvs.size() * sizeof(glm::vec2);
+	sizeuv = this->uvs.size() * sizeof(glm::vec3);
 	sizevert = this->points.size() * sizeof(glm::vec3);
 	nb = (this->points.size());
 	this->state = STATE::BUILD;
@@ -327,7 +277,7 @@ unsigned int Chunk::buildVAO(void) {
 	glGenBuffers(1, &this->VBO_UV);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO_UV);
 	glBufferData(GL_ARRAY_BUFFER, this->getSizeUVs(), this->getUVs(), GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(0));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(0));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

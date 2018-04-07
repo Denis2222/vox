@@ -54,7 +54,7 @@
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 				this->camera->ProcessInput(map);
-				this->map->Render(this->camera->getView(), this->camera->getProjection(), this->camera->position);
+				this->map->Render(this->camera);
 				this->skybox->render(this->camera);
 				//this->model->Draw(this->camera);
 

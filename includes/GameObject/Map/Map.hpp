@@ -43,7 +43,7 @@ class Map
 
 		void		updatePosition(glm::vec3 position);
 		void 		updateChunkToLoad(void);
-		void 		Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position);
+		void 		Render(Camera *camera);
 		void 		SlowRender(void);
 
 	private:

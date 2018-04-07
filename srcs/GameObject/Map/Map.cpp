@@ -346,17 +346,18 @@ void 		Map::SlowRender(void) {
 	}
 }
 
-void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
+void 		Map::Render(Camera *camera) {
 	std::list<Chunk*>::iterator	iter;
 	Chunk *c;
 
-	this->position = position;
+	this->position = camera->position;
 	glm::mat4 modelidentity(1.0f);
 	glm::mat4 model(1.0f);
 	this->program->use();
-	this->program->setMat4("projection", projection);
+
+	this->program->setMat4("projection", camera->getProjection());
 	this->program->setMat4("model", model);
-	this->program->setMat4("view", view);
+	this->program->setMat4("view", camera->getView());
 
 	glm::vec4 lightpos(this->position.x, 5000.0f,  this->position.z, 0);
 	this->program->setVec3("lightPos", lightpos);
@@ -370,17 +371,44 @@ void 		Map::Render(glm::mat4 view, glm::mat4 projection, glm::vec3 position) {
 		glBindTexture(GL_TEXTURE_2D, this->textures[tex.first]);
 	}
 
+	float roty = fmod(glm::degrees(glm::radians(camera->yaw)), 360.0f);
+	if (roty < 0)
+		roty = 360 + roty;
+
 	iter = this->renderList.begin();
-	while(iter != this->renderList.end()) {
+	for(;iter != this->renderList.end(); iter++) {
 		c = (*iter);
 
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE) {
+			int test = -10;
+			if (roty > 60 + test && roty < 160 + test
+				&& c->worldCoord.z < (this->position.z - (this->position.y + CHUNK_SIZE)))
+				continue ;
+			if ((roty > 230 + test && roty < 340 + test)
+					&& c->worldCoord.z > (this->position.z + (this->position.y + CHUNK_SIZE)))
+				continue ;
+			if ((roty > 150 + test && roty < 250 + test)
+					&& c->worldCoord.x > (this->position.x + (this->position.y + CHUNK_SIZE)))
+				continue ;
+			if ((roty > 340 + test || roty < 60 + test)
+					&& c->worldCoord.x < (this->position.x - (this->position.y + CHUNK_SIZE)))
+				continue ;
+
+
+
+
+
+
+
+
+
+
+
 			glm::mat4 myMatrix = glm::translate(model, c->worldCoord - this->position);
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, c->getTriangle());
 		}
-		iter++;
 	}
 }
 

@@ -65,7 +65,6 @@ void 	Chunk::interact(int x, int y, int z, int val) {
 		c = this->map->getChunk(this->localCoord.x, 0, this->localCoord.z + 1.0f);
 			if (c)
 			{
-				std::cout << "One more to update" << std::endl;
 				c->state = STATE::TOUPDATE;
 			}
 	}

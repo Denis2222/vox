@@ -39,13 +39,13 @@ int getHeight(int x, int z) {
 	//}
 	if (noise < 1)
 		noise = 1;
-
+/*
 	if (x==500 && z == 500)
 		noise = 4;
 	if (x==502 && z == 500)
 		noise = 5;
 	if (x==501 && z == 501)
-		noise = 6;
+		noise = 6;*/
 
 	return (noise);
 }
@@ -74,7 +74,7 @@ int getTree(int x, int y, int z) {
 	//	noise = ((int)(noiseModule.GetValue ((double)(x/what), 100,  (double)(z/what)) * 100) + 5);
 	//}
 
-	if (noise > 100 && y > 6)
+	if (noise > 105 && y > 8 && y < 40)
 		return (noise);
 	else
 		return (0);

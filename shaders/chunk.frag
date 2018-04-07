@@ -1,7 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 in vec3 TexCoord;
-uniform sampler2D texturelol[16];
+uniform sampler2D texturelol[12];
 //uniform sampler2D texture2;
 uniform vec3 lightPos;
 in vec3 pos;
@@ -27,7 +27,11 @@ void main()
     //vec3 diffuse = vec3((diff * vec3(1,1,1)));
     //vec3 ambiant = vec3((vec3(0.7,0.7,0.7)));
 
-
+	if (FragPos.y <= 5.5f)
+	{
+		FragColor = vec4(mix(vec3(0.1, 0.1, 0.9), mix(vec3(0.02, 0.58, 0.69), texture(texturelol[int(TexCoord.z)], TexCoord.xy).rgb, 0.6), FragPos.y / 5.5f), 1);
+		return ;
+	}
 
     //FragColor = vec4(mix(fogColor, texture(texturelol[int(TexCoord.z)], TexCoord.xy).rgb, fogFactor) * (diffuse/3 + ambiant), 1);
 	FragColor = vec4(texture(texturelol[int(TexCoord.z)], TexCoord.xy).rgb /** (diffuse/3 + ambiant)*/ ,1);

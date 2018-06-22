@@ -9,6 +9,7 @@ apt-get install
           libnoise-dev
           libglm-dev
           libgl1-mesa-dev
+          libassimp-dev
 
 
 make -j8

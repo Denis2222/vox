@@ -65,7 +65,15 @@
 			}
 		}
 
+		//Scotch Callback error glfw
+		static	void error_callback(int error, const char* description)
+		{
+			fprintf(stderr, "Error: %s\n", description);
+		}
+
 		void Voxel::glfwStart (bool fullscreen) {
+			//Callback error glfw
+			glfwSetErrorCallback(error_callback);
 			if (!glfwInit()) {
 				std::cout << "Failed to initialize GLFW\n" << std::endl;
 				exit(0);

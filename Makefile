@@ -3,7 +3,7 @@ ifeq ($(UNAME), Linux)
 	GCC_FLAG = -std=c++14 -Ofast
 	DL_INC = -I./includes -I./glmc -I./libft
 	DL_FLAG_DIR =
-	DL_FLAG = -lGLU -lGL -lglfw -lGLEW -lGLU -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lassimp -lnoise
+	DL_FLAG = -lGLU -lglfw -lGLEW -lGL -ldl -lm -lpthread -lXxf86vm -lX11 -lassimp -lnoise -lXrandr -lXi
 endif
 ifeq ($(UNAME), Darwin)
 	GCC_FLAG = -std=c++14 -Ofast
@@ -38,7 +38,12 @@ OBJDIR = ./objs
 SRCS=$(addprefix $(SRCDIR),$(SRC))
 OBJS = $(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
 
-all: $(NAME)
+all: check $(NAME)
+
+check:
+	@echo "apt-get install libgl-dev libglew-dev libglfw3 libglfw3-dev libnoise-dev libglm-dev libgl1-mesa-dev"
+	@echo "If	-lGL error : check : /usr/lib/libGL.so"
+	@echo "IFNOT=>  ln -s /usr/lib/libGL.so.1 /usr/lib/libGL.so"
 
 $(addprefix $(OBJDIR)/, %.o): $(addprefix $(SRCDIR)/, %.cpp)
 	$(dir_guard)

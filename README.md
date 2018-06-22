@@ -1,9 +1,14 @@
 # vox
 
-apt-get install 
-          libgl-dev 
+debian 9 need:
+apt-get install
+          libgl-dev
           libglew-dev
           libglfw3
           libglfw3-dev
           libnoise-dev
-        
+          libglm-dev
+          libgl1-mesa-dev
+
+
+make -j8

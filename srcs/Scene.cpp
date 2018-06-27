@@ -3,7 +3,8 @@
 
 			Scene::Scene(Camera *camera) {
 				this->SetCamera(camera);
-				Model::PreLoad("shotgun", "assets/rocket/rocketlauncher.x", "model");
+				/*
+					Model::PreLoad("shotgun", "assets/rocket/rocketlauncher.x", "model");
 
 					GameObject *obj = new GameObject();
 
@@ -16,7 +17,7 @@
 
 
 					this->Add(obj);
-
+					*/
 			}
 
 			Scene::~Scene(void) {

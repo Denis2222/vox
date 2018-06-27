@@ -12,6 +12,7 @@ C++ code compatible debian & osx
 opengl>3 glfw3 glm assimp libnoise
 
 ```
+#debian
 apt-get install
           libgl-dev
           libglew-dev
@@ -21,6 +22,9 @@ apt-get install
           libglm-dev
           libgl1-mesa-dev
           libassimp-dev
+          
+#osx
+brew install ...
 ```
 
 ### Installing

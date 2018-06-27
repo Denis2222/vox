@@ -13,3 +13,6 @@ apt-get install
 
 
 make -j8
+
+
+![ft_vox](https://github.com/Denis2222/vox/blob/master/example/ft_vox.gif?raw=true)

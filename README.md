@@ -5,6 +5,7 @@
 ## Getting Started
 
 C++ code compatible debian & osx
+
 ![ft_vox](https://github.com/Denis2222/vox/blob/master/example/ft_vox.gif?raw=true)
 
 ### Prerequisites

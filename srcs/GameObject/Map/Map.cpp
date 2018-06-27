@@ -380,6 +380,8 @@ void 		Map::Render(Camera *camera) {
 		c = (*iter);
 
 		if (c->state == Chunk::STATE::RENDER || Chunk::STATE::TOUPDATE) {
+
+			/*
 			int test = -10;
 			if (roty > 60 + test && roty < 160 + test
 				&& c->worldCoord.z < (this->position.z - (this->position.y + CHUNK_SIZE)))
@@ -393,17 +395,7 @@ void 		Map::Render(Camera *camera) {
 			if ((roty > 340 + test || roty < 60 + test)
 					&& c->worldCoord.x < (this->position.x - (this->position.y + CHUNK_SIZE)))
 				continue ;
-
-
-
-
-
-
-
-
-
-
-
+*/
 			glm::mat4 myMatrix = glm::translate(model, c->worldCoord - this->position);
 			this->program->setMat4("model", myMatrix);
 			glBindVertexArray(c->VAO);

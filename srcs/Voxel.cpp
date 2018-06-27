@@ -85,16 +85,16 @@
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-			this->width = 2048;
-			this->height = 1536;
+			this->width = WIDTH;
+			this->height = HEIGHT;
 			if (fullscreen) {
 				const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 				this->width = mode->width;
 				this->height = mode->height;
 				this->window = glfwCreateWindow(this->width, this->height, TITLE, glfwGetPrimaryMonitor(), NULL);
 			} else {
-				this->width = 2048;
-				this->height = 1536;
+				this->width = WIDTH;
+				this->height = HEIGHT;
 				this->window = glfwCreateWindow(this->width, this->height, TITLE, NULL, NULL);
 			}
 

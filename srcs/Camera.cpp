@@ -36,6 +36,14 @@ void 		Camera::ProcessInput(Map *map) {
 			deltaSpeed*=4;
 	}
 
+	if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		if (this->god)
+			deltaSpeed*=100;
+		else
+			deltaSpeed*=4;
+	}
+
 	float posY = position.y;
 	float posX = position.x;
 	float posZ = position.z;

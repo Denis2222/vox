@@ -43,4 +43,4 @@ And runing
 
 ## Built With
 
-* g++
+* g++ opengl glfw3 glm assimp
